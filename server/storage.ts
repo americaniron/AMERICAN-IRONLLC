@@ -1,38 +1,157 @@
-import { type User, type InsertUser } from "@shared/schema";
-import { randomUUID } from "crypto";
-
-// modify the interface with any CRUD methods
-// you might need
+import {
+  type Equipment,
+  type InsertEquipment,
+  type Part,
+  type InsertPart,
+  type QuoteRequest,
+  type InsertQuoteRequest,
+  type ContactInquiry,
+  type InsertContactInquiry,
+  type User,
+  type InsertUser,
+  equipment,
+  parts,
+  quoteRequests,
+  contactInquiries,
+  users,
+} from "@shared/schema";
+import { db } from "./db";
+import { eq, ilike, or, sql } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+
+  getEquipment(filters?: { category?: string; search?: string }): Promise<Equipment[]>;
+  getEquipmentById(equipmentId: string): Promise<Equipment | undefined>;
+  createEquipment(data: InsertEquipment): Promise<Equipment>;
+
+  getParts(filters?: { category?: string; search?: string }): Promise<Part[]>;
+  createPart(data: InsertPart): Promise<Part>;
+
+  createQuoteRequest(data: InsertQuoteRequest): Promise<QuoteRequest>;
+  createContactInquiry(data: InsertContactInquiry): Promise<ContactInquiry>;
+
+  getEquipmentCount(): Promise<number>;
+  getPartsCount(): Promise<number>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
-
-  constructor() {
-    this.users = new Map();
-  }
-
+export class DatabaseStorage implements IStorage {
   async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
+    const [user] = await db.insert(users).values(insertUser).returning();
     return user;
+  }
+
+  async getEquipment(filters?: { category?: string; search?: string }): Promise<Equipment[]> {
+    let query = db.select().from(equipment);
+
+    const conditions = [];
+
+    if (filters?.category) {
+      conditions.push(eq(equipment.category, filters.category));
+    }
+
+    if (filters?.search) {
+      const searchTerm = `%${filters.search}%`;
+      conditions.push(
+        or(
+          ilike(equipment.make, searchTerm),
+          ilike(equipment.model, searchTerm),
+          ilike(equipment.equipmentId, searchTerm),
+          ilike(equipment.city, searchTerm),
+          ilike(equipment.state, searchTerm),
+          sql`CONCAT(${equipment.make}, ' ', ${equipment.model}) ILIKE ${searchTerm}`,
+        )!
+      );
+    }
+
+    if (conditions.length > 0) {
+      let combined = conditions[0]!;
+      for (let i = 1; i < conditions.length; i++) {
+        combined = sql`${combined} AND ${conditions[i]}`;
+      }
+      query = query.where(combined) as any;
+    }
+
+    return query.limit(200);
+  }
+
+  async getEquipmentById(equipmentId: string): Promise<Equipment | undefined> {
+    const [item] = await db.select().from(equipment).where(eq(equipment.equipmentId, equipmentId));
+    return item;
+  }
+
+  async createEquipment(data: InsertEquipment): Promise<Equipment> {
+    const [item] = await db.insert(equipment).values(data).returning();
+    return item;
+  }
+
+  async getParts(filters?: { category?: string; search?: string }): Promise<Part[]> {
+    let query = db.select().from(parts);
+
+    const conditions = [];
+
+    if (filters?.category) {
+      conditions.push(eq(parts.category, filters.category));
+    }
+
+    if (filters?.search) {
+      const searchTerm = `%${filters.search}%`;
+      conditions.push(
+        or(
+          ilike(parts.partNumber, searchTerm),
+          ilike(parts.description, searchTerm),
+          ilike(parts.compatibility, searchTerm),
+        )!
+      );
+    }
+
+    if (conditions.length > 0) {
+      let combined = conditions[0]!;
+      for (let i = 1; i < conditions.length; i++) {
+        combined = sql`${combined} AND ${conditions[i]}`;
+      }
+      query = query.where(combined) as any;
+    }
+
+    return query.limit(200);
+  }
+
+  async createPart(data: InsertPart): Promise<Part> {
+    const [item] = await db.insert(parts).values(data).returning();
+    return item;
+  }
+
+  async createQuoteRequest(data: InsertQuoteRequest): Promise<QuoteRequest> {
+    const [item] = await db.insert(quoteRequests).values(data).returning();
+    return item;
+  }
+
+  async createContactInquiry(data: InsertContactInquiry): Promise<ContactInquiry> {
+    const [item] = await db.insert(contactInquiries).values(data).returning();
+    return item;
+  }
+
+  async getEquipmentCount(): Promise<number> {
+    const [result] = await db.select({ count: sql<number>`count(*)` }).from(equipment);
+    return Number(result.count);
+  }
+
+  async getPartsCount(): Promise<number> {
+    const [result] = await db.select({ count: sql<number>`count(*)` }).from(parts);
+    return Number(result.count);
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
