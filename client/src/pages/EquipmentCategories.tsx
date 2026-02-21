@@ -1,5 +1,6 @@
 import { Link } from "wouter";
-import { ArrowRight } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { ArrowRight, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -35,9 +36,16 @@ const EQUIPMENT_CATEGORIES = [
   { name: "COLD PLANERS", label: "Cold Planers", image: coldPlanerImg },
   { name: "ASPHALT PAVERS", label: "Asphalt Pavers", image: asphaltPaversImg },
   { name: "FORESTRY EQUIPMENT", label: "Forestry Equipment", image: forestryImg },
+  { name: "OTHER EQUIPMENT", label: "Other Equipment", image: null },
 ];
 
 export default function EquipmentCategories() {
+  const { data: counts } = useQuery<Record<string, number>>({
+    queryKey: ["/api/equipment/categories/counts"],
+  });
+
+  const totalItems = counts ? Object.values(counts).reduce((a, b) => a + b, 0) : 0;
+
   return (
     <div>
       <section className="relative py-20 overflow-hidden">
@@ -51,7 +59,7 @@ export default function EquipmentCategories() {
             Equipment Categories
           </h1>
           <p className="text-white/70 text-lg max-w-2xl">
-            Browse our comprehensive inventory of 1,700+ pieces of heavy equipment across all major categories.
+            Browse our comprehensive inventory of {totalItems > 0 ? `${totalItems.toLocaleString()}+` : ""} pieces of heavy equipment across all major categories.
           </p>
         </div>
       </section>
@@ -69,14 +77,25 @@ export default function EquipmentCategories() {
                   data-testid={`card-category-${cat.name.toLowerCase().replace(/\s+/g, "-")}`}
                 >
                   <div className="aspect-[16/10] relative rounded-t-md overflow-hidden bg-muted">
-                    <img
-                      src={cat.image}
-                      alt={cat.label}
-                      className="w-full h-full object-contain bg-white transition-transform duration-500 group-hover:scale-105"
-                    />
+                    {cat.image ? (
+                      <img
+                        src={cat.image}
+                        alt={cat.label}
+                        className="w-full h-full object-contain bg-white transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-card flex items-center justify-center">
+                        <Wrench className="w-16 h-16 text-muted-foreground/30" />
+                      </div>
+                    )}
                   </div>
                   <div className="p-5 flex items-center justify-between">
-                    <h3 className="font-bold text-lg">{cat.label}</h3>
+                    <div>
+                      <h3 className="font-bold text-lg">{cat.label}</h3>
+                      {counts && counts[cat.name] && (
+                        <span className="text-sm text-muted-foreground">{counts[cat.name].toLocaleString()} items</span>
+                      )}
+                    </div>
                     <ArrowRight className="w-5 h-5 text-accent opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
                 </Card>

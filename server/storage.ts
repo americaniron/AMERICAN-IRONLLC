@@ -23,9 +23,10 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
 
-  getEquipment(filters?: { category?: string; search?: string }): Promise<Equipment[]>;
+  getEquipment(filters?: { category?: string; search?: string; page?: number; limit?: number }): Promise<{ items: Equipment[]; total: number }>;
   getEquipmentById(equipmentId: string): Promise<Equipment | undefined>;
   createEquipment(data: InsertEquipment): Promise<Equipment>;
+  getEquipmentCategoryCounts(): Promise<Record<string, number>>;
 
   getParts(filters?: { category?: string; search?: string }): Promise<Part[]>;
   createPart(data: InsertPart): Promise<Part>;
@@ -53,8 +54,10 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async getEquipment(filters?: { category?: string; search?: string }): Promise<Equipment[]> {
-    let query = db.select().from(equipment);
+  async getEquipment(filters?: { category?: string; search?: string; page?: number; limit?: number }): Promise<{ items: Equipment[]; total: number }> {
+    const page = filters?.page || 1;
+    const limit = filters?.limit || 24;
+    const offset = (page - 1) * limit;
 
     const conditions = [];
 
@@ -76,15 +79,45 @@ export class DatabaseStorage implements IStorage {
       );
     }
 
+    let whereClause: any = undefined;
     if (conditions.length > 0) {
       let combined = conditions[0]!;
       for (let i = 1; i < conditions.length; i++) {
         combined = sql`${combined} AND ${conditions[i]}`;
       }
-      query = query.where(combined) as any;
+      whereClause = combined;
     }
 
-    return query.limit(200);
+    const countQuery = db.select({ count: sql<number>`count(*)` }).from(equipment);
+    if (whereClause) {
+      countQuery.where(whereClause);
+    }
+    const [countResult] = await countQuery;
+    const total = Number(countResult.count);
+
+    let itemsQuery = db.select().from(equipment);
+    if (whereClause) {
+      itemsQuery = itemsQuery.where(whereClause) as any;
+    }
+    const items = await (itemsQuery as any).limit(limit).offset(offset);
+
+    return { items, total };
+  }
+
+  async getEquipmentCategoryCounts(): Promise<Record<string, number>> {
+    const results = await db
+      .select({
+        category: equipment.category,
+        count: sql<number>`count(*)`,
+      })
+      .from(equipment)
+      .groupBy(equipment.category);
+
+    const counts: Record<string, number> = {};
+    for (const row of results) {
+      counts[row.category] = Number(row.count);
+    }
+    return counts;
   }
 
   async getEquipmentById(equipmentId: string): Promise<Equipment | undefined> {

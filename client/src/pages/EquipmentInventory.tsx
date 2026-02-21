@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, useSearch, useLocation } from "wouter";
+import { useState, useEffect } from "react";
+import { Link, useSearch } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, ArrowRight, MapPin, Calendar, Gauge, ChevronRight } from "lucide-react";
+import { Search, ArrowRight, MapPin, Calendar, Gauge, ChevronRight, ChevronLeft } from "lucide-react";
 import type { Equipment } from "@shared/schema";
 
 const CATEGORIES = [
@@ -33,7 +33,10 @@ const CATEGORIES = [
   "ASPHALT PAVERS",
   "FORESTRY EQUIPMENT",
   "PIPELAYERS",
+  "OTHER EQUIPMENT",
 ];
+
+const ITEMS_PER_PAGE = 24;
 
 export default function EquipmentInventory() {
   const searchStr = useSearch();
@@ -42,18 +45,28 @@ export default function EquipmentInventory() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState(initialCategory);
+  const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    setPage(1);
+  }, [category, searchTerm]);
 
   const queryUrl = (() => {
     const p = new URLSearchParams();
     if (category !== "ALL") p.set("category", category);
     if (searchTerm) p.set("search", searchTerm);
-    const qs = p.toString();
-    return qs ? `/api/equipment?${qs}` : "/api/equipment";
+    p.set("page", String(page));
+    p.set("limit", String(ITEMS_PER_PAGE));
+    return `/api/equipment?${p.toString()}`;
   })();
 
-  const { data: equipment, isLoading } = useQuery<Equipment[]>({
+  const { data, isLoading } = useQuery<{ items: Equipment[]; total: number }>({
     queryKey: [queryUrl],
   });
+
+  const equipment = data?.items;
+  const total = data?.total || 0;
+  const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
 
   return (
     <div>
@@ -115,9 +128,9 @@ export default function EquipmentInventory() {
               </SelectContent>
             </Select>
           </div>
-          {equipment && (
+          {data && (
             <div className="mt-4 text-sm text-muted-foreground" data-testid="text-result-count">
-              Showing <span className="font-semibold text-foreground">{equipment.length}</span> results
+              Showing <span className="font-semibold text-foreground">{((page - 1) * ITEMS_PER_PAGE) + 1}-{Math.min(page * ITEMS_PER_PAGE, total)}</span> of <span className="font-semibold text-foreground">{total.toLocaleString()}</span> results
             </div>
           )}
         </div>
@@ -139,67 +152,122 @@ export default function EquipmentInventory() {
               ))}
             </div>
           ) : equipment && equipment.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {equipment.map((item) => (
-                <Link key={item.id} href={`/equipment/details/${item.equipmentId}`}>
-                  <Card
-                    className="group overflow-visible hover-elevate cursor-pointer border-card-border h-full"
-                    data-testid={`card-equipment-${item.equipmentId}`}
-                  >
-                    <div className="aspect-[4/3] relative rounded-t-md overflow-hidden bg-muted">
-                      <img
-                        src={item.imageUrl || "/images/cat-bulldozer.png"}
-                        alt={`${item.make} ${item.model}`}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                      <div className="absolute top-3 left-3">
-                        <span className="text-xs font-medium bg-primary/90 text-primary-foreground px-2.5 py-1 rounded-md">
-                          {item.category}
-                        </span>
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {equipment.map((item) => (
+                  <Link key={item.id} href={`/equipment/details/${item.equipmentId}`}>
+                    <Card
+                      className="group overflow-visible hover-elevate cursor-pointer border-card-border h-full"
+                      data-testid={`card-equipment-${item.equipmentId}`}
+                    >
+                      <div className="aspect-[4/3] relative rounded-t-md overflow-hidden bg-muted">
+                        <img
+                          src={item.imageUrl || "/images/cat-bulldozer.png"}
+                          alt={`${item.make} ${item.model}`}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                        <div className="absolute top-3 left-3">
+                          <span className="text-xs font-medium bg-primary/90 text-primary-foreground px-2.5 py-1 rounded-md">
+                            {item.category}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                    <div className="p-4">
-                      <h3 className="font-semibold text-base mb-1">
-                        {item.make} {item.model}
-                      </h3>
-                      <div className="text-xs text-muted-foreground mb-3">
-                        ID: {item.equipmentId}
-                      </div>
-                      <div className="grid grid-cols-2 gap-2 text-sm">
-                        {item.year && (
-                          <div className="flex items-center gap-1.5 text-muted-foreground">
-                            <Calendar className="w-3.5 h-3.5" />
-                            <span>{item.year}</span>
-                          </div>
-                        )}
-                        {item.meter && (
-                          <div className="flex items-center gap-1.5 text-muted-foreground">
-                            <Gauge className="w-3.5 h-3.5" />
-                            <span>{item.meter.toLocaleString()} hrs</span>
-                          </div>
-                        )}
-                        {(item.city || item.state) && (
-                          <div className="flex items-center gap-1.5 text-muted-foreground col-span-2">
-                            <MapPin className="w-3.5 h-3.5" />
-                            <span>{[item.city, item.state].filter(Boolean).join(", ")}</span>
-                          </div>
-                        )}
-                      </div>
-                      <div className="mt-3 pt-3 border-t flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-1 font-bold text-accent text-lg">
-                          {item.price && item.price !== "CALL" ? (
-                            <>{item.price}</>
-                          ) : (
-                            <span className="text-sm font-medium text-muted-foreground">Call for Price</span>
+                      <div className="p-4">
+                        <h3 className="font-semibold text-base mb-1">
+                          {item.make} {item.model}
+                        </h3>
+                        <div className="text-xs text-muted-foreground mb-3">
+                          ID: {item.equipmentId}
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                          {item.year && (
+                            <div className="flex items-center gap-1.5 text-muted-foreground">
+                              <Calendar className="w-3.5 h-3.5" />
+                              <span>{item.year}</span>
+                            </div>
+                          )}
+                          {item.meter && (
+                            <div className="flex items-center gap-1.5 text-muted-foreground">
+                              <Gauge className="w-3.5 h-3.5" />
+                              <span>{item.meter.toLocaleString()} hrs</span>
+                            </div>
+                          )}
+                          {(item.city || item.state) && (
+                            <div className="flex items-center gap-1.5 text-muted-foreground col-span-2">
+                              <MapPin className="w-3.5 h-3.5" />
+                              <span>{[item.city, item.state].filter(Boolean).join(", ")}</span>
+                            </div>
                           )}
                         </div>
-                        <ArrowRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="mt-3 pt-3 border-t flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-1 font-bold text-accent text-lg">
+                            {item.price && item.price !== "CALL" ? (
+                              <>{item.price}</>
+                            ) : (
+                              <span className="text-sm font-medium text-muted-foreground">Call for Price</span>
+                            )}
+                          </div>
+                          <ArrowRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
                       </div>
-                    </div>
-                  </Card>
-                </Link>
-              ))}
-            </div>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-2 mt-8" data-testid="pagination">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                    data-testid="button-prev-page"
+                  >
+                    <ChevronLeft className="w-4 h-4 mr-1" />
+                    Previous
+                  </Button>
+                  <div className="flex items-center gap-1">
+                    {(() => {
+                      const pages: number[] = [];
+                      const start = Math.max(1, page - 2);
+                      const end = Math.min(totalPages, page + 2);
+                      if (start > 1) pages.push(1);
+                      if (start > 2) pages.push(-1);
+                      for (let i = start; i <= end; i++) pages.push(i);
+                      if (end < totalPages - 1) pages.push(-2);
+                      if (end < totalPages) pages.push(totalPages);
+                      return pages.map((p, idx) =>
+                        p < 0 ? (
+                          <span key={`ellipsis-${idx}`} className="px-2 text-muted-foreground">...</span>
+                        ) : (
+                          <Button
+                            key={p}
+                            variant={p === page ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setPage(p)}
+                            className="min-w-[36px]"
+                            data-testid={`button-page-${p}`}
+                          >
+                            {p}
+                          </Button>
+                        )
+                      );
+                    })()}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                    disabled={page === totalPages}
+                    data-testid="button-next-page"
+                  >
+                    Next
+                    <ChevronRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </div>
+              )}
+            </>
           ) : (
             <div className="text-center py-20">
               <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">

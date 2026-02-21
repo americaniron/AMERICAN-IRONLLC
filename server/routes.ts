@@ -11,10 +11,21 @@ export async function registerRoutes(
     try {
       const category = req.query.category as string | undefined;
       const search = req.query.search as string | undefined;
-      const items = await storage.getEquipment({ category, search });
-      res.json(items);
+      const page = req.query.page ? parseInt(req.query.page as string) : 1;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 24;
+      const result = await storage.getEquipment({ category, search, page, limit });
+      res.json(result);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch equipment" });
+    }
+  });
+
+  app.get("/api/equipment/categories/counts", async (req, res) => {
+    try {
+      const counts = await storage.getEquipmentCategoryCounts();
+      res.json(counts);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch category counts" });
     }
   });
 
