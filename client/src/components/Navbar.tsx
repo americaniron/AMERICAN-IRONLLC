@@ -67,7 +67,7 @@ export default function Navbar() {
 
             <nav className="hidden lg:flex items-center gap-1" data-testid="nav-desktop">
               <NavLink href="/" active={location === "/"}>Home</NavLink>
-              <NavLink href="/equipment" active={location === "/equipment"}>Equipment</NavLink>
+              <NavLink href="/equipment" active={location.startsWith("/equipment")}>Equipment</NavLink>
               <NavLink href="/parts" active={location === "/parts"}>Parts</NavLink>
 
               <DropdownMenu>

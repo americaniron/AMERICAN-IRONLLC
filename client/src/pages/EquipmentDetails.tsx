@@ -44,7 +44,7 @@ export default function EquipmentDetails() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-20 text-center">
         <h2 className="text-2xl font-bold mb-4">Equipment Not Found</h2>
         <p className="text-muted-foreground mb-6">The equipment listing you're looking for doesn't exist.</p>
-        <Link href="/equipment">
+        <Link href="/equipment/listings">
           <Button data-testid="button-back-to-inventory">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Inventory
@@ -72,7 +72,7 @@ export default function EquipmentDetails() {
             </Link>
             <ChevronRight className="w-3.5 h-3.5" />
             <Link href="/equipment">
-              <span className="cursor-pointer">Equipment</span>
+              <span className="cursor-pointer">Categories</span>
             </Link>
             <ChevronRight className="w-3.5 h-3.5" />
             <span className="text-foreground font-medium">
@@ -146,7 +146,7 @@ export default function EquipmentDetails() {
         </div>
 
         <div className="mt-8">
-          <Link href="/equipment">
+          <Link href="/equipment/listings">
             <Button variant="outline" className="gap-2" data-testid="button-back-inventory">
               <ArrowLeft className="w-4 h-4" />
               Back to Inventory

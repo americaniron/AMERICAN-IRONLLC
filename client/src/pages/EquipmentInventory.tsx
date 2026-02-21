@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useSearch } from "wouter";
+import { Link, useSearch, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,26 +12,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, ArrowRight, MapPin, Calendar, Gauge } from "lucide-react";
+import { Search, ArrowRight, MapPin, Calendar, Gauge, ChevronRight } from "lucide-react";
 import type { Equipment } from "@shared/schema";
 
 const CATEGORIES = [
   "ALL",
-  "WHEEL LOADERS",
   "EXCAVATORS",
   "BULLDOZERS",
-  "TELEHANDLERS",
-  "PIPELAYERS",
-  "MOTOR GRADERS",
-  "SKIDSTEER",
-  "OFF-HIGHWAY TRUCKS",
+  "WHEEL LOADERS",
   "ARTICULATED TRUCKS",
+  "MOTOR GRADERS",
+  "SCRAPERS",
+  "TELEHANDLERS",
+  "TRACK DOZERS",
+  "SKIDSTEER",
   "BACKHOES",
+  "OFF-HIGHWAY TRUCKS",
   "COMPACTORS",
   "COLD PLANERS",
-  "TRACK DOZERS",
+  "ASPHALT PAVERS",
   "FORESTRY EQUIPMENT",
-  "SCRAPERS",
+  "PIPELAYERS",
 ];
 
 export default function EquipmentInventory() {
@@ -56,18 +57,34 @@ export default function EquipmentInventory() {
 
   return (
     <div>
-      <section className="relative py-20 overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url(/images/hero-equipment.png)" }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/70 to-black/50" />
+      <div className="bg-card border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+          <nav className="flex items-center gap-2 text-sm text-muted-foreground" data-testid="breadcrumb">
+            <Link href="/">
+              <span className="cursor-pointer">Home</span>
+            </Link>
+            <ChevronRight className="w-3.5 h-3.5" />
+            <Link href="/equipment">
+              <span className="cursor-pointer">Equipment</span>
+            </Link>
+            <ChevronRight className="w-3.5 h-3.5" />
+            <span className="text-foreground font-medium">
+              {category !== "ALL" ? category : "All Listings"}
+            </span>
+          </nav>
+        </div>
+      </div>
+
+      <section className="relative py-16 overflow-hidden">
+        <div className="absolute inset-0 bg-primary" />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 tracking-tight" data-testid="text-page-title">
-            Equipment Inventory
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-primary-foreground mb-4 tracking-tight" data-testid="text-page-title">
+            {category !== "ALL" ? category : "Equipment Inventory"}
           </h1>
-          <p className="text-white/70 text-lg max-w-2xl">
-            Filter by category and search by make, model, ID, or location across our comprehensive inventory.
+          <p className="text-primary-foreground/70 text-lg max-w-2xl">
+            {category !== "ALL"
+              ? `Browse our ${category.toLowerCase()} inventory. Filter and search across available listings.`
+              : "Filter by category and search by make, model, ID, or location across our comprehensive inventory."}
           </p>
         </div>
       </section>
@@ -124,7 +141,7 @@ export default function EquipmentInventory() {
           ) : equipment && equipment.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {equipment.map((item) => (
-                <Link key={item.id} href={`/equipment/${item.equipmentId}`}>
+                <Link key={item.id} href={`/equipment/details/${item.equipmentId}`}>
                   <Card
                     className="group overflow-visible hover-elevate cursor-pointer border-card-border h-full"
                     data-testid={`card-equipment-${item.equipmentId}`}

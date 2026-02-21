@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Home from "@/pages/Home";
+import EquipmentCategories from "@/pages/EquipmentCategories";
 import EquipmentInventory from "@/pages/EquipmentInventory";
 import EquipmentDetails from "@/pages/EquipmentDetails";
 import PartsCatalog from "@/pages/PartsCatalog";
@@ -26,8 +27,9 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
-      <Route path="/equipment" component={EquipmentInventory} />
-      <Route path="/equipment/:id" component={EquipmentDetails} />
+      <Route path="/equipment" component={EquipmentCategories} />
+      <Route path="/equipment/listings" component={EquipmentInventory} />
+      <Route path="/equipment/details/:id" component={EquipmentDetails} />
       <Route path="/parts" component={PartsCatalog} />
       <Route path="/parts/:category" component={PartsCategory} />
       <Route path="/quote" component={QuoteRequest} />

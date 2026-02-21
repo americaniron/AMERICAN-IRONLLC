@@ -45,6 +45,13 @@ const equipmentData = [
   { equipmentId: "EQ-SS-002", make: "BOBCAT", model: "T870", year: 2023, meter: 500, price: "$85,000", city: "Miami", state: "FL", category: "SKIDSTEER" },
   { equipmentId: "EQ-PL-001", make: "CAT", model: "PL61", year: 2022, meter: 2500, price: "$725,000", city: "Houston", state: "TX", category: "PIPELAYERS" },
   { equipmentId: "EQ-TD-001", make: "CAT", model: "D5", year: 2024, meter: 400, price: "$295,000", city: "Georgetown", state: "TX", category: "TRACK DOZERS" },
+  { equipmentId: "EQ-TD-002", make: "CAT", model: "973D", year: 2022, meter: 3100, price: "$385,000", city: "Dallas", state: "TX", category: "TRACK DOZERS" },
+  { equipmentId: "EQ-AP-001", make: "CAT", model: "AP1000F", year: 2023, meter: 1800, price: "$545,000", city: "Tampa", state: "FL", category: "ASPHALT PAVERS" },
+  { equipmentId: "EQ-AP-002", make: "CAT", model: "AP600F", year: 2022, meter: 2400, price: "$385,000", city: "Houston", state: "TX", category: "ASPHALT PAVERS" },
+  { equipmentId: "EQ-FE-001", make: "CAT", model: "568", year: 2023, meter: 2200, price: "$625,000", city: "Jacksonville", state: "FL", category: "FORESTRY EQUIPMENT" },
+  { equipmentId: "EQ-FE-002", make: "CAT", model: "538", year: 2024, meter: 600, price: "$485,000", city: "Orlando", state: "FL", category: "FORESTRY EQUIPMENT" },
+  { equipmentId: "EQ-CLP-001", make: "CAT", model: "PM820", year: 2023, meter: 1500, price: "$750,000", city: "San Antonio", state: "TX", category: "COLD PLANERS" },
+  { equipmentId: "EQ-CLP-002", make: "CAT", model: "PM622", year: 2022, meter: 2800, price: "$520,000", city: "Austin", state: "TX", category: "COLD PLANERS" },
 ];
 
 const partsData = [

@@ -302,7 +302,7 @@ export default function Home() {
               </p>
               <div className="flex flex-wrap gap-2 mb-8">
                 {categories.map((cat) => (
-                  <Link key={cat} href={`/equipment?category=${encodeURIComponent(cat.toUpperCase())}`}>
+                  <Link key={cat} href={`/equipment/listings?category=${encodeURIComponent(cat.toUpperCase())}`}>
                     <span className="inline-flex items-center px-4 py-2 rounded-md bg-card border border-card-border text-sm font-medium cursor-pointer hover-elevate" data-testid={`badge-category-${cat.toLowerCase().replace(/\s+/g, "-")}`}>
                       {cat}
                     </span>
