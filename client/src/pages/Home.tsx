@@ -188,85 +188,41 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 flash-stagger">
-            <Link href="/equipment">
-              <Card className="flash-reveal-scale group relative overflow-visible p-6 hover-elevate cursor-pointer border-card-border bg-background" style={{ "--flash-index": 0 } as any} data-testid="card-asset-inventory">
-                <div className="absolute top-0 left-0 w-1 h-full bg-accent rounded-l-md" />
-                <div className="flex items-start gap-4 pl-3">
-                  <div className="w-12 h-12 rounded-md bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0">
-                    <Settings className="w-6 h-6 text-accent" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-lg mb-1 flex items-center gap-2">
-                      Asset Inventory Management
-                      <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed">
-                      Optimize your fleet with our meticulously vetted inventory. Filter by manufacturer, specification, and operational history.
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            </Link>
-
-            <Link href="/parts">
-              <Card className="flash-reveal-scale group relative overflow-visible p-6 hover-elevate cursor-pointer border-card-border bg-background" style={{ "--flash-index": 1 } as any} data-testid="card-parts-distribution">
-                <div className="absolute top-0 left-0 w-1 h-full bg-accent rounded-l-md" />
-                <div className="flex items-start gap-4 pl-3">
-                  <div className="w-12 h-12 rounded-md bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0">
-                    <Package className="w-6 h-6 text-accent" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-lg mb-1 flex items-center gap-2">
-                      Global Parts Distribution
-                      <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed">
-                      Minimize downtime with immediate access to our extensive component database for mission-critical machinery.
-                    </p>
+            {[
+              { icon: Settings, title: "Asset Inventory Management", desc: "Optimize your fleet with our meticulously vetted inventory. Filter by manufacturer, specification, and operational history.", href: "/equipment", testId: "card-asset-inventory" },
+              { icon: Package, title: "Global Parts Distribution", desc: "Minimize downtime with immediate access to our extensive component database for mission-critical machinery.", href: "/parts", testId: "card-parts-distribution" },
+              { icon: Search, title: "Strategic Consultations & Quotes", desc: "Receive comprehensive, transparent quotes for equipment procurement or specialized component sourcing.", href: "/quote", testId: "card-consultations" },
+              { icon: Globe, title: "Global Reach", desc: "From our Florida hub, we deploy assets and parts to job sites worldwide with expert logistics coordination.", href: "/contact", testId: "card-contact" },
+            ].map((cap, i) => (
+              <Link key={cap.href} href={cap.href}>
+                <div
+                  className="flash-reveal-scale flip-card h-48"
+                  style={{ "--flash-index": i } as any}
+                  data-testid={cap.testId}
+                >
+                  <div className="flip-card-inner">
+                    <div className="flip-card-front bg-background border border-card-border rounded-md flex items-center gap-4 p-6">
+                      <div className="w-12 h-12 rounded-md bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0">
+                        <cap.icon className="w-6 h-6 text-accent" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg">{cap.title}</h3>
+                        <p className="text-muted-foreground text-sm leading-relaxed mt-1">{cap.desc}</p>
+                      </div>
+                    </div>
+                    <div className="flip-card-back flex flex-col items-center justify-center gap-3 bg-accent border border-accent rounded-md p-8">
+                      <div className="w-14 h-14 rounded-md bg-accent-foreground/10 flex items-center justify-center">
+                        <cap.icon className="w-7 h-7 text-accent-foreground" />
+                      </div>
+                      <h3 className="font-bold text-lg text-accent-foreground text-center">{cap.title}</h3>
+                      <span className="inline-flex items-center gap-1 text-accent-foreground font-semibold text-sm">
+                        Explore <ChevronRight className="w-4 h-4" />
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </Card>
-            </Link>
-
-            <Link href="/quote">
-              <Card className="flash-reveal-scale group relative overflow-visible p-6 hover-elevate cursor-pointer border-card-border bg-background" style={{ "--flash-index": 2 } as any} data-testid="card-consultations">
-                <div className="absolute top-0 left-0 w-1 h-full bg-accent rounded-l-md" />
-                <div className="flex items-start gap-4 pl-3">
-                  <div className="w-12 h-12 rounded-md bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0">
-                    <Search className="w-6 h-6 text-accent" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-lg mb-1 flex items-center gap-2">
-                      Strategic Consultations & Quotes
-                      <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed">
-                      Receive comprehensive, transparent quotes for equipment procurement or specialized component sourcing.
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            </Link>
-
-            <Link href="/contact">
-              <Card className="flash-reveal-scale group relative overflow-visible p-6 hover-elevate cursor-pointer border-card-border bg-background" style={{ "--flash-index": 3 } as any} data-testid="card-contact">
-                <div className="absolute top-0 left-0 w-1 h-full bg-accent rounded-l-md" />
-                <div className="flex items-start gap-4 pl-3">
-                  <div className="w-12 h-12 rounded-md bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0">
-                    <Globe className="w-6 h-6 text-accent" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-lg mb-1 flex items-center gap-2">
-                      Global Reach
-                      <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed">
-                      From our Florida hub, we deploy assets and parts to job sites worldwide with expert logistics coordination.
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            </Link>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
