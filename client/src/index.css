@@ -466,6 +466,83 @@
   animation-delay: calc(var(--flash-index, 0) * 0.08s);
 }
 
+.text-accent-3d {
+  color: hsl(var(--accent));
+  text-shadow:
+    0 1px 0 hsl(45 80% 42%),
+    0 2px 0 hsl(45 70% 38%),
+    0 3px 0 hsl(45 60% 34%),
+    0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+.text-accent-outline {
+  color: hsl(var(--accent));
+  -webkit-text-stroke: 1px hsl(45 60% 35%);
+  text-shadow: 0 2px 8px rgba(255, 205, 17, 0.3);
+}
+
+.text-accent-glow {
+  color: hsl(var(--accent));
+  text-shadow:
+    0 0 10px rgba(255, 205, 17, 0.4),
+    0 0 30px rgba(255, 205, 17, 0.15),
+    0 2px 0 hsl(45 70% 40%);
+}
+
+.section-divider {
+  position: relative;
+}
+.section-divider::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, hsl(var(--accent)), transparent);
+  border-radius: 2px;
+}
+
+.section-stripe-bg {
+  background-image:
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 40px,
+      rgba(255, 205, 17, 0.03) 40px,
+      rgba(255, 205, 17, 0.03) 80px
+    );
+}
+
+.section-dot-bg {
+  background-image: radial-gradient(circle, rgba(0,0,0,0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.dark .section-dot-bg {
+  background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.dark .section-stripe-bg {
+  background-image:
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 40px,
+      rgba(255, 205, 17, 0.04) 40px,
+      rgba(255, 205, 17, 0.04) 80px
+    );
+}
+
+.dark .text-accent-3d {
+  text-shadow:
+    0 1px 0 hsl(49 100% 60%),
+    0 2px 0 hsl(49 90% 50%),
+    0 3px 4px rgba(0, 0, 0, 0.3);
+}
+
 .flash-page-transition {
   animation: flash-page-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
