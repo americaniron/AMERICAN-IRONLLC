@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Menu, X, Phone, Mail, ChevronDown, User, LogIn } from "lucide-react";
+import { SiFacebook, SiX, SiInstagram, SiLinkedin, SiYoutube } from "react-icons/si";
 import logoImg from "@assets/american-iron-logo_1771736779986.png";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
@@ -32,6 +33,14 @@ export default function Navbar() {
             Heavy Equipment & Asset Management Solutions
           </span>
           <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2.5" data-testid="nav-social-links">
+              <a href="https://facebook.com/AMERICANIRONLLC" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-primary-foreground/70 hover:text-accent transition-colors" data-testid="nav-social-facebook"><SiFacebook className="w-3.5 h-3.5" /></a>
+              <a href="https://x.com/americanironn" target="_blank" rel="noopener noreferrer" aria-label="X" className="text-primary-foreground/70 hover:text-accent transition-colors" data-testid="nav-social-x"><SiX className="w-3.5 h-3.5" /></a>
+              <a href="https://instagram.com/americanyellowiron/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-primary-foreground/70 hover:text-accent transition-colors" data-testid="nav-social-instagram"><SiInstagram className="w-3.5 h-3.5" /></a>
+              <a href="https://linkedin.com/in/americanironllc/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-primary-foreground/70 hover:text-accent transition-colors" data-testid="nav-social-linkedin"><SiLinkedin className="w-3.5 h-3.5" /></a>
+              <a href="https://youtube.com/@Americanironus" target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="text-primary-foreground/70 hover:text-accent transition-colors" data-testid="nav-social-youtube"><SiYoutube className="w-3.5 h-3.5" /></a>
+            </div>
+            <span className="w-px h-4 bg-primary-foreground/20" />
             <a
               href="tel:+18507773797"
               className="flex items-center gap-1.5 text-primary-foreground/90 transition-colors hover:text-accent"

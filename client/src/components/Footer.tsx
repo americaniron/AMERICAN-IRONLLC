@@ -1,7 +1,16 @@
 import { Link } from "wouter";
 import { Phone, Mail, MapPin, MessageCircle } from "lucide-react";
+import { SiFacebook, SiX, SiInstagram, SiLinkedin, SiYoutube } from "react-icons/si";
 import logoImg from "@assets/american-iron-logo_1771736779986.png";
 import { useFlashReveal } from "@/hooks/useFlashReveal";
+
+const socialLinks = [
+  { icon: SiFacebook, href: "https://facebook.com/AMERICANIRONLLC", label: "Facebook" },
+  { icon: SiX, href: "https://x.com/americanironn", label: "X" },
+  { icon: SiInstagram, href: "https://instagram.com/americanyellowiron/", label: "Instagram" },
+  { icon: SiLinkedin, href: "https://linkedin.com/in/americanironllc/", label: "LinkedIn" },
+  { icon: SiYoutube, href: "https://youtube.com/@Americanironus", label: "YouTube" },
+];
 
 export default function Footer() {
   const footerRef = useFlashReveal();
@@ -20,9 +29,27 @@ export default function Footer() {
                 data-testid="img-footer-logo"
               />
             </div>
-            <p className="text-sm text-primary-foreground/70 leading-relaxed">
+            <p className="text-sm text-primary-foreground/70 leading-relaxed mb-5">
               Empowering global infrastructure through comprehensive parts inventory and unparalleled equipment procurement.
             </p>
+            <div className="flex items-center gap-3" data-testid="footer-social-links">
+              {socialLinks.map((s) => {
+                const Icon = s.icon;
+                return (
+                  <a
+                    key={s.label}
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={s.label}
+                    className="w-8 h-8 rounded-full bg-primary-foreground/10 flex items-center justify-center text-primary-foreground/60 transition-all hover:bg-accent hover:text-accent-foreground"
+                    data-testid={`footer-social-${s.label.toLowerCase()}`}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                  </a>
+                );
+              })}
+            </div>
           </div>
 
           <div className="flash-reveal" style={{ "--flash-index": 1 } as any}>
