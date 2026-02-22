@@ -9,11 +9,14 @@ import {
   type InsertContactInquiry,
   type User,
   type InsertUser,
+  type ProjectEstimate,
+  type InsertProjectEstimate,
   equipment,
   parts,
   quoteRequests,
   contactInquiries,
   users,
+  projectEstimates,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, ilike, or, sql } from "drizzle-orm";
@@ -37,6 +40,8 @@ export interface IStorage {
   getEquipmentCount(): Promise<number>;
   getPartsCount(): Promise<number>;
   getPartsCategoryCounts(): Promise<Record<string, number>>;
+  getEquipmentPriceSummary(): Promise<Record<string, { min: string; max: string; avg: string; count: number }>>;
+  createProjectEstimate(data: InsertProjectEstimate): Promise<ProjectEstimate>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -201,6 +206,36 @@ export class DatabaseStorage implements IStorage {
       counts[row.category] = Number(row.count);
     }
     return counts;
+  }
+
+  async getEquipmentPriceSummary(): Promise<Record<string, { min: string; max: string; avg: string; count: number }>> {
+    const results = await db
+      .select({
+        category: equipment.category,
+        minPrice: sql<string>`MIN(REGEXP_REPLACE(price, '[^0-9.]', '', 'g')::numeric)`,
+        maxPrice: sql<string>`MAX(REGEXP_REPLACE(price, '[^0-9.]', '', 'g')::numeric)`,
+        avgPrice: sql<string>`ROUND(AVG(REGEXP_REPLACE(price, '[^0-9.]', '', 'g')::numeric))`,
+        count: sql<number>`count(*)`,
+      })
+      .from(equipment)
+      .where(sql`price IS NOT NULL AND price != '' AND REGEXP_REPLACE(price, '[^0-9.]', '', 'g') != ''`)
+      .groupBy(equipment.category);
+
+    const summary: Record<string, { min: string; max: string; avg: string; count: number }> = {};
+    for (const row of results) {
+      summary[row.category] = {
+        min: `$${Number(row.minPrice).toLocaleString()}`,
+        max: `$${Number(row.maxPrice).toLocaleString()}`,
+        avg: `$${Number(row.avgPrice).toLocaleString()}`,
+        count: Number(row.count),
+      };
+    }
+    return summary;
+  }
+
+  async createProjectEstimate(data: InsertProjectEstimate): Promise<ProjectEstimate> {
+    const [item] = await db.insert(projectEstimates).values(data).returning();
+    return item;
   }
 }
 

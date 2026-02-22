@@ -19,6 +19,7 @@ import ServiceInspection from "@/pages/ServiceInspection";
 import ServiceTransportation from "@/pages/ServiceTransportation";
 import ServiceShipping from "@/pages/ServiceShipping";
 import Contact from "@/pages/Contact";
+import ProjectEstimator from "@/pages/ProjectEstimator";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -35,6 +36,7 @@ function Router() {
       <Route path="/services/inspection" component={ServiceInspection} />
       <Route path="/services/transportation" component={ServiceTransportation} />
       <Route path="/services/shipping" component={ServiceShipping} />
+      <Route path="/services/estimator" component={ProjectEstimator} />
       <Route path="/contact" component={Contact} />
       <Route component={NotFound} />
     </Switch>

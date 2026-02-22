@@ -72,3 +72,22 @@ export const insertUserSchema = createInsertSchema(users).pick({
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
+
+export const projectEstimates = pgTable("project_estimates", {
+  id: serial("id").primaryKey(),
+  projectName: varchar("project_name", { length: 200 }).notNull(),
+  projectType: varchar("project_type", { length: 100 }).notNull(),
+  location: varchar("location", { length: 200 }).notNull(),
+  terrain: varchar("terrain", { length: 100 }).notNull(),
+  projectSize: varchar("project_size", { length: 100 }).notNull(),
+  duration: varchar("duration", { length: 100 }).notNull(),
+  additionalDetails: text("additional_details"),
+  estimateResult: text("estimate_result").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertProjectEstimateSchema = createInsertSchema(projectEstimates).omit({ id: true, createdAt: true });
+export type ProjectEstimate = typeof projectEstimates.$inferSelect;
+export type InsertProjectEstimate = z.infer<typeof insertProjectEstimateSchema>;
+
+export * from "./models/chat";

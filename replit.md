@@ -51,6 +51,8 @@ Preferred communication style: Simple, everyday language.
   - `quote_requests` — Quote request submissions (name, email, phone, shipTo, notes, items)
   - `contact_inquiries` — Contact form submissions (name, email, message)
   - `users` — User accounts (id, username) — exists in schema but auth not fully implemented
+  - `project_estimates` — AI-generated project estimates (projectName, projectType, location, terrain, projectSize, duration, additionalDetails, estimateResult)
+  - `conversations` / `messages` — Chat storage tables (from OpenAI integration)
 
 ### API Endpoints
 - `GET /api/equipment` — List equipment with optional `category` and `search` query filters
@@ -58,6 +60,13 @@ Preferred communication style: Simple, everyday language.
 - `GET /api/parts` — List parts with optional `category` and `search` query filters
 - `POST /api/quotes` — Submit a quote request (validated with Zod)
 - `POST /api/contact` — Submit a contact inquiry (validated with Zod)
+- `POST /api/estimate` — AI-powered project estimator (streaming SSE response, uses OpenAI gpt-5.2 with real inventory data)
+
+### AI Integration
+- **Provider**: Replit AI Integrations (OpenAI-compatible, no API key needed)
+- **Model**: gpt-5.2 for project estimation
+- **Feature**: Project Estimator at `/services/estimator` — generates comprehensive construction project equipment estimates using real inventory pricing data
+- **Integration files**: `server/replit_integrations/` (chat, audio, image, batch modules)
 
 ### Build System
 - **Development**: `npm run dev` — runs tsx with Vite dev server middleware for HMR
