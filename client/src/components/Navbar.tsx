@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Menu, X, Phone, Mail, ChevronDown } from "lucide-react";
-import logoImg from "@assets/american-iron-logo_1771719147172.png";
+import logoImg from "@assets/american-iron-logo_1771736779986.png";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,

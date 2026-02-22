@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { Phone, Mail, MapPin, MessageCircle } from "lucide-react";
-import logoImg from "@assets/american-iron-logo_1771719147172.png";
+import logoImg from "@assets/american-iron-logo_1771736779986.png";
 import { useFlashReveal } from "@/hooks/useFlashReveal";
 
 export default function Footer() {

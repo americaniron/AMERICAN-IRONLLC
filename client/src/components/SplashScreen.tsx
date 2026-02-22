@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import logoImg from "@assets/american-iron-logo_1771719147172.png";
+import logoImg from "@assets/american-iron-logo_1771736779986.png";
 
 export default function SplashScreen({ onComplete }: { onComplete: () => void }) {
   const [phase, setPhase] = useState<"enter" | "hold" | "exit">("enter");
