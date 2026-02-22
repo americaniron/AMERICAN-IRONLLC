@@ -47,8 +47,8 @@ function RotatingVideoBackground() {
       >
         <source src={VIDEOS[activeIndex]} type="video/mp4" />
       </video>
-      <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/70 to-black/50" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/45 to-black/25" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-black/10" />
     </>
   );
 }
