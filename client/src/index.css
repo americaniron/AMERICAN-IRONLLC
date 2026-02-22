@@ -616,3 +616,114 @@
     animation: none !important;
   }
 }
+
+/* IRON Estimator Animations */
+@keyframes iron-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 205, 17, 0.3); }
+  50% { box-shadow: 0 0 20px 4px rgba(255, 205, 17, 0.15); }
+}
+@keyframes iron-gauge-fill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@keyframes iron-scan-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+@keyframes iron-data-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+@keyframes iron-ring-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes iron-count-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.iron-panel {
+  position: relative;
+  border: 1px solid hsl(var(--accent) / 0.2);
+  background: linear-gradient(145deg, hsl(var(--card)), hsl(var(--background)));
+  overflow: hidden;
+}
+.iron-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, hsl(var(--accent)), transparent);
+  opacity: 0.6;
+}
+.iron-panel-glow {
+  animation: iron-pulse 3s ease-in-out infinite;
+}
+.iron-gauge-bar {
+  transform-origin: left;
+  animation: iron-gauge-fill 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.iron-scan {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.iron-scan::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, hsl(var(--accent) / 0.3), transparent);
+  animation: iron-scan-line 4s linear infinite;
+}
+.iron-stat-card {
+  position: relative;
+  background: linear-gradient(135deg, hsl(var(--accent) / 0.05), transparent);
+  border: 1px solid hsl(var(--accent) / 0.15);
+  border-radius: var(--radius);
+  padding: 1rem;
+  transition: border-color 0.3s ease;
+}
+.iron-stat-card:hover {
+  border-color: hsl(var(--accent) / 0.4);
+}
+.iron-input-group {
+  position: relative;
+}
+.iron-input-group:focus-within .iron-input-indicator {
+  width: 100%;
+  opacity: 1;
+}
+.iron-input-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 0;
+  background: hsl(var(--accent));
+  transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s;
+  opacity: 0;
+  border-radius: 1px;
+}
+.iron-ring {
+  animation: iron-ring-spin 8s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iron-panel-glow,
+  .iron-gauge-bar,
+  .iron-ring {
+    animation: none !important;
+  }
+  .iron-scan::after {
+    animation: none !important;
+  }
+  .iron-stat-card:hover {
+    border-color: hsl(var(--accent) / 0.15);
+  }
+}

@@ -135,7 +135,7 @@ Total Equipment Items: ${Object.values(categoryCounts).reduce((a: number, b: num
 Total Parts Items: ${Object.values(partsCategoryCounts).reduce((a: number, b: number) => a + b, 0)}
 `;
 
-      const systemPrompt = `You are an institutional-grade construction project estimator for American Iron LLC, a leading heavy equipment and parts company based in Tampa, Florida. You provide comprehensive, thorough, and professional project equipment estimates.
+      const systemPrompt = `You are the IRON Estimator — an institutional-grade construction equipment estimation tool for American Iron LLC, a leading heavy equipment and parts company based in Tampa, Florida. You provide comprehensive, thorough, and professional project equipment estimates.
 
 ${inventoryContext}
 

@@ -60,12 +60,12 @@ Preferred communication style: Simple, everyday language.
 - `GET /api/parts` — List parts with optional `category` and `search` query filters
 - `POST /api/quotes` — Submit a quote request (validated with Zod)
 - `POST /api/contact` — Submit a contact inquiry (validated with Zod)
-- `POST /api/estimate` — AI-powered project estimator (streaming SSE response, uses OpenAI gpt-5.2 with real inventory data)
+- `POST /api/estimate` — IRON Estimator: AI-powered equipment estimator (streaming SSE response, uses OpenAI gpt-5.2 with real inventory data)
 
 ### AI Integration
 - **Provider**: Replit AI Integrations (OpenAI-compatible, no API key needed)
 - **Model**: gpt-5.2 for project estimation
-- **Feature**: Project Estimator at `/services/estimator` — generates comprehensive construction project equipment estimates using real inventory pricing data
+- **Feature**: IRON Estimator at `/services/estimator` — generates comprehensive construction project equipment estimates using real inventory pricing data
 - **Integration files**: `server/replit_integrations/` (chat, audio, image, batch modules)
 
 ### Build System

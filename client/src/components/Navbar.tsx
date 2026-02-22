@@ -15,7 +15,7 @@ const services = [
   { name: "Inspection & Auditing", href: "/services/inspection" },
   { name: "Transportation", href: "/services/transportation" },
   { name: "Shipping & Forwarding", href: "/services/shipping" },
-  { name: "AI Project Estimator", href: "/services/estimator" },
+  { name: "IRON Estimator", href: "/services/estimator" },
 ];
 
 export default function Navbar() {

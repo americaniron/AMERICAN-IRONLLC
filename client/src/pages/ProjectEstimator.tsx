@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -27,9 +27,22 @@ import {
   ArrowRight,
   Download,
   RotateCcw,
+  Zap,
+  Database,
+  TrendingUp,
+  Shield,
+  Cpu,
+  Target,
+  BarChart3,
+  Layers,
 } from "lucide-react";
 import { useFlashReveal } from "@/hooks/useFlashReveal";
 import { useToast } from "@/hooks/use-toast";
+
+const ESTIMATOR_VIDEOS = [
+  "/images/estimator-bg-1.mp4",
+  "/images/estimator-bg-2.mp4",
+];
 
 const PROJECT_TYPES = [
   "Highway / Road Construction",
@@ -80,6 +93,102 @@ const DURATIONS = [
   "36+ Months",
 ];
 
+function RotatingVideoBackground() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [fadingOut, setFadingOut] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const nextIndexRef = useRef(1);
+
+  const handleVideoEnd = useCallback(() => {
+    setFadingOut(true);
+    setTimeout(() => {
+      setActiveIndex(nextIndexRef.current);
+      nextIndexRef.current = (nextIndexRef.current + 1) % ESTIMATOR_VIDEOS.length;
+      setFadingOut(false);
+    }, 600);
+  }, []);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.load();
+    video.play().catch(() => {});
+  }, [activeIndex]);
+
+  return (
+    <>
+      <video
+        ref={videoRef}
+        key={activeIndex}
+        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-600"
+        style={{ opacity: fadingOut ? 0 : 1 }}
+        muted
+        playsInline
+        onEnded={handleVideoEnd}
+        data-testid="estimator-hero-video"
+      >
+        <source src={ESTIMATOR_VIDEOS[activeIndex]} type="video/mp4" />
+      </video>
+      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />
+    </>
+  );
+}
+
+function AnimatedCounter({ value, suffix = "" }: { value: string; suffix?: string }) {
+  const [visible, setVisible] = useState(false);
+  const ref = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { setVisible(true); obs.disconnect(); }
+    }, { threshold: 0.3 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  return (
+    <span
+      ref={ref}
+      className="inline-block transition-all duration-700"
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(8px)",
+      }}
+    >
+      {value}{suffix}
+    </span>
+  );
+}
+
+function FieldCompletionRing({ filled, total }: { filled: number; total: number }) {
+  const pct = (filled / total) * 100;
+  const circumference = 2 * Math.PI * 18;
+  const offset = circumference - (pct / 100) * circumference;
+
+  return (
+    <div className="relative w-12 h-12 shrink-0">
+      <svg className="w-12 h-12 -rotate-90" viewBox="0 0 40 40">
+        <circle cx="20" cy="20" r="18" fill="none" stroke="hsl(var(--border))" strokeWidth="2" />
+        <circle
+          cx="20" cy="20" r="18" fill="none"
+          stroke="hsl(var(--accent))"
+          strokeWidth="2.5"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+          className="transition-all duration-700 ease-out"
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-xs font-bold text-accent">{filled}/{total}</span>
+      </div>
+    </div>
+  );
+}
+
 export default function ProjectEstimator() {
   const heroRef = useFlashReveal();
   const formRef = useFlashReveal();
@@ -100,6 +209,8 @@ export default function ProjectEstimator() {
   const [showResult, setShowResult] = useState(false);
 
   const resultContainerRef = useRef<HTMLDivElement>(null);
+
+  const filledFields = [projectName, projectType, location, terrain, projectSize, duration].filter(Boolean).length;
 
   useEffect(() => {
     if (showResult && resultContainerRef.current) {
@@ -277,62 +388,138 @@ export default function ProjectEstimator() {
 
   return (
     <div className="flash-page-transition">
-      <section className="relative py-24 overflow-hidden bg-black" ref={heroRef}>
-        <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-accent/5" />
-        <div className="absolute inset-0">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-accent/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-10 right-20 w-96 h-96 bg-accent/3 rounded-full blur-3xl" />
-        </div>
+      {/* Hero with Video Background */}
+      <section className="relative py-28 lg:py-36 overflow-hidden bg-black" ref={heroRef}>
+        <RotatingVideoBackground />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
           <div className="max-w-3xl">
-            <div className="flash-reveal inline-flex items-center gap-2 mb-4">
+            <div className="flash-reveal inline-flex items-center gap-2 mb-4 px-4 py-1.5 rounded-full border border-accent/30 bg-accent/10 backdrop-blur-sm">
               <Sparkles className="w-4 h-4 text-accent" />
-              <span className="text-accent text-sm font-semibold tracking-widest uppercase">AI-Powered Tool</span>
+              <span className="text-accent text-sm font-semibold tracking-widest uppercase" data-testid="text-estimator-badge">AMERICAN IRON AI POWERED TOOL</span>
             </div>
-            <h1 className="flash-reveal text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 tracking-tight" style={{ "--flash-index": 1 } as any} data-testid="text-estimator-title">
-              Project <span className="text-accent-3d">Estimator</span>
+            <h1 className="flash-reveal text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-5 tracking-tight leading-tight" style={{ "--flash-index": 1 } as any} data-testid="text-estimator-title">
+              IRON <span className="text-accent-3d">Estimator</span>
             </h1>
-            <p className="flash-reveal text-lg text-gray-300 mb-6 leading-relaxed max-w-2xl" style={{ "--flash-index": 2 } as any} data-testid="text-estimator-description">
+            <p className="flash-reveal text-lg lg:text-xl text-gray-300 mb-8 leading-relaxed max-w-2xl" style={{ "--flash-index": 2 } as any} data-testid="text-estimator-description">
               Get an institutional-grade equipment estimate for your construction project. Our AI analyzes your project requirements against our inventory of 2,100+ equipment items and 12,200+ parts to deliver comprehensive cost projections.
             </p>
-            <div className="flash-reveal flex flex-wrap gap-4" style={{ "--flash-index": 3 } as any}>
-              <div className="flex items-center gap-2 text-sm text-gray-400">
-                <HardHat className="w-4 h-4 text-accent" />
-                <span>2,100+ Equipment Items</span>
+
+            {/* Hero Stats Row */}
+            <div className="flash-reveal grid grid-cols-3 gap-4 max-w-lg" style={{ "--flash-index": 3 } as any}>
+              <div className="text-center p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10">
+                <div className="text-2xl font-black text-accent">
+                  <AnimatedCounter value="2,100" suffix="+" />
+                </div>
+                <div className="text-xs text-gray-400 mt-0.5 uppercase tracking-wider">Equipment</div>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-400">
-                <Calculator className="w-4 h-4 text-accent" />
-                <span>Real Inventory Pricing</span>
+              <div className="text-center p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10">
+                <div className="text-2xl font-black text-accent">
+                  <AnimatedCounter value="12,200" suffix="+" />
+                </div>
+                <div className="text-xs text-gray-400 mt-0.5 uppercase tracking-wider">Parts</div>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-400">
-                <FileText className="w-4 h-4 text-accent" />
-                <span>Comprehensive Reports</span>
+              <div className="text-center p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10">
+                <div className="text-2xl font-black text-accent">
+                  <AnimatedCounter value="AI" />
+                </div>
+                <div className="text-xs text-gray-400 mt-0.5 uppercase tracking-wider">Powered</div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Control Panel Section */}
       <section className="py-16 bg-background" ref={formRef}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
+
+          {/* System Status Bar */}
+          <div className="flash-reveal mb-8 iron-panel rounded-xl p-4">
+            <div className="iron-scan" />
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <div className="w-3 h-3 rounded-full bg-green-500" />
+                  <div className="absolute inset-0 w-3 h-3 rounded-full bg-green-500 animate-ping opacity-50" />
+                </div>
+                <span className="text-sm font-semibold text-foreground">IRON ESTIMATOR — SYSTEM ONLINE</span>
+              </div>
+              <div className="flex items-center gap-6 text-xs text-muted-foreground">
+                <div className="flex items-center gap-1.5">
+                  <Database className="w-3.5 h-3.5 text-accent" />
+                  <span>Inventory Synced</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Cpu className="w-3.5 h-3.5 text-accent" />
+                  <span>AI Model Active</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Shield className="w-3.5 h-3.5 text-accent" />
+                  <span>Enterprise Grade</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Main Control Panel */}
             <div className="lg:col-span-2">
-              <Card className="flash-reveal p-8 border-card-border bg-background" data-testid="form-estimator">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-md bg-accent/10 border border-accent/20 flex items-center justify-center">
-                    <Calculator className="w-5 h-5 text-accent" />
+              <div className="iron-panel iron-panel-glow rounded-2xl p-8" data-testid="form-estimator">
+                <div className="iron-scan" />
+
+                {/* Panel Header */}
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-4">
+                    <div className="relative">
+                      <div className="w-14 h-14 rounded-xl bg-accent/10 border border-accent/30 flex items-center justify-center">
+                        <Target className="w-7 h-7 text-accent" />
+                      </div>
+                      <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-accent flex items-center justify-center">
+                        <Zap className="w-2.5 h-2.5 text-black" />
+                      </div>
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-black tracking-tight">CONTROL PANEL</h2>
+                      <p className="text-sm text-muted-foreground">Configure project parameters for AI analysis</p>
+                    </div>
                   </div>
-                  <div>
-                    <h2 className="text-xl font-bold">Project Details</h2>
-                    <p className="text-sm text-muted-foreground">Fill in your project parameters for a tailored estimate</p>
+                  <FieldCompletionRing filled={filledFields} total={6} />
+                </div>
+
+                {/* Readiness Gauge */}
+                <div className="mb-8 p-4 rounded-lg bg-muted/30 border border-border/50">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Estimation Readiness</span>
+                    <span className="text-xs font-bold text-accent">{Math.round((filledFields / 6) * 100)}%</span>
+                  </div>
+                  <div className="h-2 rounded-full bg-muted overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-accent/70 to-accent transition-all duration-700 ease-out"
+                      style={{ width: `${(filledFields / 6) * 100}%` }}
+                    />
+                  </div>
+                  <div className="flex justify-between mt-2">
+                    {["Name", "Type", "Location", "Terrain", "Size", "Duration"].map((label, idx) => (
+                      <div key={label} className="flex flex-col items-center gap-1">
+                        <div className={`w-2 h-2 rounded-full transition-colors duration-300 ${
+                          [projectName, projectType, location, terrain, projectSize, duration][idx]
+                            ? "bg-accent"
+                            : "bg-muted-foreground/30"
+                        }`} />
+                        <span className="text-[10px] text-muted-foreground hidden sm:block">{label}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div className="space-y-2">
-                      <Label htmlFor="projectName" className="flex items-center gap-1.5">
-                        <FileText className="w-3.5 h-3.5 text-accent" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Project Name */}
+                    <div className="iron-input-group space-y-2">
+                      <Label htmlFor="projectName" className="flex items-center gap-2 text-sm font-semibold">
+                        <div className="w-6 h-6 rounded bg-accent/10 flex items-center justify-center">
+                          <FileText className="w-3.5 h-3.5 text-accent" />
+                        </div>
                         Project Name *
                       </Label>
                       <Input
@@ -340,17 +527,22 @@ export default function ProjectEstimator() {
                         placeholder="e.g. I-75 Highway Expansion Phase 2"
                         value={projectName}
                         onChange={(e) => setProjectName(e.target.value)}
+                        className="bg-muted/30"
                         data-testid="input-project-name"
                       />
+                      <div className="iron-input-indicator" />
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="projectType" className="flex items-center gap-1.5">
-                        <HardHat className="w-3.5 h-3.5 text-accent" />
+                    {/* Project Type */}
+                    <div className="iron-input-group space-y-2">
+                      <Label htmlFor="projectType" className="flex items-center gap-2 text-sm font-semibold">
+                        <div className="w-6 h-6 rounded bg-accent/10 flex items-center justify-center">
+                          <HardHat className="w-3.5 h-3.5 text-accent" />
+                        </div>
                         Project Type *
                       </Label>
                       <Select value={projectType} onValueChange={setProjectType}>
-                        <SelectTrigger data-testid="select-project-type">
+                        <SelectTrigger className="bg-muted/30" data-testid="select-project-type">
                           <SelectValue placeholder="Select project type" />
                         </SelectTrigger>
                         <SelectContent>
@@ -361,11 +553,15 @@ export default function ProjectEstimator() {
                           ))}
                         </SelectContent>
                       </Select>
+                      <div className="iron-input-indicator" />
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="location" className="flex items-center gap-1.5">
-                        <MapPin className="w-3.5 h-3.5 text-accent" />
+                    {/* Location */}
+                    <div className="iron-input-group space-y-2">
+                      <Label htmlFor="location" className="flex items-center gap-2 text-sm font-semibold">
+                        <div className="w-6 h-6 rounded bg-accent/10 flex items-center justify-center">
+                          <MapPin className="w-3.5 h-3.5 text-accent" />
+                        </div>
                         Project Location *
                       </Label>
                       <Input
@@ -373,17 +569,22 @@ export default function ProjectEstimator() {
                         placeholder="e.g. Tampa, FL or Houston, TX"
                         value={location}
                         onChange={(e) => setLocation(e.target.value)}
+                        className="bg-muted/30"
                         data-testid="input-location"
                       />
+                      <div className="iron-input-indicator" />
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="terrain" className="flex items-center gap-1.5">
-                        <Mountain className="w-3.5 h-3.5 text-accent" />
+                    {/* Terrain */}
+                    <div className="iron-input-group space-y-2">
+                      <Label htmlFor="terrain" className="flex items-center gap-2 text-sm font-semibold">
+                        <div className="w-6 h-6 rounded bg-accent/10 flex items-center justify-center">
+                          <Mountain className="w-3.5 h-3.5 text-accent" />
+                        </div>
                         Terrain Type *
                       </Label>
                       <Select value={terrain} onValueChange={setTerrain}>
-                        <SelectTrigger data-testid="select-terrain">
+                        <SelectTrigger className="bg-muted/30" data-testid="select-terrain">
                           <SelectValue placeholder="Select terrain type" />
                         </SelectTrigger>
                         <SelectContent>
@@ -394,15 +595,19 @@ export default function ProjectEstimator() {
                           ))}
                         </SelectContent>
                       </Select>
+                      <div className="iron-input-indicator" />
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="projectSize" className="flex items-center gap-1.5">
-                        <Ruler className="w-3.5 h-3.5 text-accent" />
+                    {/* Project Size */}
+                    <div className="iron-input-group space-y-2">
+                      <Label htmlFor="projectSize" className="flex items-center gap-2 text-sm font-semibold">
+                        <div className="w-6 h-6 rounded bg-accent/10 flex items-center justify-center">
+                          <Ruler className="w-3.5 h-3.5 text-accent" />
+                        </div>
                         Project Size *
                       </Label>
                       <Select value={projectSize} onValueChange={setProjectSize}>
-                        <SelectTrigger data-testid="select-project-size">
+                        <SelectTrigger className="bg-muted/30" data-testid="select-project-size">
                           <SelectValue placeholder="Select project size" />
                         </SelectTrigger>
                         <SelectContent>
@@ -413,15 +618,19 @@ export default function ProjectEstimator() {
                           ))}
                         </SelectContent>
                       </Select>
+                      <div className="iron-input-indicator" />
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="duration" className="flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5 text-accent" />
+                    {/* Duration */}
+                    <div className="iron-input-group space-y-2">
+                      <Label htmlFor="duration" className="flex items-center gap-2 text-sm font-semibold">
+                        <div className="w-6 h-6 rounded bg-accent/10 flex items-center justify-center">
+                          <Clock className="w-3.5 h-3.5 text-accent" />
+                        </div>
                         Estimated Duration *
                       </Label>
                       <Select value={duration} onValueChange={setDuration}>
-                        <SelectTrigger data-testid="select-duration">
+                        <SelectTrigger className="bg-muted/30" data-testid="select-duration">
                           <SelectValue placeholder="Select duration" />
                         </SelectTrigger>
                         <SelectContent>
@@ -432,12 +641,16 @@ export default function ProjectEstimator() {
                           ))}
                         </SelectContent>
                       </Select>
+                      <div className="iron-input-indicator" />
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="additionalDetails" className="flex items-center gap-1.5">
-                      <FileText className="w-3.5 h-3.5 text-accent" />
+                  {/* Additional Details */}
+                  <div className="iron-input-group space-y-2">
+                    <Label htmlFor="additionalDetails" className="flex items-center gap-2 text-sm font-semibold">
+                      <div className="w-6 h-6 rounded bg-accent/10 flex items-center justify-center">
+                        <Layers className="w-3.5 h-3.5 text-accent" />
+                      </div>
                       Additional Project Details (Optional)
                     </Label>
                     <Textarea
@@ -446,26 +659,30 @@ export default function ProjectEstimator() {
                       value={additionalDetails}
                       onChange={(e) => setAdditionalDetails(e.target.value)}
                       rows={4}
+                      className="bg-muted/30 resize-none"
                       data-testid="textarea-additional-details"
                     />
+                    <div className="iron-input-indicator" />
                   </div>
 
-                  <div className="flex gap-3">
+                  {/* Action Buttons */}
+                  <div className="flex gap-3 pt-2">
                     <Button
                       type="submit"
                       disabled={isGenerating}
-                      className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold px-8"
+                      size="lg"
+                      className="bg-accent text-accent-foreground font-black px-10 gap-2 shadow-lg shadow-accent/20"
                       data-testid="button-generate-estimate"
                     >
                       {isGenerating ? (
                         <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Generating Estimate...
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                          GENERATING ESTIMATE...
                         </>
                       ) : (
                         <>
-                          <Sparkles className="w-4 h-4 mr-2" />
-                          Generate Estimate
+                          <Zap className="w-5 h-5" />
+                          GENERATE ESTIMATE
                         </>
                       )}
                     </Button>
@@ -474,6 +691,8 @@ export default function ProjectEstimator() {
                         type="button"
                         variant="outline"
                         onClick={handleReset}
+                        size="lg"
+                        className="px-6 font-semibold"
                         data-testid="button-reset-estimate"
                       >
                         <RotateCcw className="w-4 h-4 mr-2" />
@@ -482,88 +701,117 @@ export default function ProjectEstimator() {
                     )}
                   </div>
                 </form>
-              </Card>
+              </div>
             </div>
 
+            {/* Sidebar */}
             <div className="space-y-6">
-              <Card className="flash-reveal p-6 border-card-border bg-background" style={{ "--flash-index": 1 } as any}>
-                <h3 className="font-semibold mb-3 flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-accent" />
-                  How It Works
-                </h3>
-                <div className="space-y-3 text-sm text-muted-foreground">
-                  <div className="flex gap-3">
-                    <div className="w-6 h-6 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0 text-xs font-bold text-accent">1</div>
-                    <p>Enter your project parameters including type, location, terrain, and scale</p>
+              {/* AI Engine Card */}
+              <div className="iron-panel rounded-xl p-6" style={{ "--flash-index": 1 } as any}>
+                <div className="iron-scan" />
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="relative w-10 h-10">
+                    <svg className="w-10 h-10 iron-ring" viewBox="0 0 40 40">
+                      <circle cx="20" cy="20" r="17" fill="none" stroke="hsl(var(--accent) / 0.2)" strokeWidth="1.5" />
+                      <circle cx="20" cy="20" r="17" fill="none" stroke="hsl(var(--accent))" strokeWidth="1.5" strokeDasharray="12 8" />
+                    </svg>
+                    <Cpu className="absolute inset-0 m-auto w-4 h-4 text-accent" />
                   </div>
-                  <div className="flex gap-3">
-                    <div className="w-6 h-6 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0 text-xs font-bold text-accent">2</div>
-                    <p>Our AI cross-references your needs against 2,100+ equipment items in our inventory</p>
-                  </div>
-                  <div className="flex gap-3">
-                    <div className="w-6 h-6 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0 text-xs font-bold text-accent">3</div>
-                    <p>Receive a comprehensive estimate with equipment, parts, logistics, and cost breakdowns</p>
+                  <div>
+                    <h3 className="font-black text-sm">AI ENGINE</h3>
+                    <p className="text-[11px] text-accent">GPT-5.2 Active</p>
                   </div>
                 </div>
-              </Card>
+                <div className="space-y-3 text-sm text-muted-foreground">
+                  <div className="flex gap-3 items-start">
+                    <div className="w-6 h-6 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0 text-[10px] font-black text-accent">1</div>
+                    <p>Enter your project parameters including type, location, terrain, and scale</p>
+                  </div>
+                  <div className="flex gap-3 items-start">
+                    <div className="w-6 h-6 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0 text-[10px] font-black text-accent">2</div>
+                    <p>AI cross-references your needs against 2,100+ equipment items</p>
+                  </div>
+                  <div className="flex gap-3 items-start">
+                    <div className="w-6 h-6 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0 text-[10px] font-black text-accent">3</div>
+                    <p>Receive comprehensive estimate with equipment, parts, logistics, and costs</p>
+                  </div>
+                </div>
+              </div>
 
-              <Card className="flash-reveal p-6 border-card-border bg-background" style={{ "--flash-index": 2 } as any}>
-                <h3 className="font-semibold mb-3">Estimate Includes</h3>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <ChevronRight className="w-3.5 h-3.5 text-accent mt-0.5 shrink-0" />
-                    Primary equipment with models & quantities
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <ChevronRight className="w-3.5 h-3.5 text-accent mt-0.5 shrink-0" />
-                    Supporting equipment & power generation
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <ChevronRight className="w-3.5 h-3.5 text-accent mt-0.5 shrink-0" />
-                    Transportation & logistics costs
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <ChevronRight className="w-3.5 h-3.5 text-accent mt-0.5 shrink-0" />
-                    Maintenance & replacement parts budget
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <ChevronRight className="w-3.5 h-3.5 text-accent mt-0.5 shrink-0" />
-                    Personnel requirements
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <ChevronRight className="w-3.5 h-3.5 text-accent mt-0.5 shrink-0" />
-                    Complete cost summary (low/mid/high)
-                  </li>
+              {/* Capabilities Grid */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="iron-stat-card text-center">
+                  <BarChart3 className="w-5 h-5 text-accent mx-auto mb-2" />
+                  <div className="text-xs font-bold">Cost Analysis</div>
+                  <div className="text-[10px] text-muted-foreground">Low/Mid/High</div>
+                </div>
+                <div className="iron-stat-card text-center">
+                  <TrendingUp className="w-5 h-5 text-accent mx-auto mb-2" />
+                  <div className="text-xs font-bold">ROI Projections</div>
+                  <div className="text-[10px] text-muted-foreground">Buy vs Rent</div>
+                </div>
+                <div className="iron-stat-card text-center">
+                  <Layers className="w-5 h-5 text-accent mx-auto mb-2" />
+                  <div className="text-xs font-bold">Fleet Planning</div>
+                  <div className="text-[10px] text-muted-foreground">Full Breakdown</div>
+                </div>
+                <div className="iron-stat-card text-center">
+                  <Calculator className="w-5 h-5 text-accent mx-auto mb-2" />
+                  <div className="text-xs font-bold">Parts Budget</div>
+                  <div className="text-[10px] text-muted-foreground">Maintenance</div>
+                </div>
+              </div>
+
+              {/* Estimate Includes */}
+              <div className="iron-panel rounded-xl p-6" style={{ "--flash-index": 2 } as any}>
+                <h3 className="font-black text-sm mb-3 uppercase tracking-wider">Estimate Includes</h3>
+                <ul className="space-y-2.5 text-sm text-muted-foreground">
+                  {[
+                    "Primary equipment with models & quantities",
+                    "Supporting equipment & power generation",
+                    "Transportation & logistics costs",
+                    "Maintenance & replacement parts budget",
+                    "Personnel requirements",
+                    "Complete cost summary (low/mid/high)",
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-2">
+                      <ChevronRight className="w-3.5 h-3.5 text-accent mt-0.5 shrink-0" />
+                      {item}
+                    </li>
+                  ))}
                 </ul>
-              </Card>
+              </div>
 
-              <Card className="flash-reveal p-6 border-accent/30 bg-accent/5" style={{ "--flash-index": 3 } as any}>
-                <h3 className="font-semibold mb-2 text-accent">Need a Formal Quote?</h3>
+              {/* CTA Card */}
+              <div className="iron-panel rounded-xl p-6 border-accent/30 bg-accent/5" style={{ "--flash-index": 3 } as any}>
+                <h3 className="font-black text-sm mb-2 text-accent uppercase">Need a Formal Quote?</h3>
                 <p className="text-sm text-muted-foreground mb-3">
                   This AI estimate provides budget guidance. For exact pricing and availability, request a formal quote from our team.
                 </p>
                 <Link href="/quote">
-                  <Button variant="outline" size="sm" className="border-accent/30 hover:bg-accent/10" data-testid="link-request-quote">
+                  <Button variant="outline" size="sm" className="border-accent/30 hover:bg-accent/10 font-semibold" data-testid="link-request-quote">
                     Request Quote <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
                   </Button>
                 </Link>
-              </Card>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Result Section */}
       {showResult && (
         <section className="py-16 bg-muted/30 border-t border-border" ref={resultRef}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6" ref={resultContainerRef}>
-            <Card className="p-8 border-card-border bg-background" data-testid="card-estimate-result">
+            <Card className="iron-panel rounded-2xl p-8" data-testid="card-estimate-result">
+              <div className="iron-scan" />
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-md bg-accent/10 border border-accent/20 flex items-center justify-center">
-                    <FileText className="w-5 h-5 text-accent" />
+                  <div className="w-12 h-12 rounded-xl bg-accent/10 border border-accent/30 flex items-center justify-center">
+                    <FileText className="w-6 h-6 text-accent" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold">Equipment Estimate Report</h2>
+                    <h2 className="text-xl font-black">IRON ESTIMATE REPORT</h2>
                     <p className="text-sm text-muted-foreground">{projectName} — {projectType}</p>
                   </div>
                 </div>
@@ -576,10 +824,11 @@ export default function ProjectEstimator() {
                       const url = URL.createObjectURL(blob);
                       const a = document.createElement("a");
                       a.href = url;
-                      a.download = `${projectName.replace(/\s+/g, "_")}_Estimate.md`;
+                      a.download = `${projectName.replace(/\s+/g, "_")}_IRON_Estimate.md`;
                       a.click();
                       URL.revokeObjectURL(url);
                     }}
+                    className="font-semibold"
                     data-testid="button-download-estimate"
                   >
                     <Download className="w-4 h-4 mr-1.5" />
@@ -590,9 +839,18 @@ export default function ProjectEstimator() {
 
               <div className="prose prose-sm max-w-none">
                 {isGenerating && !estimateResult && (
-                  <div className="flex items-center gap-3 py-12 justify-center text-muted-foreground">
-                    <Loader2 className="w-6 h-6 animate-spin text-accent" />
-                    <span>Analyzing project requirements and inventory data...</span>
+                  <div className="flex flex-col items-center gap-4 py-16 text-muted-foreground">
+                    <div className="relative w-16 h-16">
+                      <svg className="w-16 h-16 iron-ring" viewBox="0 0 64 64">
+                        <circle cx="32" cy="32" r="28" fill="none" stroke="hsl(var(--accent) / 0.2)" strokeWidth="2" />
+                        <circle cx="32" cy="32" r="28" fill="none" stroke="hsl(var(--accent))" strokeWidth="2" strokeDasharray="20 12" />
+                      </svg>
+                      <Cpu className="absolute inset-0 m-auto w-6 h-6 text-accent" />
+                    </div>
+                    <div className="text-center">
+                      <p className="font-semibold text-foreground">Analyzing Project Requirements</p>
+                      <p className="text-sm">Cross-referencing inventory data and generating estimate...</p>
+                    </div>
                   </div>
                 )}
 
@@ -603,7 +861,7 @@ export default function ProjectEstimator() {
                 )}
 
                 {isGenerating && estimateResult && (
-                  <div className="flex items-center gap-2 mt-4 text-accent text-sm">
+                  <div className="flex items-center gap-2 mt-4 text-accent text-sm font-semibold">
                     <Loader2 className="w-4 h-4 animate-spin" />
                     <span>Generating...</span>
                   </div>
@@ -613,17 +871,17 @@ export default function ProjectEstimator() {
               {!isGenerating && estimateResult && (
                 <div className="mt-8 pt-6 border-t border-border flex flex-col sm:flex-row gap-4">
                   <Link href="/quote">
-                    <Button className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold" data-testid="button-request-formal-quote">
+                    <Button size="lg" className="bg-accent text-accent-foreground font-black px-8 shadow-lg shadow-accent/20" data-testid="button-request-formal-quote">
                       Request Formal Quote <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
                   </Link>
                   <Link href="/equipment">
-                    <Button variant="outline" data-testid="button-browse-equipment">
+                    <Button variant="outline" size="lg" className="font-semibold" data-testid="button-browse-equipment">
                       Browse Equipment <ChevronRight className="w-4 h-4 ml-1" />
                     </Button>
                   </Link>
                   <Link href="/parts">
-                    <Button variant="outline" data-testid="button-browse-parts">
+                    <Button variant="outline" size="lg" className="font-semibold" data-testid="button-browse-parts">
                       Browse Parts Catalog <ChevronRight className="w-4 h-4 ml-1" />
                     </Button>
                   </Link>
