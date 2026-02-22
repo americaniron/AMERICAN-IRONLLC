@@ -127,10 +127,10 @@ export default function EquipmentDetails() {
             </Card>
 
             <div className="flash-reveal flex flex-col gap-3" style={{ "--flash-index": 3 } as any}>
-              <Link href="/contact">
+              <Link href={`/quote/item/equipment/${id}`}>
                 <Button className="w-full bg-accent text-accent-foreground gap-2" size="lg" data-testid="button-get-quote-detail">
                   <FileText className="w-4 h-4" />
-                  Send me a Quote
+                  Get a Quote
                 </Button>
               </Link>
               <Link href="/services/shipping">

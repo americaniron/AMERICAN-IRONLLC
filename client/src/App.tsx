@@ -22,6 +22,7 @@ import Contact from "@/pages/Contact";
 import ProjectEstimator from "@/pages/ProjectEstimator";
 import PowerUnits from "@/pages/PowerUnits";
 import PowerUnitsListings from "@/pages/PowerUnitsListings";
+import QuotePreview from "@/pages/QuotePreview";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -41,6 +42,7 @@ function Router() {
       <Route path="/services/estimator" component={ProjectEstimator} />
       <Route path="/power-units" component={PowerUnits} />
       <Route path="/power-units/listings" component={PowerUnitsListings} />
+      <Route path="/quote/item/:type/:id" component={QuotePreview} />
       <Route path="/contact" component={Contact} />
       <Route component={NotFound} />
     </Switch>

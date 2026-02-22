@@ -4,6 +4,10 @@ import { storage } from "./storage";
 import { insertQuoteRequestSchema, insertContactInquirySchema } from "@shared/schema";
 import OpenAI from "openai";
 import { z } from "zod";
+import { Resend } from "resend";
+import PDFDocument from "pdfkit";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const estimateRequestSchema = z.object({
   projectName: z.string().min(1).max(200),
@@ -282,6 +286,244 @@ Provide a thorough, institutional-grade estimate with specific equipment recomme
       } else {
         res.status(500).json({ error: "Failed to generate estimate" });
       }
+    }
+  });
+
+  const quoteEmailSchema = z.object({
+    email: z.string().email(),
+    itemType: z.enum(["equipment", "power-unit"]),
+    itemId: z.string(),
+    quoteNumber: z.string(),
+    quoteDate: z.string(),
+  });
+
+  app.post("/api/quotes/send-email", async (req, res) => {
+    try {
+      const parsed = quoteEmailSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ error: "Validation error", details: parsed.error.issues });
+      }
+
+      const { email, itemType, itemId, quoteNumber, quoteDate } = parsed.data;
+
+      let itemTitle = "";
+      let itemIdentifier = "";
+      let itemCategory = "";
+      let itemPrice = "Call for Price";
+      let specs: { label: string; value: string }[] = [];
+
+      if (itemType === "equipment") {
+        const item = await storage.getEquipmentById(itemId);
+        if (!item) return res.status(404).json({ error: "Equipment not found" });
+        itemTitle = `${item.make} ${item.model}`;
+        itemIdentifier = `ID: ${item.equipmentId}`;
+        itemCategory = item.category;
+        itemPrice = item.price && item.price !== "CALL" ? item.price : "Call for Price";
+        specs = [
+          { label: "Make", value: item.make },
+          { label: "Model", value: item.model },
+          { label: "Year", value: item.year?.toString() || "N/A" },
+          { label: "Hours", value: item.meter ? `${item.meter.toLocaleString()} hrs` : "N/A" },
+          { label: "Location", value: [item.city, item.state].filter(Boolean).join(", ") || "Tampa, FL" },
+        ];
+      } else {
+        const id = parseInt(itemId);
+        if (isNaN(id)) return res.status(400).json({ error: "Invalid power unit ID" });
+        const item = await storage.getPowerUnitById(id);
+        if (!item) return res.status(404).json({ error: "Power unit not found" });
+        itemTitle = item.model;
+        itemIdentifier = `SN: ${item.stockNumber}`;
+        itemCategory = item.category;
+        itemPrice = item.price ? `$${Number(item.price).toLocaleString()}` : "Call for Price";
+        specs = [
+          { label: "Model", value: item.model },
+          { label: "Stock Number", value: item.stockNumber },
+          { label: "Category", value: item.category },
+          ...(item.hp ? [{ label: "Horsepower", value: `${item.hp} HP` }] : []),
+          ...(item.kw ? [{ label: "Kilowatts", value: `${item.kw} kW` }] : []),
+          ...(item.rpm ? [{ label: "RPM", value: `${item.rpm}` }] : []),
+          ...(item.year ? [{ label: "Year", value: item.year }] : []),
+          ...(item.condition ? [{ label: "Condition", value: item.condition }] : []),
+          ...(item.location ? [{ label: "Location", value: item.location }] : []),
+        ];
+      }
+
+      const dateObj = new Date(quoteDate);
+      const validTo = new Date(dateObj);
+      validTo.setDate(validTo.getDate() + 30);
+      const formatDate = (d: Date) =>
+        d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+
+      const pdfBuffer = await new Promise<Buffer>((resolve, reject) => {
+        const doc = new PDFDocument({ size: "LETTER", margin: 50 });
+        const chunks: Buffer[] = [];
+        doc.on("data", (chunk: Buffer) => chunks.push(chunk));
+        doc.on("end", () => resolve(Buffer.concat(chunks)));
+        doc.on("error", reject);
+
+        doc.rect(0, 0, doc.page.width, 80).fill("#000000");
+        doc.fontSize(22).fill("#FFCD11").text("AMERICAN IRON LLC", 50, 25, { continued: false });
+        doc.fontSize(10).fill("#FFFFFF").text("Heavy Equipment & Industrial Parts", 50, 52);
+        doc.fill("#CCCCCC").text("+1 (850) 777-3797 | info@americanironus.com | Tampa, FL", 300, 30, { align: "right", width: 220 });
+
+        doc.moveDown(2);
+        doc.y = 100;
+        doc.fontSize(18).fill("#000000").text("QUOTATION", 50);
+        doc.fontSize(10).fill("#666666").text(`Quote #: ${quoteNumber}`, 400, 100, { align: "right", width: 160 });
+        doc.text(`Date: ${formatDate(dateObj)}`, 400, 115, { align: "right", width: 160 });
+        doc.text(`Valid Until: ${formatDate(validTo)}`, 400, 130, { align: "right", width: 160 });
+
+        doc.moveTo(50, 155).lineTo(562, 155).stroke("#CCCCCC");
+
+        doc.y = 170;
+        doc.fontSize(14).fill("#000000").text(itemTitle, 50);
+        doc.fontSize(10).fill("#666666").text(`${itemIdentifier} | ${itemCategory}`, 50);
+
+        doc.moveTo(50, doc.y + 10).lineTo(562, doc.y + 10).stroke("#CCCCCC");
+        doc.y += 25;
+
+        doc.fontSize(12).fill("#000000").text("SPECIFICATIONS", 50);
+        doc.moveDown(0.5);
+
+        specs.forEach((spec, i) => {
+          const y = doc.y;
+          if (i % 2 === 0) {
+            doc.rect(50, y - 2, 512, 20).fill("#F5F5F5");
+          }
+          doc.fontSize(10).fill("#666666").text(spec.label, 60, y + 2, { width: 150 });
+          doc.fill("#000000").text(spec.value, 220, y + 2, { width: 300 });
+          doc.y = y + 22;
+        });
+
+        doc.moveDown(1);
+        doc.moveTo(50, doc.y).lineTo(562, doc.y).stroke("#CCCCCC");
+        doc.moveDown(0.5);
+
+        doc.fontSize(12).fill("#000000").text("PRICING", 50);
+        doc.moveDown(0.5);
+
+        const tableTop = doc.y;
+        doc.rect(50, tableTop, 512, 22).fill("#000000");
+        doc.fontSize(10).fill("#FFFFFF").text("Item", 60, tableTop + 6, { width: 250 });
+        doc.text("Qty", 320, tableTop + 6, { width: 60, align: "center" });
+        doc.text("Unit Price", 400, tableTop + 6, { width: 152, align: "right" });
+
+        const row1Top = tableTop + 24;
+        doc.rect(50, row1Top, 512, 24).fill("#FFFFFF");
+        doc.fontSize(10).fill("#000000").text(itemTitle, 60, row1Top + 6, { width: 250 });
+        doc.text("1", 320, row1Top + 6, { width: 60, align: "center" });
+        doc.text(itemPrice, 400, row1Top + 6, { width: 152, align: "right" });
+
+        const totalTop = row1Top + 26;
+        doc.rect(50, totalTop, 512, 26).fill("#000000");
+        doc.fontSize(11).fill("#FFFFFF").text("Total", 60, totalTop + 7, { width: 300, align: "right" });
+        doc.fill("#FFCD11").text(itemPrice, 400, totalTop + 7, { width: 152, align: "right" });
+
+        doc.y = totalTop + 50;
+        doc.moveTo(50, doc.y).lineTo(562, doc.y).stroke("#CCCCCC");
+        doc.moveDown(0.5);
+
+        doc.fontSize(11).fill("#000000").text("TERMS & CONDITIONS", 50);
+        doc.moveDown(0.3);
+        const terms = [
+          "1. This quotation is valid for 30 days from the date of issue.",
+          "2. Prices are quoted in USD and are subject to change without notice after the validity period.",
+          "3. Shipping, freight, and handling charges are not included unless otherwise stated.",
+          "4. Payment terms: Wire transfer or certified check.",
+          "5. Equipment is sold as-is, where-is unless otherwise specified.",
+          "6. American Iron LLC reserves the right to modify or withdraw this quotation prior to acceptance.",
+        ];
+        terms.forEach((term) => {
+          doc.fontSize(8).fill("#666666").text(term, 50, doc.y, { width: 512 });
+          doc.moveDown(0.2);
+        });
+
+        doc.moveDown(1);
+        doc.moveTo(50, doc.y).lineTo(562, doc.y).stroke("#CCCCCC");
+        doc.moveDown(0.5);
+        doc.fontSize(9).fill("#888888").text("American Iron LLC — Tampa, Florida", 50, doc.y, { align: "center", width: 512 });
+        doc.text("Phone: +1 (850) 777-3797 | Email: info@americanironus.com | Web: www.americanironus.com", { align: "center", width: 512 });
+
+        doc.end();
+      });
+
+      const htmlBody = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f4f4f4;font-family:Arial,Helvetica,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;background:#ffffff;">
+    <tr>
+      <td style="background:#000000;padding:24px 32px;">
+        <h1 style="margin:0;color:#FFCD11;font-size:22px;font-weight:bold;">AMERICAN IRON LLC</h1>
+        <p style="margin:4px 0 0;color:#cccccc;font-size:13px;">Heavy Equipment & Industrial Parts</p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:32px;">
+        <h2 style="margin:0 0 8px;color:#000;font-size:20px;">Your Equipment Quote</h2>
+        <p style="margin:0 0 24px;color:#666;font-size:14px;">Quote #${quoteNumber} | ${formatDate(dateObj)}</p>
+        <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e0e0e0;border-radius:6px;overflow:hidden;">
+          <tr>
+            <td style="background:#f9f9f9;padding:16px;">
+              <p style="margin:0 0 4px;font-size:11px;color:#FFCD11;font-weight:bold;text-transform:uppercase;">${itemCategory}</p>
+              <h3 style="margin:0 0 4px;color:#000;font-size:16px;">${itemTitle}</h3>
+              <p style="margin:0;color:#888;font-size:13px;">${itemIdentifier}</p>
+            </td>
+          </tr>
+          ${specs.map((s, i) => `
+          <tr>
+            <td style="padding:10px 16px;border-top:1px solid #eee;background:${i % 2 === 0 ? "#ffffff" : "#fafafa"};">
+              <span style="color:#888;font-size:13px;display:inline-block;width:140px;">${s.label}</span>
+              <span style="color:#000;font-size:13px;font-weight:600;">${s.value}</span>
+            </td>
+          </tr>`).join("")}
+          <tr>
+            <td style="background:#000;padding:14px 16px;">
+              <span style="color:#fff;font-size:14px;font-weight:bold;">Total: </span>
+              <span style="color:#FFCD11;font-size:16px;font-weight:bold;">${itemPrice}</span>
+            </td>
+          </tr>
+        </table>
+        <p style="margin:24px 0 0;color:#888;font-size:12px;">This quote is valid for 30 days. Shipping charges not included. Please reply to this email or call +1 (850) 777-3797 to proceed.</p>
+        <p style="margin:16px 0 0;">
+          <a href="https://www.americanironus.com" style="display:inline-block;background:#FFCD11;color:#000;padding:10px 24px;text-decoration:none;border-radius:4px;font-weight:bold;font-size:14px;">Visit Our Website</a>
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td style="background:#f4f4f4;padding:20px 32px;text-align:center;">
+        <p style="margin:0;color:#999;font-size:11px;">American Iron LLC — Tampa, Florida</p>
+        <p style="margin:4px 0 0;color:#999;font-size:11px;">+1 (850) 777-3797 | info@americanironus.com</p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+      const { data: emailResult, error: emailError } = await resend.emails.send({
+        from: "American Iron LLC <onboarding@resend.dev>",
+        to: email,
+        subject: `Quote ${quoteNumber} — ${itemTitle} | American Iron LLC`,
+        html: htmlBody,
+        attachments: [
+          {
+            filename: `American_Iron_Quote_${quoteNumber}.pdf`,
+            content: pdfBuffer,
+          },
+        ],
+      });
+
+      if (emailError) {
+        console.error("Resend error:", emailError);
+        return res.status(500).json({ error: "Failed to send email", details: emailError.message });
+      }
+
+      console.log("Quote email sent:", emailResult?.id, "to:", email);
+      res.json({ success: true, emailId: emailResult?.id });
+    } catch (error: any) {
+      console.error("Quote email error:", error);
+      res.status(500).json({ error: "Failed to send quote email" });
     }
   });
 

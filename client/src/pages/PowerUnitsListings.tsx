@@ -196,7 +196,7 @@ export default function PowerUnitsListings() {
                         ) : (
                           <span className="font-semibold text-accent" data-testid={`text-price-${item.id}`}>Call for Price</span>
                         )}
-                        <Link href="/quote">
+                        <Link href={`/quote/item/power-unit/${item.id}`}>
                           <Button size="sm" variant="outline" className="gap-1 text-xs" data-testid={`button-quote-${item.id}`}>
                             Get Quote
                             <ArrowRight className="w-3 h-3" />

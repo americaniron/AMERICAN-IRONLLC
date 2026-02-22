@@ -758,3 +758,33 @@ body > div:not(#root) {
   pointer-events: none;
   visibility: hidden !important;
 }
+
+@media print {
+  body {
+    background: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .print\:hidden,
+  nav,
+  footer,
+  header,
+  .flash-page-transition > .bg-card.border-b,
+  .flash-page-transition > .bg-muted\/30 {
+    display: none !important;
+  }
+  #quote-template {
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+  #quote-template > div:first-child {
+    border-radius: 0 !important;
+  }
+  @page {
+    margin: 0.5in;
+    size: letter;
+  }
+}

@@ -67,6 +67,7 @@ Preferred communication style: Simple, everyday language.
 - `GET /api/power-units/categories/counts` — Get power unit counts by category
 - `GET /api/power-units/:id` — Get single power unit by database ID
 - `POST /api/estimate` — IRON Estimator: AI-powered equipment estimator (streaming SSE response, uses OpenAI gpt-5.2 with real inventory data)
+- `POST /api/quotes/send-email` — Send quote email with PDF attachment (uses Resend API + PDFKit); accepts { email, itemType, itemId, quoteNumber, quoteDate }
 
 ### AI Integration
 - **Provider**: Replit AI Integrations (OpenAI-compatible, no API key needed)
