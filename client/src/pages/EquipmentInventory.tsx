@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useSearch } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,7 +40,8 @@ const CATEGORIES = [
 const ITEMS_PER_PAGE = 24;
 
 export default function EquipmentInventory() {
-  const searchStr = useSearch();
+  const [location] = useLocation();
+  const searchStr = typeof window !== "undefined" ? window.location.search : "";
   const params = new URLSearchParams(searchStr);
   const initialCategory = params.get("category") || "ALL";
 
