@@ -1,9 +1,57 @@
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useFlashReveal } from "@/hooks/useFlashReveal";
+
+const VIDEOS = [
+  "/images/equip-bg-1.mp4",
+  "/images/equip-bg-2.mp4",
+];
+
+function RotatingVideoBackground() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [fadingOut, setFadingOut] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const nextIndexRef = useRef(1);
+
+  const handleVideoEnd = useCallback(() => {
+    setFadingOut(true);
+    setTimeout(() => {
+      setActiveIndex(nextIndexRef.current);
+      nextIndexRef.current = (nextIndexRef.current + 1) % VIDEOS.length;
+      setFadingOut(false);
+    }, 600);
+  }, []);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.load();
+    video.play().catch(() => {});
+  }, [activeIndex]);
+
+  return (
+    <>
+      <video
+        ref={videoRef}
+        key={activeIndex}
+        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-600"
+        style={{ opacity: fadingOut ? 0 : 1 }}
+        muted
+        playsInline
+        onEnded={handleVideoEnd}
+        data-testid="equip-hero-video"
+      >
+        <source src={VIDEOS[activeIndex]} type="video/mp4" />
+      </video>
+      <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/70 to-black/50" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />
+    </>
+  );
+}
 
 import telehandlerImg from "@assets/TELEHANDLER_1771680608848.png";
 import asphaltPaversImg from "@assets/ASPHALT_PAVERS_1771680608848.png";
@@ -52,12 +100,8 @@ export default function EquipmentCategories() {
 
   return (
     <div className="flash-page-transition">
-      <section className="relative py-20 overflow-hidden" ref={heroRef}>
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${excavatorsImg})` }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/75 to-black/55" />
+      <section className="relative py-24 overflow-hidden bg-black" ref={heroRef}>
+        <RotatingVideoBackground />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
           <h1 className="flash-reveal text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 tracking-tight" data-testid="text-page-title">
             Equipment Categories
