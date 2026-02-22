@@ -9,6 +9,15 @@ import PDFDocument from "pdfkit";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+function escHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 const estimateRequestSchema = z.object({
   projectName: z.string().min(1).max(200),
   projectType: z.string().min(1).max(100),
@@ -111,6 +120,96 @@ export async function registerRoutes(
     try {
       const data = insertQuoteRequestSchema.parse(req.body);
       const item = await storage.createQuoteRequest(data);
+
+      const businessHtml = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f4f4f4;font-family:Arial,Helvetica,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;background:#ffffff;">
+    <tr>
+      <td style="background:#000000;padding:24px 32px;">
+        <h1 style="margin:0;color:#FFCD11;font-size:22px;font-weight:bold;">AMERICAN IRON LLC</h1>
+        <p style="margin:4px 0 0;color:#cccccc;font-size:13px;">New Quote Request Received</p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:32px;">
+        <h2 style="margin:0 0 16px;color:#000;font-size:18px;">Parts Quote Request</h2>
+        <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e0e0e0;border-radius:6px;overflow:hidden;">
+          <tr><td style="padding:12px 16px;background:#f9f9f9;border-bottom:1px solid #eee;"><span style="color:#888;font-size:13px;display:inline-block;width:100px;">Name</span><span style="color:#000;font-size:14px;font-weight:600;">${escHtml(data.name)}</span></td></tr>
+          <tr><td style="padding:12px 16px;border-bottom:1px solid #eee;"><span style="color:#888;font-size:13px;display:inline-block;width:100px;">Email</span><a href="mailto:${data.email}" style="color:#FFCD11;font-size:14px;font-weight:600;text-decoration:none;">${escHtml(data.email)}</a></td></tr>
+          ${data.phone ? `<tr><td style="padding:12px 16px;background:#f9f9f9;border-bottom:1px solid #eee;"><span style="color:#888;font-size:13px;display:inline-block;width:100px;">Phone</span><span style="color:#000;font-size:14px;font-weight:600;">${escHtml(data.phone)}</span></td></tr>` : ""}
+          ${data.shipTo ? `<tr><td style="padding:12px 16px;border-bottom:1px solid #eee;"><span style="color:#888;font-size:13px;display:inline-block;width:100px;">Ship To</span><span style="color:#000;font-size:14px;font-weight:600;">${escHtml(data.shipTo)}</span></td></tr>` : ""}
+          ${data.items ? `<tr><td style="padding:16px;background:#f9f9f9;border-bottom:1px solid #eee;"><span style="color:#888;font-size:13px;display:block;margin-bottom:8px;">Parts Requested</span><p style="margin:0;color:#000;font-size:14px;line-height:1.5;font-family:monospace;white-space:pre-wrap;">${escHtml(data.items)}</p></td></tr>` : ""}
+          ${data.notes ? `<tr><td style="padding:16px;"><span style="color:#888;font-size:13px;display:block;margin-bottom:8px;">Notes</span><p style="margin:0;color:#000;font-size:14px;line-height:1.5;white-space:pre-wrap;">${escHtml(data.notes)}</p></td></tr>` : ""}
+        </table>
+        <p style="margin:24px 0 0;color:#888;font-size:12px;">Submitted on ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}</p>
+        <p style="margin:12px 0 0;"><a href="mailto:${data.email}?subject=RE: Your Parts Quote Request — American Iron LLC" style="display:inline-block;background:#FFCD11;color:#000;padding:10px 24px;text-decoration:none;border-radius:4px;font-weight:bold;font-size:14px;">Reply to ${escHtml(data.name)}</a></p>
+      </td>
+    </tr>
+    <tr>
+      <td style="background:#f4f4f4;padding:16px 32px;text-align:center;">
+        <p style="margin:0;color:#999;font-size:11px;">American Iron LLC — Tampa, Florida | +1 (850) 777-3797</p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+      const confirmHtml = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f4f4f4;font-family:Arial,Helvetica,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;background:#ffffff;">
+    <tr>
+      <td style="background:#000000;padding:24px 32px;">
+        <h1 style="margin:0;color:#FFCD11;font-size:22px;font-weight:bold;">AMERICAN IRON LLC</h1>
+        <p style="margin:4px 0 0;color:#cccccc;font-size:13px;">Heavy Equipment & Industrial Parts</p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:32px;">
+        <h2 style="margin:0 0 8px;color:#000;font-size:18px;">Quote Request Received</h2>
+        <p style="margin:0 0 20px;color:#666;font-size:14px;line-height:1.5;">Thank you, ${escHtml(data.name)}. We've received your parts quote request and will respond within one business day with pricing and availability.</p>
+        ${data.items ? `<table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e0e0e0;border-radius:6px;overflow:hidden;"><tr><td style="padding:16px;background:#f9f9f9;"><span style="color:#888;font-size:13px;display:block;margin-bottom:8px;">Parts Requested</span><p style="margin:0;color:#000;font-size:14px;line-height:1.5;font-family:monospace;white-space:pre-wrap;">${escHtml(data.items)}</p></td></tr></table>` : ""}
+        <p style="margin:24px 0 0;color:#666;font-size:13px;">Need immediate assistance?</p>
+        <p style="margin:8px 0 0;color:#000;font-size:13px;">Phone: +1 (850) 777-3797</p>
+        <p style="margin:4px 0 0;color:#000;font-size:13px;">WhatsApp: +1 (813) 200-6088</p>
+        <p style="margin:16px 0 0;"><a href="https://www.americanironus.com/parts" style="display:inline-block;background:#FFCD11;color:#000;padding:10px 24px;text-decoration:none;border-radius:4px;font-weight:bold;font-size:14px;">Browse Parts Catalog</a></p>
+      </td>
+    </tr>
+    <tr>
+      <td style="background:#f4f4f4;padding:16px 32px;text-align:center;">
+        <p style="margin:0;color:#999;font-size:11px;">American Iron LLC — Tampa, Florida | +1 (850) 777-3797</p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+      try {
+        await Promise.all([
+          resend.emails.send({
+            from: "American Iron LLC <onboarding@resend.dev>",
+            to: "info@americanironus.com",
+            subject: `New Parts Quote Request from ${escHtml(data.name)}`,
+            html: businessHtml,
+            replyTo: data.email,
+          }),
+          resend.emails.send({
+            from: "American Iron LLC <onboarding@resend.dev>",
+            to: data.email,
+            subject: "Quote Request Received — American Iron LLC",
+            html: confirmHtml,
+          }),
+        ]);
+        console.log("Quote request emails sent for:", data.name, data.email);
+      } catch (emailErr) {
+        console.error("Quote request email send error (non-blocking):", emailErr);
+      }
+
       res.status(201).json(item);
     } catch (error: any) {
       if (error?.issues) {
@@ -124,6 +223,95 @@ export async function registerRoutes(
     try {
       const data = insertContactInquirySchema.parse(req.body);
       const item = await storage.createContactInquiry(data);
+
+      const businessHtml = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f4f4f4;font-family:Arial,Helvetica,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;background:#ffffff;">
+    <tr>
+      <td style="background:#000000;padding:24px 32px;">
+        <h1 style="margin:0;color:#FFCD11;font-size:22px;font-weight:bold;">AMERICAN IRON LLC</h1>
+        <p style="margin:4px 0 0;color:#cccccc;font-size:13px;">New Contact Form Submission</p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:32px;">
+        <h2 style="margin:0 0 16px;color:#000;font-size:18px;">New Inquiry Received</h2>
+        <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e0e0e0;border-radius:6px;overflow:hidden;">
+          <tr><td style="padding:12px 16px;background:#f9f9f9;border-bottom:1px solid #eee;"><span style="color:#888;font-size:13px;display:inline-block;width:100px;">Name</span><span style="color:#000;font-size:14px;font-weight:600;">${escHtml(data.name)}</span></td></tr>
+          <tr><td style="padding:12px 16px;border-bottom:1px solid #eee;"><span style="color:#888;font-size:13px;display:inline-block;width:100px;">Email</span><a href="mailto:${data.email}" style="color:#FFCD11;font-size:14px;font-weight:600;text-decoration:none;">${escHtml(data.email)}</a></td></tr>
+          <tr><td style="padding:16px;background:#f9f9f9;"><span style="color:#888;font-size:13px;display:block;margin-bottom:8px;">Message</span><p style="margin:0;color:#000;font-size:14px;line-height:1.5;white-space:pre-wrap;">${escHtml(data.message)}</p></td></tr>
+        </table>
+        <p style="margin:24px 0 0;color:#888;font-size:12px;">Submitted on ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}</p>
+        <p style="margin:12px 0 0;"><a href="mailto:${data.email}?subject=RE: Your Inquiry — American Iron LLC" style="display:inline-block;background:#FFCD11;color:#000;padding:10px 24px;text-decoration:none;border-radius:4px;font-weight:bold;font-size:14px;">Reply to ${escHtml(data.name)}</a></p>
+      </td>
+    </tr>
+    <tr>
+      <td style="background:#f4f4f4;padding:16px 32px;text-align:center;">
+        <p style="margin:0;color:#999;font-size:11px;">American Iron LLC — Tampa, Florida | +1 (850) 777-3797</p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+      const confirmHtml = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f4f4f4;font-family:Arial,Helvetica,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;background:#ffffff;">
+    <tr>
+      <td style="background:#000000;padding:24px 32px;">
+        <h1 style="margin:0;color:#FFCD11;font-size:22px;font-weight:bold;">AMERICAN IRON LLC</h1>
+        <p style="margin:4px 0 0;color:#cccccc;font-size:13px;">Heavy Equipment & Industrial Parts</p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:32px;">
+        <h2 style="margin:0 0 8px;color:#000;font-size:18px;">Thank You, ${escHtml(data.name)}</h2>
+        <p style="margin:0 0 20px;color:#666;font-size:14px;line-height:1.5;">We've received your inquiry and a specialist will respond within one business day.</p>
+        <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e0e0e0;border-radius:6px;overflow:hidden;">
+          <tr><td style="padding:16px;background:#f9f9f9;"><span style="color:#888;font-size:13px;display:block;margin-bottom:8px;">Your Message</span><p style="margin:0;color:#000;font-size:14px;line-height:1.5;white-space:pre-wrap;">${escHtml(data.message)}</p></td></tr>
+        </table>
+        <p style="margin:24px 0 0;color:#666;font-size:13px;">In the meantime, you can reach us directly:</p>
+        <p style="margin:8px 0 0;color:#000;font-size:13px;">Phone: +1 (850) 777-3797</p>
+        <p style="margin:4px 0 0;color:#000;font-size:13px;">WhatsApp: +1 (813) 200-6088</p>
+        <p style="margin:16px 0 0;"><a href="https://www.americanironus.com" style="display:inline-block;background:#FFCD11;color:#000;padding:10px 24px;text-decoration:none;border-radius:4px;font-weight:bold;font-size:14px;">Browse Our Inventory</a></p>
+      </td>
+    </tr>
+    <tr>
+      <td style="background:#f4f4f4;padding:16px 32px;text-align:center;">
+        <p style="margin:0;color:#999;font-size:11px;">American Iron LLC — Tampa, Florida | +1 (850) 777-3797</p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+      try {
+        await Promise.all([
+          resend.emails.send({
+            from: "American Iron LLC <onboarding@resend.dev>",
+            to: "info@americanironus.com",
+            subject: `New Contact Inquiry from ${escHtml(data.name)}`,
+            html: businessHtml,
+            replyTo: data.email,
+          }),
+          resend.emails.send({
+            from: "American Iron LLC <onboarding@resend.dev>",
+            to: data.email,
+            subject: "We've Received Your Inquiry — American Iron LLC",
+            html: confirmHtml,
+          }),
+        ]);
+        console.log("Contact emails sent for:", data.name, data.email);
+      } catch (emailErr) {
+        console.error("Contact email send error (non-blocking):", emailErr);
+      }
+
       res.status(201).json(item);
     } catch (error: any) {
       if (error?.issues) {
