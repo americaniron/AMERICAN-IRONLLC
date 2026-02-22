@@ -98,7 +98,7 @@ export default function Home() {
 
   return (
     <div className="flash-page-transition">
-      <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden bg-black">
+      <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden bg-black" style={{ WebkitTransform: "translateZ(0)" }}>
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: "url(/images/hero-equipment.png)" }}

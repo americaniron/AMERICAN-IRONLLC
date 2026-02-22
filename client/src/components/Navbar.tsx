@@ -23,7 +23,7 @@ export default function Navbar() {
 
   return (
     <>
-      <div className="flash-navbar bg-primary text-primary-foreground text-sm hidden lg:block">
+      <div className="bg-primary text-primary-foreground text-sm hidden lg:block">
         <div className="max-w-7xl mx-auto px-6 py-2 flex items-center justify-between gap-4">
           <span className="text-primary-foreground/80">
             Heavy Equipment & Asset Management Solutions
@@ -49,7 +49,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      <header className="flash-navbar sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b" style={{ animationDelay: "0.1s" }}>
+      <header className="flash-navbar sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b" style={{ animationDelay: "0.1s", WebkitBackfaceVisibility: "hidden" as any }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16 lg:h-18">
             <Link href="/" data-testid="link-home">

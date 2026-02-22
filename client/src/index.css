@@ -753,3 +753,8 @@
     border-color: hsl(var(--accent) / 0.15);
   }
 }
+
+body > div:not(#root) {
+  pointer-events: none;
+  visibility: hidden !important;
+}
