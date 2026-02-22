@@ -1,3 +1,4 @@
+import { useState, useCallback } from "react";
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -5,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SplashScreen from "@/components/SplashScreen";
 import Home from "@/pages/Home";
 import EquipmentCategories from "@/pages/EquipmentCategories";
 import EquipmentInventory from "@/pages/EquipmentInventory";
@@ -18,10 +20,6 @@ import ServiceTransportation from "@/pages/ServiceTransportation";
 import ServiceShipping from "@/pages/ServiceShipping";
 import Contact from "@/pages/Contact";
 import NotFound from "@/pages/not-found";
-
-function ScrollToTop() {
-  return null;
-}
 
 function Router() {
   return (
@@ -44,9 +42,20 @@ function Router() {
 }
 
 function App() {
+  const [splashDone, setSplashDone] = useState(() => {
+    if (typeof window !== "undefined" && sessionStorage.getItem("ai-splash-shown")) return true;
+    return false;
+  });
+
+  const handleSplashComplete = useCallback(() => {
+    sessionStorage.setItem("ai-splash-shown", "1");
+    setSplashDone(true);
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        {!splashDone && <SplashScreen onComplete={handleSplashComplete} />}
         <div className="min-h-screen flex flex-col">
           <Navbar />
           <main className="flex-1">

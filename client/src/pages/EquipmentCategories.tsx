@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useFlashReveal } from "@/hooks/useFlashReveal";
 
 import telehandlerImg from "@assets/TELEHANDLER_1771680608848.png";
 import asphaltPaversImg from "@assets/ASPHALT_PAVERS_1771680608848.png";
@@ -46,34 +47,38 @@ export default function EquipmentCategories() {
 
   const totalItems = counts ? Object.values(counts).reduce((a, b) => a + b, 0) : 0;
 
+  const heroRef = useFlashReveal();
+  const gridRef = useFlashReveal();
+
   return (
     <div>
-      <section className="relative py-20 overflow-hidden">
+      <section className="relative py-20 overflow-hidden" ref={heroRef}>
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${excavatorsImg})` }}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/75 to-black/55" />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 tracking-tight" data-testid="text-page-title">
+          <h1 className="flash-reveal text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 tracking-tight" data-testid="text-page-title">
             Equipment Categories
           </h1>
-          <p className="text-white/70 text-lg max-w-2xl">
+          <p className="flash-reveal text-white/70 text-lg max-w-2xl" style={{ "--flash-index": 1 } as any}>
             Browse our comprehensive inventory of {totalItems > 0 ? `${totalItems.toLocaleString()}+` : ""} pieces of heavy equipment across all major categories.
           </p>
         </div>
       </section>
 
-      <section className="py-12">
+      <section className="py-12" ref={gridRef}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {EQUIPMENT_CATEGORIES.map((cat) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 flash-stagger">
+            {EQUIPMENT_CATEGORIES.map((cat, i) => (
               <Link
                 key={cat.name}
                 href={`/equipment/listings?category=${encodeURIComponent(cat.name)}`}
               >
                 <Card
-                  className="group overflow-visible hover-elevate cursor-pointer border-card-border h-full"
+                  className="flash-reveal-scale group overflow-visible hover-elevate cursor-pointer border-card-border h-full"
+                  style={{ "--flash-index": i } as any}
                   data-testid={`card-category-${cat.name.toLowerCase().replace(/\s+/g, "-")}`}
                 >
                   <div className="aspect-[16/10] relative rounded-t-md overflow-hidden bg-muted">

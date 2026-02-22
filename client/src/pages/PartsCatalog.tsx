@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
+import { useFlashReveal } from "@/hooks/useFlashReveal";
 
 import attachmentsImg from "@assets/attachments_1771718821209.jpg";
 import drivetrainImg from "@assets/drivetrain_1771718821209.jpg";
@@ -85,19 +86,22 @@ export default function PartsCatalog() {
 
   const totalItems = counts ? Object.values(counts).reduce((a, b) => a + b, 0) : 0;
 
+  const heroRef = useFlashReveal();
+  const gridRef = useFlashReveal();
+
   return (
     <div>
-      <section className="relative py-20 overflow-hidden">
+      <section className="relative py-20 overflow-hidden" ref={heroRef}>
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${engineImg})` }}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/75 to-black/55" />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 tracking-tight" data-testid="text-parts-title">
+          <h1 className="flash-reveal text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 tracking-tight" data-testid="text-parts-title">
             Parts Catalog
           </h1>
-          <p className="text-white/70 text-lg max-w-2xl mb-6">
+          <p className="flash-reveal text-white/70 text-lg max-w-2xl mb-6" style={{ "--flash-index": 1 } as any}>
             Browse parts by category across our inventory of {totalItems > 0 ? `${totalItems.toLocaleString()}+` : "12,200+"} items in stock.
           </p>
           <div className="flex flex-wrap gap-3">
@@ -116,11 +120,11 @@ export default function PartsCatalog() {
         </div>
       </section>
 
-      <section className="py-12">
+      <section className="py-12" ref={gridRef}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between gap-4 mb-8">
             <div>
-              <h2 className="text-2xl font-bold tracking-tight">Browse by Category</h2>
+              <h2 className="flash-reveal text-2xl font-bold tracking-tight">Browse by Category</h2>
               <p className="text-muted-foreground mt-1">
                 {totalItems > 0 ? (
                   <>Inventory items: <span className="font-semibold text-foreground">{totalItems.toLocaleString()}</span></>
@@ -131,11 +135,12 @@ export default function PartsCatalog() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-            {categories.map((cat) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 flash-stagger">
+            {categories.map((cat, i) => (
               <Link key={cat.slug} href={`/parts/${cat.slug}`}>
                 <Card
-                  className="group overflow-visible hover-elevate cursor-pointer border-card-border h-full"
+                  className="flash-reveal-scale group overflow-visible hover-elevate cursor-pointer border-card-border h-full"
+                  style={{ "--flash-index": i } as any}
                   data-testid={`card-parts-${cat.slug}`}
                 >
                   <div className="aspect-[3/2] relative rounded-t-md overflow-hidden bg-white">

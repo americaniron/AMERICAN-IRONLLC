@@ -286,3 +286,151 @@
     inset: -1px;
   }
 }
+
+@keyframes flash-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes flash-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes flash-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes flash-slide-left {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes flash-slide-right {
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes flash-counter {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes flash-splash-logo {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes flash-splash-bar {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes flash-splash-exit {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes flash-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.flash-reveal {
+  opacity: 0;
+  transform: translateY(32px);
+}
+
+.flash-reveal.flash-visible {
+  animation: flash-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.flash-reveal-scale {
+  opacity: 0;
+  transform: scale(0.92);
+}
+
+.flash-reveal-scale.flash-visible {
+  animation: flash-scale-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.flash-reveal-left {
+  opacity: 0;
+  transform: translateX(-40px);
+}
+
+.flash-reveal-left.flash-visible {
+  animation: flash-slide-right 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.flash-reveal-right {
+  opacity: 0;
+  transform: translateX(40px);
+}
+
+.flash-reveal-right.flash-visible {
+  animation: flash-slide-left 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.flash-stagger > .flash-reveal.flash-visible,
+.flash-stagger > .flash-reveal-scale.flash-visible {
+  animation-delay: calc(var(--flash-index, 0) * 0.08s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flash-reveal,
+  .flash-reveal-scale,
+  .flash-reveal-left,
+  .flash-reveal-right {
+    opacity: 1;
+    transform: none;
+    animation: none !important;
+  }
+}
