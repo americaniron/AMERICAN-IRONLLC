@@ -24,20 +24,20 @@ import { useFlashReveal } from "@/hooks/useFlashReveal";
 import { useQuoteCart } from "@/hooks/useQuoteCart";
 
 const CATEGORY_IMAGES: Record<string, string> = {
-  "Air Inlet & Exhaust": "/images/parts/air-inlet-exhaust.jpg",
-  "Turbochargers": "/images/parts/turbochargers.jpg",
-  "Bearings": "/images/parts/bearings.jpg",
-  "Belts & Hoses": "/images/parts/belts-hoses.jpg",
-  "Braking & Friction": "/images/parts/braking-friction.jpg",
-  "Cooling System": "/images/parts/cooling-system.jpg",
-  "Electrical": "/images/parts/electrical.jpg",
-  "Engine Components": "/images/parts/engine-components.jpg",
-  "Filters": "/images/parts/filters.jpg",
-  "Ground Engaging Tools": "/images/parts/ground-engaging.jpg",
-  "Hardware": "/images/parts/hardware.jpg",
-  "Hydraulic System": "/images/parts/hydraulic-system.jpg",
-  "Gaskets & Seals": "/images/parts/gaskets-seals.jpg",
-  "Undercarriage": "/images/parts/undercarriage.jpg",
+  "Air Inlet & Exhaust": "/images/parts/air-inlet-exhaust.png",
+  "Turbochargers": "/images/parts/turbochargers.png",
+  "Bearings": "/images/parts/bearings.png",
+  "Belts & Hoses": "/images/parts/belts-hoses.png",
+  "Braking & Friction": "/images/parts/braking-friction.png",
+  "Cooling System": "/images/parts/cooling-system.png",
+  "Electrical": "/images/parts/electrical.png",
+  "Engine Components": "/images/parts/engine-components.png",
+  "Filters": "/images/parts/filters.png",
+  "Ground Engaging Tools": "/images/parts/ground-engaging.png",
+  "Hardware": "/images/parts/hardware.png",
+  "Hydraulic System": "/images/parts/hydraulic-system.png",
+  "Gaskets & Seals": "/images/parts/gaskets-seals.png",
+  "Undercarriage": "/images/parts/undercarriage.png",
 };
 
 interface PartsResponse {
@@ -120,7 +120,7 @@ export default function PartsCategory() {
   const totalPages = Math.ceil(total / limit);
 
   const label = category === "all" ? "All Parts" : category;
-  const categoryImage = CATEGORY_IMAGES[category] || "/images/parts/generic-part.jpg";
+  const categoryImage = CATEGORY_IMAGES[category] || "/images/parts/generic-part.png";
 
   const heroRef = useFlashReveal();
 
@@ -274,7 +274,7 @@ export default function PartsCategory() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {parts.map((part) => {
                       const inCart = isInCart(part.partNumber);
-                      const partImage = part.imageUrl || CATEGORY_IMAGES[part.category] || "/images/parts/generic-part.jpg";
+                      const partImage = part.imageUrl || CATEGORY_IMAGES[part.category] || "/images/parts/generic-part.png";
                       return (
                         <Card
                           key={part.id}

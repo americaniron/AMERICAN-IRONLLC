@@ -14,20 +14,20 @@ const VIDEOS = [
 ];
 
 const CATEGORY_IMAGES: Record<string, string> = {
-  "Air Inlet & Exhaust": "/images/parts/air-inlet-exhaust.jpg",
-  "Turbochargers": "/images/parts/turbochargers.jpg",
-  "Bearings": "/images/parts/bearings.jpg",
-  "Belts & Hoses": "/images/parts/belts-hoses.jpg",
-  "Braking & Friction": "/images/parts/braking-friction.jpg",
-  "Cooling System": "/images/parts/cooling-system.jpg",
-  "Electrical": "/images/parts/electrical.jpg",
-  "Engine Components": "/images/parts/engine-components.jpg",
-  "Filters": "/images/parts/filters.jpg",
-  "Ground Engaging Tools": "/images/parts/ground-engaging.jpg",
-  "Hardware": "/images/parts/hardware.jpg",
-  "Hydraulic System": "/images/parts/hydraulic-system.jpg",
-  "Gaskets & Seals": "/images/parts/gaskets-seals.jpg",
-  "Undercarriage": "/images/parts/undercarriage.jpg",
+  "Air Inlet & Exhaust": "/images/parts/air-inlet-exhaust.png",
+  "Turbochargers": "/images/parts/turbochargers.png",
+  "Bearings": "/images/parts/bearings.png",
+  "Belts & Hoses": "/images/parts/belts-hoses.png",
+  "Braking & Friction": "/images/parts/braking-friction.png",
+  "Cooling System": "/images/parts/cooling-system.png",
+  "Electrical": "/images/parts/electrical.png",
+  "Engine Components": "/images/parts/engine-components.png",
+  "Filters": "/images/parts/filters.png",
+  "Ground Engaging Tools": "/images/parts/ground-engaging.png",
+  "Hardware": "/images/parts/hardware.png",
+  "Hydraulic System": "/images/parts/hydraulic-system.png",
+  "Gaskets & Seals": "/images/parts/gaskets-seals.png",
+  "Undercarriage": "/images/parts/undercarriage.png",
 };
 
 const CATEGORY_DESCRIPTIONS: Record<string, string> = {
@@ -211,7 +211,7 @@ export default function PartsCatalog() {
                   >
                     <div className="aspect-[16/9] relative overflow-hidden bg-black">
                       <img
-                        src={CATEGORY_IMAGES[cat] || "/images/parts/generic-part.jpg"}
+                        src={CATEGORY_IMAGES[cat] || "/images/parts/generic-part.png"}
                         alt={cat}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-80 group-hover:opacity-100"
                         loading="lazy"
