@@ -52,6 +52,7 @@ Preferred communication style: Simple, everyday language.
   - `contact_inquiries` — Contact form submissions (name, email, message)
   - `users` — User accounts (id, username) — exists in schema but auth not fully implemented
   - `project_estimates` — AI-generated project estimates (projectName, projectType, location, terrain, projectSize, duration, additionalDetails, estimateResult)
+  - `power_units` — Power units & generators inventory (id, stockNumber, model, category, hp, kw, rpm, year, condition, location, price, imageUrl) — 95 items across 4 categories: Generator Sets (40), Marine Engines (26), Power Units (21), Industrial Generators (8)
   - `conversations` / `messages` — Chat storage tables (from OpenAI integration)
 
 ### API Endpoints
@@ -62,6 +63,9 @@ Preferred communication style: Simple, everyday language.
 - `GET /api/parts/:id` — Get single part by database ID
 - `POST /api/quotes` — Submit a quote request (validated with Zod)
 - `POST /api/contact` — Submit a contact inquiry (validated with Zod)
+- `GET /api/power-units` — List power units with optional `category` and `search` filters, pagination
+- `GET /api/power-units/categories/counts` — Get power unit counts by category
+- `GET /api/power-units/:id` — Get single power unit by database ID
 - `POST /api/estimate` — IRON Estimator: AI-powered equipment estimator (streaming SSE response, uses OpenAI gpt-5.2 with real inventory data)
 
 ### AI Integration

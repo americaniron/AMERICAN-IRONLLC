@@ -67,6 +67,7 @@ export default function Navbar() {
               <NavLink href="/" active={location === "/"}>Home</NavLink>
               <NavLink href="/equipment" active={location.startsWith("/equipment")}>Equipment</NavLink>
               <NavLink href="/parts" active={location === "/parts"}>Parts</NavLink>
+              <NavLink href="/power-units" active={location.startsWith("/power-units")}>Power Units</NavLink>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -123,6 +124,7 @@ export default function Navbar() {
               <MobileLink href="/" onClick={() => setMobileOpen(false)}>Home</MobileLink>
               <MobileLink href="/equipment" onClick={() => setMobileOpen(false)}>Equipment Inventory</MobileLink>
               <MobileLink href="/parts" onClick={() => setMobileOpen(false)}>Parts Catalog</MobileLink>
+              <MobileLink href="/power-units" onClick={() => setMobileOpen(false)}>Power Units & Generators</MobileLink>
               <div className="py-1 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Services</div>
               {services.map((s) => (
                 <MobileLink key={s.href} href={s.href} onClick={() => setMobileOpen(false)}>

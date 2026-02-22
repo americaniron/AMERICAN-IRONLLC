@@ -95,4 +95,23 @@ export const insertProjectEstimateSchema = createInsertSchema(projectEstimates).
 export type ProjectEstimate = typeof projectEstimates.$inferSelect;
 export type InsertProjectEstimate = z.infer<typeof insertProjectEstimateSchema>;
 
+export const powerUnits = pgTable("power_units", {
+  id: serial("id").primaryKey(),
+  stockNumber: varchar("stock_number", { length: 30 }).notNull(),
+  model: varchar("model", { length: 150 }).notNull(),
+  category: varchar("category", { length: 50 }).notNull(),
+  hp: integer("hp"),
+  kw: integer("kw"),
+  rpm: integer("rpm"),
+  year: varchar("year", { length: 20 }),
+  condition: varchar("condition", { length: 100 }),
+  location: varchar("location", { length: 100 }),
+  price: varchar("price", { length: 50 }),
+  imageUrl: text("image_url"),
+});
+
+export const insertPowerUnitSchema = createInsertSchema(powerUnits).omit({ id: true });
+export type PowerUnit = typeof powerUnits.$inferSelect;
+export type InsertPowerUnit = z.infer<typeof insertPowerUnitSchema>;
+
 export * from "./models/chat";

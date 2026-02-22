@@ -133,9 +133,44 @@ export async function registerRoutes(
     try {
       const equipmentCount = await storage.getEquipmentCount();
       const partsCount = await storage.getPartsCount();
-      res.json({ equipmentCount, partsCount });
+      const powerUnitsCount = await storage.getPowerUnitsCount();
+      res.json({ equipmentCount, partsCount, powerUnitsCount });
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch stats" });
+    }
+  });
+
+  app.get("/api/power-units", async (req, res) => {
+    try {
+      const category = req.query.category as string | undefined;
+      const search = req.query.search as string | undefined;
+      const page = req.query.page ? parseInt(req.query.page as string) : 1;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 24;
+      const result = await storage.getPowerUnits({ category, search, page, limit });
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch power units" });
+    }
+  });
+
+  app.get("/api/power-units/categories/counts", async (req, res) => {
+    try {
+      const counts = await storage.getPowerUnitCategoryCounts();
+      res.json(counts);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch power unit category counts" });
+    }
+  });
+
+  app.get("/api/power-units/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) return res.status(400).json({ error: "Invalid power unit ID" });
+      const item = await storage.getPowerUnitById(id);
+      if (!item) return res.status(404).json({ error: "Power unit not found" });
+      res.json(item);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch power unit" });
     }
   });
 

@@ -11,12 +11,15 @@ import {
   type InsertUser,
   type ProjectEstimate,
   type InsertProjectEstimate,
+  type PowerUnit,
+  type InsertPowerUnit,
   equipment,
   parts,
   quoteRequests,
   contactInquiries,
   users,
   projectEstimates,
+  powerUnits,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, ilike, or, sql } from "drizzle-orm";
@@ -45,6 +48,12 @@ export interface IStorage {
   getPartsCategoryCounts(): Promise<Record<string, number>>;
   getEquipmentPriceSummary(): Promise<Record<string, { min: string; max: string; avg: string; count: number }>>;
   createProjectEstimate(data: InsertProjectEstimate): Promise<ProjectEstimate>;
+
+  getPowerUnits(filters?: { category?: string; search?: string; page?: number; limit?: number }): Promise<{ items: PowerUnit[]; total: number }>;
+  getPowerUnitById(id: number): Promise<PowerUnit | undefined>;
+  createPowerUnit(data: InsertPowerUnit): Promise<PowerUnit>;
+  getPowerUnitCategoryCounts(): Promise<Record<string, number>>;
+  getPowerUnitsCount(): Promise<number>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -291,6 +300,80 @@ export class DatabaseStorage implements IStorage {
   async createProjectEstimate(data: InsertProjectEstimate): Promise<ProjectEstimate> {
     const [item] = await db.insert(projectEstimates).values(data).returning();
     return item;
+  }
+
+  async getPowerUnits(filters?: { category?: string; search?: string; page?: number; limit?: number }): Promise<{ items: PowerUnit[]; total: number }> {
+    const page = filters?.page || 1;
+    const limit = filters?.limit || 24;
+    const offset = (page - 1) * limit;
+
+    const conditions = [];
+
+    if (filters?.category) {
+      conditions.push(eq(powerUnits.category, filters.category));
+    }
+
+    if (filters?.search) {
+      const searchTerm = `%${filters.search}%`;
+      conditions.push(
+        or(
+          ilike(powerUnits.model, searchTerm),
+          ilike(powerUnits.stockNumber, searchTerm),
+          ilike(powerUnits.condition, searchTerm),
+        )!
+      );
+    }
+
+    let whereClause: any = undefined;
+    if (conditions.length > 0) {
+      let combined = conditions[0]!;
+      for (let i = 1; i < conditions.length; i++) {
+        combined = sql`${combined} AND ${conditions[i]}`;
+      }
+      whereClause = combined;
+    }
+
+    const countQuery = db.select({ count: sql<number>`count(*)` }).from(powerUnits);
+    if (whereClause) countQuery.where(whereClause);
+    const [countResult] = await countQuery;
+    const total = Number(countResult.count);
+
+    let itemsQuery = db.select().from(powerUnits);
+    if (whereClause) itemsQuery = itemsQuery.where(whereClause) as any;
+    const items = await (itemsQuery as any).limit(limit).offset(offset);
+
+    return { items, total };
+  }
+
+  async getPowerUnitById(id: number): Promise<PowerUnit | undefined> {
+    const [item] = await db.select().from(powerUnits).where(eq(powerUnits.id, id));
+    return item;
+  }
+
+  async createPowerUnit(data: InsertPowerUnit): Promise<PowerUnit> {
+    const [item] = await db.insert(powerUnits).values(data).returning();
+    return item;
+  }
+
+  async getPowerUnitCategoryCounts(): Promise<Record<string, number>> {
+    const results = await db
+      .select({
+        category: powerUnits.category,
+        count: sql<number>`count(*)`,
+      })
+      .from(powerUnits)
+      .groupBy(powerUnits.category);
+
+    const counts: Record<string, number> = {};
+    for (const row of results) {
+      counts[row.category] = Number(row.count);
+    }
+    return counts;
+  }
+
+  async getPowerUnitsCount(): Promise<number> {
+    const [result] = await db.select({ count: sql<number>`count(*)` }).from(powerUnits);
+    return Number(result.count);
   }
 }
 
