@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Menu, X, Phone, Mail, ChevronDown } from "lucide-react";
+import logoImg from "@assets/american-iron-logo_1771719147172.png";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -52,16 +53,13 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16 lg:h-18">
             <Link href="/" data-testid="link-home">
-              <div className="flex items-center gap-3 cursor-pointer">
-                <div className="w-10 h-10 bg-accent rounded-md flex items-center justify-center">
-                  <span className="text-accent-foreground font-black text-lg">AI</span>
-                </div>
-                <div className="hidden sm:block">
-                  <div className="font-bold text-base tracking-tight leading-none">
-                    AMERICAN IRON
-                  </div>
-                  <div className="text-xs text-muted-foreground tracking-widest">LLC</div>
-                </div>
+              <div className="flex items-center gap-2 cursor-pointer">
+                <img
+                  src={logoImg}
+                  alt="American Iron LLC"
+                  className="h-12 w-auto"
+                  data-testid="img-logo"
+                />
               </div>
             </Link>
 

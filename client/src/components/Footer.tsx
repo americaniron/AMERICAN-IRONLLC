@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { Phone, Mail, MapPin, MessageCircle } from "lucide-react";
+import logoImg from "@assets/american-iron-logo_1771719147172.png";
 
 export default function Footer() {
   return (
@@ -8,13 +9,12 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-accent rounded-md flex items-center justify-center">
-                <span className="text-accent-foreground font-black text-lg">AI</span>
-              </div>
-              <div>
-                <div className="font-bold text-base tracking-tight leading-none text-primary-foreground">AMERICAN IRON</div>
-                <div className="text-xs text-primary-foreground/60 tracking-widest">LLC</div>
-              </div>
+              <img
+                src={logoImg}
+                alt="American Iron LLC"
+                className="h-14 w-auto"
+                data-testid="img-footer-logo"
+              />
             </div>
             <p className="text-sm text-primary-foreground/70 leading-relaxed">
               Empowering global infrastructure through comprehensive parts inventory and unparalleled equipment procurement.
