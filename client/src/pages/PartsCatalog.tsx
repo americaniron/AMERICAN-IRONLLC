@@ -1,109 +1,104 @@
 import { Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  ArrowRight,
-  Wrench,
-  Droplets,
-  Settings,
-  Filter,
-  Layers,
-  Cable,
-  Hammer,
-  Cog,
-  Zap,
-  Package,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
+
+import attachmentsImg from "@assets/attachments_1771718821209.jpg";
+import drivetrainImg from "@assets/drivetrain_1771718821209.jpg";
+import electricalImg from "@assets/electrical-and-electronics_1771718821209.jpg";
+import engineImg from "@assets/engine_1771718821209.jpg";
+import filtersImg from "@assets/filters-fluid_1771718821209.jpg";
+import groundEngagingImg from "@assets/ground-engaging-tools_1771718821209.jpg";
+import hosesImg from "@assets/hoses-and-tubes_1771718821209.jpg";
+import hydraulicsImg from "@assets/hydraulics_1771718821209.jpg";
+import undercarriageImg from "@assets/undercarriage_1771718821209.jpg";
+import upgradesImg from "@assets/upgrades-repair-kits_1771718821209.jpg";
 
 const categories = [
   {
     name: "Attachments",
     slug: "attachments",
     desc: "Buckets, couplers, forks, and more.",
-    icon: Wrench,
-    image: "/images/cat-wheel-loader.png",
-  },
-  {
-    name: "Hydraulics",
-    slug: "hydraulics",
-    desc: "Pumps, valves, cylinders, and manifolds.",
-    icon: Droplets,
-    image: "/images/cat-excavator.png",
-  },
-  {
-    name: "Engine",
-    slug: "engine",
-    desc: "Gaskets, injectors, belts, sensors, and more.",
-    icon: Settings,
-    image: "/images/cat-bulldozer.png",
-  },
-  {
-    name: "Filters & Fluids",
-    slug: "filters-and-fluids",
-    desc: "Filters, service items, and fluid components.",
-    icon: Filter,
-    image: "/images/cat-wheel-loader.png",
-  },
-  {
-    name: "Undercarriage",
-    slug: "undercarriage",
-    desc: "Tracks, rollers, idlers, and wear parts.",
-    icon: Layers,
-    image: "/images/cat-bulldozer.png",
-  },
-  {
-    name: "Hoses & Tubes",
-    slug: "hoses-and-tubes",
-    desc: "Hoses, tubes, fittings, and clamps.",
-    icon: Cable,
-    image: "/images/cat-excavator.png",
-  },
-  {
-    name: "Ground Engaging Tools",
-    slug: "ground-engaging-tools",
-    desc: "Teeth, adapters, edges, and cutting bits.",
-    icon: Hammer,
-    image: "/images/cat-bulldozer.png",
+    image: attachmentsImg,
   },
   {
     name: "Drivetrain",
     slug: "drivetrain",
     desc: "Transmission, torque, axles, and final drives.",
-    icon: Cog,
-    image: "/images/cat-wheel-loader.png",
+    image: drivetrainImg,
   },
   {
     name: "Electrical & Electronics",
     slug: "electrical-and-electronics",
     desc: "Harnesses, switches, controllers, sensors.",
-    icon: Zap,
-    image: "/images/cat-excavator.png",
+    image: electricalImg,
+  },
+  {
+    name: "Engine",
+    slug: "engine",
+    desc: "Gaskets, injectors, belts, sensors, and more.",
+    image: engineImg,
+  },
+  {
+    name: "Filters & Fluids",
+    slug: "filters-and-fluids",
+    desc: "Filters, service items, and fluid components.",
+    image: filtersImg,
+  },
+  {
+    name: "Ground Engaging Tools",
+    slug: "ground-engaging-tools",
+    desc: "Teeth, adapters, edges, and cutting bits.",
+    image: groundEngagingImg,
+  },
+  {
+    name: "Hoses & Tubes",
+    slug: "hoses-and-tubes",
+    desc: "Hoses, tubes, fittings, and clamps.",
+    image: hosesImg,
+  },
+  {
+    name: "Hydraulics",
+    slug: "hydraulics",
+    desc: "Pumps, valves, cylinders, and manifolds.",
+    image: hydraulicsImg,
+  },
+  {
+    name: "Undercarriage",
+    slug: "undercarriage",
+    desc: "Tracks, rollers, idlers, and wear parts.",
+    image: undercarriageImg,
   },
   {
     name: "Upgrades & Repair Kits",
     slug: "upgrades-repair-kits",
     desc: "Popular kits and repair items across systems.",
-    icon: Package,
-    image: "/images/cat-bulldozer.png",
+    image: upgradesImg,
   },
 ];
 
 export default function PartsCatalog() {
+  const { data: counts } = useQuery<Record<string, number>>({
+    queryKey: ["/api/parts/categories/counts"],
+  });
+
+  const totalItems = counts ? Object.values(counts).reduce((a, b) => a + b, 0) : 0;
+
   return (
     <div>
       <section className="relative py-20 overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url(/images/hero-parts.png)" }}
+          style={{ backgroundImage: `url(${engineImg})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/70 to-black/50" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/75 to-black/55" />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 tracking-tight" data-testid="text-parts-title">
             Parts Catalog
           </h1>
           <p className="text-white/70 text-lg max-w-2xl mb-6">
-            Browse parts by category or view all parts. Over 12,000 items in stock.
+            Browse parts by category across our inventory of {totalItems > 0 ? `${totalItems.toLocaleString()}+` : "12,200+"} items in stock.
           </p>
           <div className="flex flex-wrap gap-3">
             <Link href="/parts/all">
@@ -127,7 +122,11 @@ export default function PartsCatalog() {
             <div>
               <h2 className="text-2xl font-bold tracking-tight">Browse by Category</h2>
               <p className="text-muted-foreground mt-1">
-                Inventory items: <span className="font-semibold text-foreground">12,236</span>
+                {totalItems > 0 ? (
+                  <>Inventory items: <span className="font-semibold text-foreground">{totalItems.toLocaleString()}</span></>
+                ) : (
+                  <>Inventory items: <span className="font-semibold text-foreground">12,200+</span></>
+                )}
               </p>
             </div>
           </div>
@@ -139,26 +138,32 @@ export default function PartsCatalog() {
                   className="group overflow-visible hover-elevate cursor-pointer border-card-border h-full"
                   data-testid={`card-parts-${cat.slug}`}
                 >
-                  <div className="aspect-[3/2] relative rounded-t-md overflow-hidden bg-muted">
+                  <div className="aspect-[3/2] relative rounded-t-md overflow-hidden bg-white">
                     <img
                       src={cat.image}
                       alt={cat.name}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    <div className="absolute bottom-3 left-3">
-                      <div className="w-8 h-8 rounded-md bg-accent/90 flex items-center justify-center">
-                        <cat.icon className="w-4 h-4 text-accent-foreground" />
-                      </div>
-                    </div>
                   </div>
                   <div className="p-4">
                     <h3 className="font-semibold text-sm mb-1">{cat.name}</h3>
                     <p className="text-xs text-muted-foreground leading-relaxed">{cat.desc}</p>
+                    {counts && counts[cat.slug] && (
+                      <p className="text-xs text-muted-foreground mt-2 font-medium">{counts[cat.slug].toLocaleString()} items</p>
+                    )}
                   </div>
                 </Card>
               </Link>
             ))}
+          </div>
+
+          <div className="mt-12 text-center">
+            <Link href="/parts/all">
+              <Button size="lg" className="bg-accent text-accent-foreground gap-2 text-base px-8" data-testid="button-view-all-parts-bottom">
+                View All Parts
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

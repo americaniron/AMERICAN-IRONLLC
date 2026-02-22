@@ -36,6 +36,7 @@ export interface IStorage {
 
   getEquipmentCount(): Promise<number>;
   getPartsCount(): Promise<number>;
+  getPartsCategoryCounts(): Promise<Record<string, number>>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -184,6 +185,22 @@ export class DatabaseStorage implements IStorage {
   async getPartsCount(): Promise<number> {
     const [result] = await db.select({ count: sql<number>`count(*)` }).from(parts);
     return Number(result.count);
+  }
+
+  async getPartsCategoryCounts(): Promise<Record<string, number>> {
+    const results = await db
+      .select({
+        category: parts.category,
+        count: sql<number>`count(*)`,
+      })
+      .from(parts)
+      .groupBy(parts.category);
+
+    const counts: Record<string, number> = {};
+    for (const row of results) {
+      counts[row.category] = Number(row.count);
+    }
+    return counts;
   }
 }
 

@@ -41,6 +41,15 @@ export async function registerRoutes(
     }
   });
 
+  app.get("/api/parts/categories/counts", async (req, res) => {
+    try {
+      const counts = await storage.getPartsCategoryCounts();
+      res.json(counts);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch parts category counts" });
+    }
+  });
+
   app.get("/api/parts", async (req, res) => {
     try {
       const category = req.query.category as string | undefined;
