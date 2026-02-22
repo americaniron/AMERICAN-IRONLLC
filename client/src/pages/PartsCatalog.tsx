@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,12 @@ import hosesImg from "@assets/hoses-and-tubes_1771718821209.jpg";
 import hydraulicsImg from "@assets/hydraulics_1771718821209.jpg";
 import undercarriageImg from "@assets/undercarriage_1771718821209.jpg";
 import upgradesImg from "@assets/upgrades-repair-kits_1771718821209.jpg";
+
+const VIDEOS = [
+  "/images/parts-bg-1.mp4",
+  "/images/parts-bg-2.mp4",
+  "/images/parts-bg-3.mp4",
+];
 
 const categories = [
   {
@@ -79,6 +86,48 @@ const categories = [
   },
 ];
 
+function RotatingVideoBackground() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [fadingOut, setFadingOut] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const nextIndexRef = useRef(1);
+
+  const handleVideoEnd = useCallback(() => {
+    setFadingOut(true);
+    setTimeout(() => {
+      setActiveIndex(nextIndexRef.current);
+      nextIndexRef.current = (nextIndexRef.current + 1) % VIDEOS.length;
+      setFadingOut(false);
+    }, 600);
+  }, []);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.load();
+    video.play().catch(() => {});
+  }, [activeIndex]);
+
+  return (
+    <>
+      <video
+        ref={videoRef}
+        key={activeIndex}
+        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-600"
+        style={{ opacity: fadingOut ? 0 : 1 }}
+        muted
+        playsInline
+        onEnded={handleVideoEnd}
+        data-testid="parts-hero-video"
+      >
+        <source src={VIDEOS[activeIndex]} type="video/mp4" />
+      </video>
+      <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/70 to-black/50" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />
+    </>
+  );
+}
+
 export default function PartsCatalog() {
   const { data: counts } = useQuery<Record<string, number>>({
     queryKey: ["/api/parts/categories/counts"],
@@ -91,15 +140,11 @@ export default function PartsCatalog() {
 
   return (
     <div className="flash-page-transition">
-      <section className="relative py-20 overflow-hidden" ref={heroRef}>
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${engineImg})` }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/75 to-black/55" />
+      <section className="relative py-24 overflow-hidden bg-black" ref={heroRef}>
+        <RotatingVideoBackground />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
           <h1 className="flash-reveal text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 tracking-tight" data-testid="text-parts-title">
-            Parts Catalog
+            Parts <span className="text-accent-3d">Catalog</span>
           </h1>
           <p className="flash-reveal text-white/70 text-lg max-w-2xl mb-6" style={{ "--flash-index": 1 } as any}>
             Browse parts by category across our inventory of {totalItems > 0 ? `${totalItems.toLocaleString()}+` : "12,200+"} items in stock.
