@@ -19,25 +19,39 @@ export function useFlashReveal(threshold = 0.15) {
     const el = ref.current;
     if (!el) return;
 
-    const targets = el.querySelectorAll(FLASH_SELECTORS);
+    const observed = new WeakSet<Element>();
 
-    if (targets.length === 0) return;
-
-    const observer = new IntersectionObserver(
+    const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add("flash-visible");
-            observer.unobserve(entry.target);
+            io.unobserve(entry.target);
           }
         });
       },
       { threshold, rootMargin: "0px 0px -40px 0px" }
     );
 
-    targets.forEach((t) => observer.observe(t));
+    function observeNew() {
+      const targets = el!.querySelectorAll(FLASH_SELECTORS);
+      targets.forEach((t) => {
+        if (!observed.has(t) && !t.classList.contains("flash-visible")) {
+          observed.add(t);
+          io.observe(t);
+        }
+      });
+    }
 
-    return () => observer.disconnect();
+    observeNew();
+
+    const mo = new MutationObserver(() => observeNew());
+    mo.observe(el, { childList: true, subtree: true });
+
+    return () => {
+      io.disconnect();
+      mo.disconnect();
+    };
   }, [threshold]);
 
   return ref;
