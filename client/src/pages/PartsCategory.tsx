@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useParams, Link, useSearch } from "wouter";
+import { useParams, Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,12 +15,30 @@ import {
   Plus,
   Check,
   X,
-  Package,
   Filter,
+  Wrench,
+  Cog,
 } from "lucide-react";
 import type { Part } from "@shared/schema";
 import { useFlashReveal } from "@/hooks/useFlashReveal";
 import { useQuoteCart } from "@/hooks/useQuoteCart";
+
+const CATEGORY_IMAGES: Record<string, string> = {
+  "Air Inlet & Exhaust": "/images/parts/air-inlet-exhaust.jpg",
+  "Turbochargers": "/images/parts/turbochargers.jpg",
+  "Bearings": "/images/parts/bearings.jpg",
+  "Belts & Hoses": "/images/parts/belts-hoses.jpg",
+  "Braking & Friction": "/images/parts/braking-friction.jpg",
+  "Cooling System": "/images/parts/cooling-system.jpg",
+  "Electrical": "/images/parts/electrical.jpg",
+  "Engine Components": "/images/parts/engine-components.jpg",
+  "Filters": "/images/parts/filters.jpg",
+  "Ground Engaging Tools": "/images/parts/ground-engaging.jpg",
+  "Hardware": "/images/parts/hardware.jpg",
+  "Hydraulic System": "/images/parts/hydraulic-system.jpg",
+  "Gaskets & Seals": "/images/parts/gaskets-seals.jpg",
+  "Undercarriage": "/images/parts/undercarriage.jpg",
+};
 
 interface PartsResponse {
   items: Part[];
@@ -30,15 +48,20 @@ interface PartsResponse {
 export default function PartsCategory() {
   const { category: rawCategory } = useParams<{ category: string }>();
   const category = rawCategory ? decodeURIComponent(rawCategory) : "all";
-  const searchParams = useSearch();
-  const initialSearch = new URLSearchParams(searchParams).get("search") || "";
+  const [location] = useLocation();
 
-  const [searchTerm, setSearchTerm] = useState(initialSearch);
-  const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
+  const urlSearch = useMemo(() => {
+    const idx = location.indexOf("?");
+    if (idx === -1) return "";
+    return new URLSearchParams(location.slice(idx)).get("search") || "";
+  }, [location]);
+
+  const [searchTerm, setSearchTerm] = useState(urlSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState(urlSearch);
   const [page, setPage] = useState(1);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
-  const limit = 50;
+  const limit = 48;
 
   const { items: cartItems, addItem, removeItem, isInCart } = useQuoteCart();
 
@@ -97,9 +120,9 @@ export default function PartsCategory() {
   const totalPages = Math.ceil(total / limit);
 
   const label = category === "all" ? "All Parts" : category;
+  const categoryImage = CATEGORY_IMAGES[category] || "/images/parts/generic-part.jpg";
 
   const heroRef = useFlashReveal();
-  const tableRef = useFlashReveal();
 
   return (
     <div className="flash-page-transition">
@@ -119,27 +142,40 @@ export default function PartsCategory() {
         </div>
       </div>
 
-      <section className="py-8 border-b bg-gradient-to-b from-card to-background" ref={heroRef}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      <section className="relative py-12 overflow-hidden bg-black" ref={heroRef}>
+        <img
+          src={categoryImage}
+          alt={label}
+          className="absolute inset-0 w-full h-full object-cover opacity-30"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40" />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <div>
-              <div className="flex items-center gap-3 mb-1">
+              <div className="flex items-center gap-3 mb-2">
                 <Link href="/parts">
-                  <Button variant="ghost" size="sm" className="gap-1 -ml-2 text-muted-foreground hover:text-foreground" data-testid="button-back-to-catalog">
+                  <Button variant="ghost" size="sm" className="gap-1 -ml-2 text-white/60 hover:text-white hover:bg-white/10" data-testid="button-back-to-catalog">
                     <ArrowLeft className="w-4 h-4" />
                     Catalog
                   </Button>
                 </Link>
               </div>
-              <h1 className="flash-reveal text-2xl sm:text-3xl font-bold tracking-tight" data-testid="text-parts-category-title">
+              <h1 className="flash-reveal text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white" data-testid="text-parts-category-title">
                 {label}
               </h1>
-              <p className="flash-reveal text-sm text-muted-foreground mt-1" style={{ "--flash-index": 1 } as any}>
-                <span className="font-semibold text-foreground" data-testid="text-parts-count">{total.toLocaleString()}</span> parts found
+              <div className="flash-reveal mt-2 flex items-center gap-3 text-sm" style={{ "--flash-index": 1 } as any}>
+                <span className="text-white/70">
+                  <span className="font-semibold text-accent" data-testid="text-parts-count">{total.toLocaleString()}</span> parts available
+                </span>
                 {selectedSubcategory && (
-                  <span> in <Badge variant="secondary" className="text-xs ml-1 no-default-active-elevate">{selectedSubcategory}</Badge></span>
+                  <Badge variant="secondary" className="text-xs no-default-active-elevate bg-white/20 text-white border-0">
+                    {selectedSubcategory}
+                    <button onClick={() => setSelectedSubcategory(null)} className="ml-1 hover:text-accent">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </Badge>
                 )}
-              </p>
+              </div>
             </div>
             <div className="flex items-center gap-2">
               {cartItems.length > 0 && (
@@ -151,7 +187,7 @@ export default function PartsCategory() {
                 </Link>
               )}
               <Link href="/quote">
-                <Button variant="outline" className="gap-2" data-testid="button-quote-from-parts">
+                <Button variant="outline" className="gap-2 text-white border-white/30 bg-white/10" data-testid="button-quote-from-parts">
                   Request Quote
                 </Button>
               </Link>
@@ -159,20 +195,20 @@ export default function PartsCategory() {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <div className="relative flex-1 max-w-lg">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50" />
               <Input
                 placeholder="Search by part number, description, or equipment..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/40"
                 data-testid="input-search-parts"
               />
             </div>
             <Button
               variant="outline"
               size="sm"
-              className="lg:hidden gap-2"
+              className="lg:hidden gap-2 text-white border-white/30 bg-white/10"
               onClick={() => setShowMobileSidebar(!showMobileSidebar)}
               data-testid="button-toggle-filters"
             >
@@ -183,11 +219,11 @@ export default function PartsCategory() {
         </div>
       </section>
 
-      <section className="py-6" ref={tableRef}>
+      <section className="py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex gap-6">
             {sortedSubcategories.length > 0 && (
-              <aside className={`${showMobileSidebar ? "fixed inset-0 z-50 bg-background p-6 overflow-y-auto" : "hidden"} lg:block lg:static lg:w-64 lg:shrink-0`}>
+              <aside className={`${showMobileSidebar ? "fixed inset-0 z-50 bg-background p-6 overflow-y-auto" : "hidden"} lg:block lg:static lg:w-56 lg:shrink-0`}>
                 {showMobileSidebar && (
                   <div className="flex items-center justify-between mb-4 lg:hidden">
                     <h3 className="font-semibold text-lg">Subcategories</h3>
@@ -197,9 +233,9 @@ export default function PartsCategory() {
                   </div>
                 )}
                 <div className="hidden lg:block">
-                  <h3 className="font-semibold text-sm mb-3 text-muted-foreground uppercase tracking-wider">Subcategories</h3>
+                  <h3 className="font-semibold text-xs mb-3 text-muted-foreground uppercase tracking-wider">Subcategories</h3>
                 </div>
-                <div className="space-y-0.5">
+                <div className="space-y-0.5 max-h-[70vh] overflow-y-auto">
                   <button
                     onClick={() => { setSelectedSubcategory(null); setPage(1); setShowMobileSidebar(false); }}
                     className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
@@ -213,13 +249,13 @@ export default function PartsCategory() {
                     <button
                       key={name}
                       onClick={() => { setSelectedSubcategory(name); setPage(1); setShowMobileSidebar(false); }}
-                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors flex items-center justify-between ${
+                      className={`w-full text-left px-3 py-1.5 rounded-md text-xs transition-colors flex items-center justify-between ${
                         selectedSubcategory === name ? "bg-accent/10 text-accent font-medium" : "text-muted-foreground hover:text-foreground hover:bg-muted"
                       }`}
                       data-testid={`button-subcategory-${name.toLowerCase().replace(/\s+/g, "-")}`}
                     >
                       <span className="truncate mr-2">{name}</span>
-                      <span className="text-xs opacity-60 shrink-0">{count}</span>
+                      <span className="text-[10px] opacity-50 shrink-0">{count}</span>
                     </button>
                   ))}
                 </div>
@@ -228,90 +264,116 @@ export default function PartsCategory() {
 
             <div className="flex-1 min-w-0">
               {isLoading ? (
-                <div className="space-y-3">
-                  {Array.from({ length: 10 }).map((_, i) => (
-                    <Skeleton key={i} className="h-14 w-full rounded-md" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <Skeleton key={i} className="h-64 w-full rounded-lg" />
                   ))}
                 </div>
               ) : parts.length > 0 ? (
                 <>
-                  <div className="flash-reveal-scale overflow-x-auto border rounded-lg">
-                    <table className="w-full text-sm" data-testid="table-parts">
-                      <thead>
-                        <tr className="border-b bg-muted/50 text-left">
-                          <th className="py-3 px-4 font-semibold text-muted-foreground w-10"></th>
-                          <th className="py-3 px-4 font-semibold text-muted-foreground">Part No.</th>
-                          <th className="py-3 px-4 font-semibold text-muted-foreground">Description</th>
-                          {category === "all" && (
-                            <th className="py-3 px-4 font-semibold text-muted-foreground hidden md:table-cell">Category</th>
-                          )}
-                          <th className="py-3 px-4 font-semibold text-muted-foreground hidden sm:table-cell">Subcategory</th>
-                          <th className="py-3 px-4 font-semibold text-muted-foreground hidden lg:table-cell">Equipment</th>
-                          <th className="py-3 px-4 font-semibold text-muted-foreground">Price</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {parts.map((part) => {
-                          const inCart = isInCart(part.partNumber);
-                          return (
-                            <tr
-                              key={part.id}
-                              className="border-b last:border-0 hover:bg-muted/30 transition-colors"
-                              data-testid={`row-part-${part.id}`}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {parts.map((part) => {
+                      const inCart = isInCart(part.partNumber);
+                      const partImage = part.imageUrl || CATEGORY_IMAGES[part.category] || "/images/parts/generic-part.jpg";
+                      return (
+                        <Card
+                          key={part.id}
+                          className="group overflow-hidden border-card-border hover-elevate transition-all duration-300"
+                          data-testid={`card-part-${part.id}`}
+                        >
+                          <div className="aspect-[4/3] relative overflow-hidden bg-black">
+                            <img
+                              src={partImage}
+                              alt={part.description}
+                              className="w-full h-full object-cover opacity-70 group-hover:opacity-90 transition-all duration-500 group-hover:scale-105"
+                              loading="lazy"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                            <div className="absolute top-2 left-2">
+                              <span className="bg-accent text-black text-[10px] font-bold px-2 py-0.5 rounded font-mono">
+                                {part.partNumber}
+                              </span>
+                            </div>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); e.preventDefault(); inCart ? removeItem(part.partNumber) : addItem(part); }}
+                              className={`absolute top-2 right-2 w-8 h-8 rounded-lg flex items-center justify-center transition-all shadow-md ${
+                                inCart
+                                  ? "bg-accent text-black hover:bg-red-500 hover:text-white"
+                                  : "bg-black/60 text-white hover:bg-accent hover:text-black backdrop-blur-sm"
+                              }`}
+                              title={inCart ? "Remove from quote" : "Add to quote"}
+                              data-testid={`button-addtoquote-${part.partNumber}`}
                             >
-                              <td className="py-2.5 px-4">
-                                <button
-                                  onClick={() => inCart ? removeItem(part.partNumber) : addItem(part)}
-                                  className={`w-7 h-7 rounded-md flex items-center justify-center transition-all ${
-                                    inCart
-                                      ? "bg-accent text-black hover:bg-red-500 hover:text-white"
-                                      : "border border-border hover:border-accent hover:text-accent"
-                                  }`}
-                                  title={inCart ? "Remove from quote" : "Add to quote"}
-                                  data-testid={`button-quote-${part.partNumber}`}
-                                >
-                                  {inCart ? <Check className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
-                                </button>
-                              </td>
-                              <td className="py-2.5 px-4 font-mono font-medium text-accent whitespace-nowrap">{part.partNumber}</td>
-                              <td className="py-2.5 px-4 max-w-xs truncate">{part.description}</td>
-                              {category === "all" && (
-                                <td className="py-2.5 px-4 hidden md:table-cell">
-                                  <Badge variant="secondary" className="text-xs no-default-active-elevate whitespace-nowrap">
-                                    {part.category}
-                                  </Badge>
-                                </td>
-                              )}
-                              <td className="py-2.5 px-4 hidden sm:table-cell text-muted-foreground text-xs">
-                                {part.subcategory || "\u2014"}
-                              </td>
-                              <td className="py-2.5 px-4 hidden lg:table-cell text-muted-foreground text-xs max-w-[200px] truncate">
-                                {part.equipment || "\u2014"}
-                              </td>
-                              <td className="py-2.5 px-4 font-medium text-accent whitespace-nowrap">
-                                {part.price || "Call"}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
+                              {inCart ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                            </button>
+                            <div className="absolute bottom-2 left-2 right-2">
+                              <h3 className="text-white font-semibold text-sm leading-tight line-clamp-2">
+                                {part.description}
+                              </h3>
+                            </div>
+                          </div>
+                          <div className="p-3 space-y-2">
+                            {part.subcategory && (
+                              <Badge variant="outline" className="text-[10px] no-default-active-elevate">
+                                {part.subcategory}
+                              </Badge>
+                            )}
+                            {part.equipment && (
+                              <div className="flex items-start gap-1.5">
+                                <Wrench className="w-3 h-3 text-muted-foreground mt-0.5 shrink-0" />
+                                <p className="text-[11px] text-muted-foreground leading-tight line-clamp-2">
+                                  {part.equipment}
+                                </p>
+                              </div>
+                            )}
+                            {part.engineModel && (
+                              <div className="flex items-start gap-1.5">
+                                <Cog className="w-3 h-3 text-muted-foreground mt-0.5 shrink-0" />
+                                <p className="text-[11px] text-muted-foreground leading-tight line-clamp-1">
+                                  Engine: {part.engineModel}
+                                </p>
+                              </div>
+                            )}
+                            <div className="flex items-center justify-between pt-1 border-t border-border/50">
+                              <span className="text-sm font-bold text-accent">
+                                {part.price || "Call for Price"}
+                              </span>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); e.preventDefault(); inCart ? removeItem(part.partNumber) : addItem(part); }}
+                                className={`text-xs font-medium flex items-center gap-1 px-2 py-1 rounded transition-colors ${
+                                  inCart
+                                    ? "text-accent hover:text-red-500"
+                                    : "text-muted-foreground hover:text-accent"
+                                }`}
+                                data-testid={`button-addquote-bottom-${part.partNumber}`}
+                              >
+                                {inCart ? (
+                                  <><Check className="w-3 h-3" /> In Quote</>
+                                ) : (
+                                  <><Plus className="w-3 h-3" /> Add to Quote</>
+                                )}
+                              </button>
+                            </div>
+                          </div>
+                        </Card>
+                      );
+                    })}
                   </div>
 
                   {totalPages > 1 && (
-                    <div className="flex items-center justify-between mt-6 gap-4">
+                    <div className="flex flex-col sm:flex-row items-center justify-between mt-8 gap-4">
                       <p className="text-sm text-muted-foreground">
-                        Showing {((page - 1) * limit) + 1}–{Math.min(page * limit, total)} of {total.toLocaleString()}
+                        Showing {((page - 1) * limit) + 1}–{Math.min(page * limit, total)} of {total.toLocaleString()} parts
                       </p>
                       <div className="flex items-center gap-2">
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setPage(p => Math.max(1, p - 1))}
+                          onClick={() => { setPage(p => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                           disabled={page <= 1}
                           data-testid="button-prev-page"
                         >
-                          <ChevronLeft className="w-4 h-4" />
+                          <ChevronLeft className="w-4 h-4 mr-1" />
                           Prev
                         </Button>
                         <div className="flex items-center gap-1">
@@ -332,7 +394,7 @@ export default function PartsCategory() {
                                 variant={pageNum === page ? "default" : "ghost"}
                                 size="sm"
                                 className={`w-8 h-8 p-0 ${pageNum === page ? "bg-accent text-accent-foreground" : ""}`}
-                                onClick={() => setPage(pageNum)}
+                                onClick={() => { setPage(pageNum); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                                 data-testid={`button-page-${pageNum}`}
                               >
                                 {pageNum}
@@ -343,12 +405,12 @@ export default function PartsCategory() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                          onClick={() => { setPage(p => Math.min(totalPages, p + 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                           disabled={page >= totalPages}
                           data-testid="button-next-page"
                         >
                           Next
-                          <ChevronRight className="w-4 h-4" />
+                          <ChevronRight className="w-4 h-4 ml-1" />
                         </Button>
                       </div>
                     </div>
@@ -368,7 +430,7 @@ export default function PartsCategory() {
                       </Button>
                     )}
                     <Link href="/parts">
-                      <Button variant="outline" className="gap-2" data-testid="button-back-to-catalog">
+                      <Button variant="outline" className="gap-2" data-testid="button-back-to-catalog-empty">
                         <ArrowLeft className="w-4 h-4" />
                         Back to Catalog
                       </Button>
