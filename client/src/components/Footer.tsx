@@ -94,7 +94,7 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
   return (
     <li>
       <Link href={href}>
-        <span className="text-sm text-primary-foreground/70 cursor-pointer transition-colors hover:text-accent">
+        <span className="text-sm text-primary-foreground/70 cursor-pointer transition-colors hover:text-accent py-1 inline-block">
           {children}
         </span>
       </Link>

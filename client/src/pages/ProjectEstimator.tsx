@@ -120,7 +120,7 @@ function RotatingVideoBackground() {
       <video
         ref={videoRef}
         key={activeIndex}
-        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-600"
+        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
         style={{ opacity: fadingOut ? 0 : 1 }}
         muted
         playsInline
@@ -405,24 +405,24 @@ export default function ProjectEstimator() {
             </p>
 
             {/* Hero Stats Row */}
-            <div className="flash-reveal grid grid-cols-3 gap-4 max-w-lg" style={{ "--flash-index": 3 } as any}>
-              <div className="text-center p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10">
-                <div className="text-2xl font-black text-accent">
+            <div className="flash-reveal grid grid-cols-3 gap-3 sm:gap-4 max-w-lg" style={{ "--flash-index": 3 } as any}>
+              <div className="text-center p-2 sm:p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10">
+                <div className="text-xl sm:text-2xl font-black text-accent">
                   <AnimatedCounter value="2,100" suffix="+" />
                 </div>
-                <div className="text-xs text-gray-400 mt-0.5 uppercase tracking-wider">Equipment</div>
+                <div className="text-[10px] sm:text-xs text-gray-400 mt-0.5 uppercase tracking-wider">Equipment</div>
               </div>
-              <div className="text-center p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10">
-                <div className="text-2xl font-black text-accent">
+              <div className="text-center p-2 sm:p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10">
+                <div className="text-xl sm:text-2xl font-black text-accent">
                   <AnimatedCounter value="12,200" suffix="+" />
                 </div>
-                <div className="text-xs text-gray-400 mt-0.5 uppercase tracking-wider">Parts</div>
+                <div className="text-[10px] sm:text-xs text-gray-400 mt-0.5 uppercase tracking-wider">Parts</div>
               </div>
-              <div className="text-center p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10">
-                <div className="text-2xl font-black text-accent">
+              <div className="text-center p-2 sm:p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10">
+                <div className="text-xl sm:text-2xl font-black text-accent">
                   <AnimatedCounter value="AI" />
                 </div>
-                <div className="text-xs text-gray-400 mt-0.5 uppercase tracking-wider">Powered</div>
+                <div className="text-[10px] sm:text-xs text-gray-400 mt-0.5 uppercase tracking-wider">Powered</div>
               </div>
             </div>
           </div>
@@ -464,22 +464,22 @@ export default function ProjectEstimator() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Control Panel */}
             <div className="lg:col-span-2">
-              <div className="iron-panel iron-panel-glow rounded-2xl p-8" data-testid="form-estimator">
+              <div className="iron-panel iron-panel-glow rounded-2xl p-4 sm:p-8" data-testid="form-estimator">
                 <div className="iron-scan" />
 
                 {/* Panel Header */}
-                <div className="flex items-center justify-between mb-8">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                   <div className="flex items-center gap-4">
-                    <div className="relative">
-                      <div className="w-14 h-14 rounded-xl bg-accent/10 border border-accent/30 flex items-center justify-center">
-                        <Target className="w-7 h-7 text-accent" />
+                    <div className="relative shrink-0">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-accent/10 border border-accent/30 flex items-center justify-center">
+                        <Target className="w-6 h-6 sm:w-7 sm:h-7 text-accent" />
                       </div>
                       <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-accent flex items-center justify-center">
                         <Zap className="w-2.5 h-2.5 text-black" />
                       </div>
                     </div>
                     <div>
-                      <h2 className="text-2xl font-black tracking-tight">CONTROL PANEL</h2>
+                      <h2 className="text-xl sm:text-2xl font-black tracking-tight">CONTROL PANEL</h2>
                       <p className="text-sm text-muted-foreground">Configure project parameters for AI analysis</p>
                     </div>
                   </div>
@@ -666,7 +666,7 @@ export default function ProjectEstimator() {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex gap-3 pt-2">
+                  <div className="flex flex-wrap gap-3 pt-2">
                     <Button
                       type="submit"
                       disabled={isGenerating}
@@ -803,16 +803,16 @@ export default function ProjectEstimator() {
       {showResult && (
         <section className="py-16 bg-muted/30 border-t border-border" ref={resultRef}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6" ref={resultContainerRef}>
-            <Card className="iron-panel rounded-2xl p-8" data-testid="card-estimate-result">
+            <Card className="iron-panel rounded-2xl p-4 sm:p-8" data-testid="card-estimate-result">
               <div className="iron-scan" />
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-accent/10 border border-accent/30 flex items-center justify-center">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-12 h-12 rounded-xl bg-accent/10 border border-accent/30 flex items-center justify-center shrink-0">
                     <FileText className="w-6 h-6 text-accent" />
                   </div>
-                  <div>
-                    <h2 className="text-xl font-black">IRON ESTIMATE REPORT</h2>
-                    <p className="text-sm text-muted-foreground">{projectName} — {projectType}</p>
+                  <div className="min-w-0">
+                    <h2 className="text-lg sm:text-xl font-black truncate">IRON ESTIMATE REPORT</h2>
+                    <p className="text-sm text-muted-foreground truncate">{projectName} — {projectType}</p>
                   </div>
                 </div>
                 {!isGenerating && estimateResult && (
@@ -828,7 +828,7 @@ export default function ProjectEstimator() {
                       a.click();
                       URL.revokeObjectURL(url);
                     }}
-                    className="font-semibold"
+                    className="font-semibold shrink-0"
                     data-testid="button-download-estimate"
                   >
                     <Download className="w-4 h-4 mr-1.5" />

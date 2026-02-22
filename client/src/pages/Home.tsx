@@ -251,7 +251,7 @@ export default function Home() {
             {services.map((svc, i) => (
               <Link key={svc.href} href={svc.href}>
                 <div
-                  className="flash-reveal-scale flip-card h-80"
+                  className="flash-reveal-scale flip-card h-64 sm:h-80"
                   style={{ "--flash-index": i } as any}
                   data-testid={`card-service-${svc.href.split("/").pop()}`}
                 >

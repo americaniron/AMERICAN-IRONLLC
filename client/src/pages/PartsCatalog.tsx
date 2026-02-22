@@ -113,7 +113,7 @@ function RotatingVideoBackground() {
       <video
         ref={videoRef}
         key={activeIndex}
-        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-600"
+        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
         style={{ opacity: fadingOut ? 0 : 1 }}
         muted
         playsInline
