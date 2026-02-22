@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, Phone, Mail, ChevronDown } from "lucide-react";
+import { Menu, X, Phone, Mail, ChevronDown, User, LogIn } from "lucide-react";
 import logoImg from "@assets/american-iron-logo_1771736779986.png";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
 const services = [
@@ -20,6 +22,7 @@ const services = [
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [location, setLoc] = useLocation();
+  const { user, isAuthenticated, logout } = useAuth();
 
   return (
     <>
@@ -107,6 +110,44 @@ export default function Navbar() {
                   Request Quote
                 </Button>
               </Link>
+
+              {isAuthenticated ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="flex items-center gap-1.5 px-2 py-1.5 rounded-md hover:bg-muted transition-colors" data-testid="button-user-menu">
+                      {user?.profileImageUrl ? (
+                        <img src={user.profileImageUrl} alt="" className="w-7 h-7 rounded-full object-cover" />
+                      ) : (
+                        <div className="w-7 h-7 rounded-full bg-accent/20 flex items-center justify-center">
+                          <User className="w-4 h-4 text-accent" />
+                        </div>
+                      )}
+                      <ChevronDown className="w-3 h-3 text-muted-foreground hidden sm:block" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <div className="px-2 py-1.5 text-xs text-muted-foreground truncate">
+                      {user?.email || user?.firstName || "Account"}
+                    </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="cursor-pointer" onSelect={() => setLoc("/portal")} data-testid="link-my-portal">
+                      <User className="w-4 h-4 mr-2" /> My Portal
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="cursor-pointer text-destructive" onSelect={() => logout()} data-testid="link-logout">
+                      Sign Out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <a href="/api/login" data-testid="button-sign-in">
+                  <Button size="sm" variant="outline" className="hidden sm:flex gap-1.5">
+                    <LogIn className="w-3.5 h-3.5" />
+                    Sign In
+                  </Button>
+                </a>
+              )}
+
               <button
                 className="lg:hidden p-2"
                 onClick={() => setMobileOpen(!mobileOpen)}
@@ -134,6 +175,23 @@ export default function Navbar() {
               <MobileLink href="/services/estimator" onClick={() => setMobileOpen(false)}>IRON Estimator</MobileLink>
               <MobileLink href="/quote" onClick={() => setMobileOpen(false)}>Request Quote</MobileLink>
               <MobileLink href="/contact" onClick={() => setMobileOpen(false)}>Contact Us</MobileLink>
+              <div className="border-t my-2" />
+              {isAuthenticated ? (
+                <>
+                  <MobileLink href="/portal" onClick={() => setMobileOpen(false)}>My Portal</MobileLink>
+                  <button
+                    onClick={() => { setMobileOpen(false); logout(); }}
+                    className="block px-3 py-2.5 text-sm font-medium rounded-md cursor-pointer transition-colors hover:bg-muted text-left text-destructive"
+                    data-testid="mobile-link-logout"
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <a href="/api/login" className="block px-3 py-2.5 text-sm font-medium rounded-md cursor-pointer transition-colors hover:bg-muted" data-testid="mobile-link-sign-in">
+                  Sign In
+                </a>
+              )}
               <div className="pt-3 flex flex-col gap-2 text-sm text-muted-foreground">
                 <a href="tel:+18507773797" className="flex items-center gap-2">
                   <Phone className="w-4 h-4" /> +1 (850) 777-3797

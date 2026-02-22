@@ -39,6 +39,7 @@ export const quoteRequests = pgTable("quote_requests", {
   shipTo: text("ship_to"),
   notes: text("notes"),
   items: text("items"),
+  status: varchar("status", { length: 30 }).default("pending"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -52,7 +53,7 @@ export const contactInquiries = pgTable("contact_inquiries", {
 
 export const insertEquipmentSchema = createInsertSchema(equipment).omit({ id: true });
 export const insertPartSchema = createInsertSchema(parts).omit({ id: true });
-export const insertQuoteRequestSchema = createInsertSchema(quoteRequests).omit({ id: true, createdAt: true });
+export const insertQuoteRequestSchema = createInsertSchema(quoteRequests).omit({ id: true, createdAt: true, status: true });
 export const insertContactInquirySchema = createInsertSchema(contactInquiries).omit({ id: true, createdAt: true });
 
 export type Equipment = typeof equipment.$inferSelect;
@@ -63,20 +64,6 @@ export type QuoteRequest = typeof quoteRequests.$inferSelect;
 export type InsertQuoteRequest = z.infer<typeof insertQuoteRequestSchema>;
 export type ContactInquiry = typeof contactInquiries.$inferSelect;
 export type InsertContactInquiry = z.infer<typeof insertContactInquirySchema>;
-
-export const users = pgTable("users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
-});
-
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
-});
-
-export type InsertUser = z.infer<typeof insertUserSchema>;
-export type User = typeof users.$inferSelect;
 
 export const projectEstimates = pgTable("project_estimates", {
   id: serial("id").primaryKey(),
@@ -114,4 +101,39 @@ export const insertPowerUnitSchema = createInsertSchema(powerUnits).omit({ id: t
 export type PowerUnit = typeof powerUnits.$inferSelect;
 export type InsertPowerUnit = z.infer<typeof insertPowerUnitSchema>;
 
+export const customerOrders = pgTable("customer_orders", {
+  id: serial("id").primaryKey(),
+  customerId: varchar("customer_id", { length: 255 }).notNull(),
+  customerEmail: varchar("customer_email", { length: 200 }).notNull(),
+  quoteRequestId: integer("quote_request_id"),
+  itemType: varchar("item_type", { length: 30 }),
+  itemDescription: text("item_description"),
+  total: varchar("total", { length: 50 }),
+  status: varchar("status", { length: 30 }).default("processing").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const customerPayments = pgTable("customer_payments", {
+  id: serial("id").primaryKey(),
+  customerId: varchar("customer_id", { length: 255 }).notNull(),
+  customerEmail: varchar("customer_email", { length: 200 }).notNull(),
+  orderId: integer("order_id"),
+  amount: varchar("amount", { length: 50 }).notNull(),
+  status: varchar("status", { length: 30 }).default("pending").notNull(),
+  method: varchar("method", { length: 50 }),
+  reference: varchar("reference", { length: 200 }),
+  paidAt: timestamp("paid_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertCustomerOrderSchema = createInsertSchema(customerOrders).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertCustomerPaymentSchema = createInsertSchema(customerPayments).omit({ id: true, createdAt: true });
+
+export type CustomerOrder = typeof customerOrders.$inferSelect;
+export type InsertCustomerOrder = z.infer<typeof insertCustomerOrderSchema>;
+export type CustomerPayment = typeof customerPayments.$inferSelect;
+export type InsertCustomerPayment = z.infer<typeof insertCustomerPaymentSchema>;
+
 export * from "./models/chat";
+export * from "./models/auth";

@@ -7,28 +7,27 @@ import {
   type InsertQuoteRequest,
   type ContactInquiry,
   type InsertContactInquiry,
-  type User,
-  type InsertUser,
   type ProjectEstimate,
   type InsertProjectEstimate,
   type PowerUnit,
   type InsertPowerUnit,
+  type CustomerOrder,
+  type InsertCustomerOrder,
+  type CustomerPayment,
+  type InsertCustomerPayment,
   equipment,
   parts,
   quoteRequests,
   contactInquiries,
-  users,
   projectEstimates,
   powerUnits,
+  customerOrders,
+  customerPayments,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, ilike, or, sql } from "drizzle-orm";
+import { eq, ilike, or, sql, desc } from "drizzle-orm";
 
 export interface IStorage {
-  getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
-
   getEquipment(filters?: { category?: string; search?: string; page?: number; limit?: number }): Promise<{ items: Equipment[]; total: number }>;
   getEquipmentById(equipmentId: string): Promise<Equipment | undefined>;
   createEquipment(data: InsertEquipment): Promise<Equipment>;
@@ -54,24 +53,14 @@ export interface IStorage {
   createPowerUnit(data: InsertPowerUnit): Promise<PowerUnit>;
   getPowerUnitCategoryCounts(): Promise<Record<string, number>>;
   getPowerUnitsCount(): Promise<number>;
+
+  getQuotesByEmail(email: string): Promise<QuoteRequest[]>;
+  getOrdersByCustomerId(customerId: string): Promise<CustomerOrder[]>;
+  getPaymentsByCustomerId(customerId: string): Promise<CustomerPayment[]>;
+  getContactInquiriesByEmail(email: string): Promise<ContactInquiry[]>;
 }
 
 export class DatabaseStorage implements IStorage {
-  async getUser(id: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user;
-  }
-
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
-    return user;
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db.insert(users).values(insertUser).returning();
-    return user;
-  }
-
   async getEquipment(filters?: { category?: string; search?: string; page?: number; limit?: number }): Promise<{ items: Equipment[]; total: number }> {
     const page = filters?.page || 1;
     const limit = filters?.limit || 24;
@@ -374,6 +363,22 @@ export class DatabaseStorage implements IStorage {
   async getPowerUnitsCount(): Promise<number> {
     const [result] = await db.select({ count: sql<number>`count(*)` }).from(powerUnits);
     return Number(result.count);
+  }
+
+  async getQuotesByEmail(email: string): Promise<QuoteRequest[]> {
+    return db.select().from(quoteRequests).where(eq(quoteRequests.email, email)).orderBy(desc(quoteRequests.createdAt));
+  }
+
+  async getOrdersByCustomerId(customerId: string): Promise<CustomerOrder[]> {
+    return db.select().from(customerOrders).where(eq(customerOrders.customerId, customerId)).orderBy(desc(customerOrders.createdAt));
+  }
+
+  async getPaymentsByCustomerId(customerId: string): Promise<CustomerPayment[]> {
+    return db.select().from(customerPayments).where(eq(customerPayments.customerId, customerId)).orderBy(desc(customerPayments.createdAt));
+  }
+
+  async getContactInquiriesByEmail(email: string): Promise<ContactInquiry[]> {
+    return db.select().from(contactInquiries).where(eq(contactInquiries.email, email)).orderBy(desc(contactInquiries.createdAt));
   }
 }
 

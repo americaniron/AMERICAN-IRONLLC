@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertQuoteRequestSchema, insertContactInquirySchema } from "@shared/schema";
+import { isAuthenticated } from "./replit_integrations/auth";
 import OpenAI from "openai";
 import { z } from "zod";
 import { Resend } from "resend";
@@ -712,6 +713,85 @@ Provide a thorough, institutional-grade estimate with specific equipment recomme
     } catch (error: any) {
       console.error("Quote email error:", error);
       res.status(500).json({ error: "Failed to send quote email" });
+    }
+  });
+
+  app.get("/api/portal/profile", isAuthenticated, async (req: any, res) => {
+    try {
+      const claims = req.user?.claims;
+      if (!claims?.email) {
+        return res.status(400).json({ error: "No email associated with account" });
+      }
+      const quotes = await storage.getQuotesByEmail(claims.email);
+      const orders = await storage.getOrdersByCustomerId(claims.sub);
+      const payments = await storage.getPaymentsByCustomerId(claims.sub);
+      const inquiries = await storage.getContactInquiriesByEmail(claims.email);
+      res.json({
+        user: {
+          id: claims.sub,
+          email: claims.email,
+          firstName: claims.first_name,
+          lastName: claims.last_name,
+          profileImageUrl: claims.profile_image_url,
+        },
+        counts: {
+          quotes: quotes.length,
+          orders: orders.length,
+          payments: payments.length,
+          inquiries: inquiries.length,
+        },
+      });
+    } catch (error) {
+      console.error("Portal profile error:", error);
+      res.status(500).json({ error: "Failed to fetch profile" });
+    }
+  });
+
+  app.get("/api/portal/quotes", isAuthenticated, async (req: any, res) => {
+    try {
+      const email = req.user?.claims?.email;
+      if (!email) return res.status(400).json({ error: "No email associated with account" });
+      const quotes = await storage.getQuotesByEmail(email);
+      res.json(quotes);
+    } catch (error) {
+      console.error("Portal quotes error:", error);
+      res.status(500).json({ error: "Failed to fetch quotes" });
+    }
+  });
+
+  app.get("/api/portal/orders", isAuthenticated, async (req: any, res) => {
+    try {
+      const customerId = req.user?.claims?.sub;
+      if (!customerId) return res.status(401).json({ error: "Unauthorized" });
+      const orders = await storage.getOrdersByCustomerId(customerId);
+      res.json(orders);
+    } catch (error) {
+      console.error("Portal orders error:", error);
+      res.status(500).json({ error: "Failed to fetch orders" });
+    }
+  });
+
+  app.get("/api/portal/payments", isAuthenticated, async (req: any, res) => {
+    try {
+      const customerId = req.user?.claims?.sub;
+      if (!customerId) return res.status(401).json({ error: "Unauthorized" });
+      const payments = await storage.getPaymentsByCustomerId(customerId);
+      res.json(payments);
+    } catch (error) {
+      console.error("Portal payments error:", error);
+      res.status(500).json({ error: "Failed to fetch payments" });
+    }
+  });
+
+  app.get("/api/portal/inquiries", isAuthenticated, async (req: any, res) => {
+    try {
+      const email = req.user?.claims?.email;
+      if (!email) return res.status(400).json({ error: "No email associated with account" });
+      const inquiries = await storage.getContactInquiriesByEmail(email);
+      res.json(inquiries);
+    } catch (error) {
+      console.error("Portal inquiries error:", error);
+      res.status(500).json({ error: "Failed to fetch inquiries" });
     }
   });
 
