@@ -294,34 +294,44 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 flash-stagger">
             {services.map((svc, i) => (
               <Link key={svc.href} href={svc.href}>
-                <Card
-                  className="flash-reveal-scale group overflow-visible hover-elevate cursor-pointer border-card-border h-full bg-background"
+                <div
+                  className="flash-reveal-scale flip-card h-80"
                   style={{ "--flash-index": i } as any}
                   data-testid={`card-service-${svc.href.split("/").pop()}`}
                 >
-                  <div className="aspect-[4/3] relative rounded-t-md overflow-hidden">
-                    <img
-                      src={svc.image}
-                      alt={svc.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                    <div className="absolute bottom-3 left-3">
-                      <div className="w-9 h-9 rounded-md bg-accent/90 flex items-center justify-center">
-                        <svc.icon className="w-4.5 h-4.5 text-accent-foreground" />
+                  <div className="flip-card-inner">
+                    <div className="flip-card-front bg-background border border-card-border rounded-md">
+                      <div className="h-[60%] relative overflow-hidden rounded-t-md">
+                        <img
+                          src={svc.image}
+                          alt={svc.title}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                        <div className="absolute bottom-3 left-3">
+                          <div className="w-9 h-9 rounded-md bg-accent/90 flex items-center justify-center">
+                            <svc.icon className="w-4.5 h-4.5 text-accent-foreground" />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="p-5">
+                        <h3 className="font-semibold text-base">{svc.title}</h3>
                       </div>
                     </div>
+                    <div className="flip-card-back flex flex-col items-center justify-center gap-4 bg-accent border border-accent p-8">
+                      <div className="w-12 h-12 rounded-md bg-accent-foreground/10 flex items-center justify-center">
+                        <svc.icon className="w-6 h-6 text-accent-foreground" />
+                      </div>
+                      <h3 className="font-bold text-lg text-accent-foreground text-center">{svc.title}</h3>
+                      <p className="text-accent-foreground/80 text-sm leading-relaxed text-center">
+                        {svc.desc}
+                      </p>
+                      <span className="inline-flex items-center gap-1 text-accent-foreground font-semibold text-sm mt-1">
+                        Learn More <ChevronRight className="w-4 h-4" />
+                      </span>
+                    </div>
                   </div>
-                  <div className="p-5">
-                    <h3 className="font-semibold mb-2 flex items-center gap-1.5">
-                      {svc.title}
-                      <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {svc.desc}
-                    </p>
-                  </div>
-                </Card>
+                </div>
               </Link>
             ))}
           </div>
