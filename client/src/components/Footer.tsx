@@ -15,7 +15,7 @@ export default function Footer() {
               <img
                 src={logoImg}
                 alt="American Iron LLC"
-                className="h-14 w-auto"
+                className="h-14 w-auto brightness-0 invert"
                 data-testid="img-footer-logo"
               />
             </div>

@@ -57,7 +57,7 @@ export default function Navbar() {
                 <img
                   src={logoImg}
                   alt="American Iron LLC"
-                  className="h-12 w-auto"
+                  className="h-12 w-auto object-contain mix-blend-multiply dark:mix-blend-screen dark:invert"
                   data-testid="img-logo"
                 />
               </div>
