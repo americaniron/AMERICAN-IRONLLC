@@ -405,15 +405,25 @@ export default function Home() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 flash-stagger">
             {valueProps.map((vp, i) => (
-              <div key={vp.title} className="flash-reveal flex items-start gap-4 bg-white/[0.04] backdrop-blur-sm border border-white/[0.08] rounded-md p-6" style={{ "--flash-index": i } as any} data-testid={`value-${vp.title.toLowerCase().replace(/\s+/g, "-")}`}>
-                <div className="w-12 h-12 rounded-md bg-accent/20 border border-accent/30 flex items-center justify-center shrink-0">
-                  <vp.icon className="w-6 h-6 text-accent" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg mb-2">{vp.title}</h3>
-                  <p className="text-primary-foreground/70 text-sm leading-relaxed">
-                    {vp.desc}
-                  </p>
+              <div
+                key={vp.title}
+                className="flash-reveal flip-card h-44"
+                style={{ "--flash-index": i } as any}
+                data-testid={`value-${vp.title.toLowerCase().replace(/\s+/g, "-")}`}
+              >
+                <div className="flip-card-inner">
+                  <div className="flip-card-front flex flex-col items-center justify-center gap-4 bg-white/[0.04] backdrop-blur-sm border border-white/[0.08] p-6">
+                    <div className="w-14 h-14 rounded-md bg-accent/20 border border-accent/30 flex items-center justify-center">
+                      <vp.icon className="w-7 h-7 text-accent" />
+                    </div>
+                    <h3 className="font-semibold text-lg text-center">{vp.title}</h3>
+                  </div>
+                  <div className="flip-card-back flex flex-col items-center justify-center gap-3 bg-accent/90 border border-accent p-6">
+                    <h3 className="font-bold text-base text-accent-foreground text-center">{vp.title}</h3>
+                    <p className="text-accent-foreground/80 text-sm leading-relaxed text-center">
+                      {vp.desc}
+                    </p>
+                  </div>
                 </div>
               </div>
             ))}
