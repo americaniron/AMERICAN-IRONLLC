@@ -9,7 +9,7 @@ export default function Footer() {
   return (
     <footer className="bg-primary text-primary-foreground" ref={footerRef}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
           <div className="flash-reveal" style={{ "--flash-index": 0 } as any}>
             <div className="flex items-center gap-3 mb-4">
               <img
@@ -40,11 +40,19 @@ export default function Footer() {
               <FooterLink href="/services/inspection">Inspection & Auditing</FooterLink>
               <FooterLink href="/services/transportation">Transportation</FooterLink>
               <FooterLink href="/services/shipping">Shipping & Forwarding</FooterLink>
-              <FooterLink href="/services/estimator">IRON Estimator</FooterLink>
             </ul>
           </div>
 
           <div className="flash-reveal" style={{ "--flash-index": 3 } as any}>
+            <h4 className="font-semibold text-sm uppercase tracking-wider mb-4 text-accent">IRON Estimator</h4>
+            <ul className="space-y-2.5">
+              <FooterLink href="/services/estimator">AI Estimator Tool</FooterLink>
+              <FooterLink href="/quote">Request a Quote</FooterLink>
+              <FooterLink href="/contact">Contact Us</FooterLink>
+            </ul>
+          </div>
+
+          <div className="flash-reveal" style={{ "--flash-index": 4 } as any}>
             <h4 className="font-semibold text-sm uppercase tracking-wider mb-4 text-accent">Contact</h4>
             <ul className="space-y-3 text-sm text-primary-foreground/70">
               <li className="flex items-start gap-2.5">
@@ -73,7 +81,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="flash-reveal mt-12 pt-8 border-t border-primary-foreground/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-primary-foreground/50" style={{ "--flash-index": 4 } as any}>
+        <div className="flash-reveal mt-12 pt-8 border-t border-primary-foreground/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-primary-foreground/50" style={{ "--flash-index": 5 } as any}>
           <span>&copy; {new Date().getFullYear()} American Iron LLC. All rights reserved.</span>
           <span>Tampa, Florida | Heavy Equipment & Asset Management Solutions</span>
         </div>

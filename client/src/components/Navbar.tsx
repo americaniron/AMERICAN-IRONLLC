@@ -15,7 +15,6 @@ const services = [
   { name: "Inspection & Auditing", href: "/services/inspection" },
   { name: "Transportation", href: "/services/transportation" },
   { name: "Shipping & Forwarding", href: "/services/shipping" },
-  { name: "IRON Estimator", href: "/services/estimator" },
 ];
 
 export default function Navbar() {
@@ -73,7 +72,7 @@ export default function Navbar() {
                 <DropdownMenuTrigger asChild>
                   <button
                     className={`px-3 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-1 ${
-                      location.startsWith("/services")
+                      location.startsWith("/services") && location !== "/services/estimator"
                         ? "text-accent"
                         : "text-foreground/70"
                     }`}
@@ -94,6 +93,7 @@ export default function Navbar() {
                 </DropdownMenuContent>
               </DropdownMenu>
 
+              <NavLink href="/services/estimator" active={location === "/services/estimator"}>IRON Estimator</NavLink>
               <NavLink href="/contact" active={location === "/contact"}>Contact</NavLink>
             </nav>
 
@@ -126,6 +126,7 @@ export default function Navbar() {
                   {s.name}
                 </MobileLink>
               ))}
+              <MobileLink href="/services/estimator" onClick={() => setMobileOpen(false)}>IRON Estimator</MobileLink>
               <MobileLink href="/quote" onClick={() => setMobileOpen(false)}>Request Quote</MobileLink>
               <MobileLink href="/contact" onClick={() => setMobileOpen(false)}>Contact Us</MobileLink>
               <div className="pt-3 flex flex-col gap-2 text-sm text-muted-foreground">
