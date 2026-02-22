@@ -15,9 +15,11 @@ import {
   ChevronRight,
 } from "lucide-react";
 import type { Equipment } from "@shared/schema";
+import { useFlashReveal } from "@/hooks/useFlashReveal";
 
 export default function EquipmentDetails() {
   const { id } = useParams<{ id: string }>();
+  const contentRef = useFlashReveal();
 
   const { data: item, isLoading } = useQuery<Equipment>({
     queryKey: [`/api/equipment/${id}`],
@@ -25,7 +27,7 @@ export default function EquipmentDetails() {
 
   if (isLoading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+      <div className="flash-page-transition max-w-7xl mx-auto px-4 sm:px-6 py-10">
         <Skeleton className="h-6 w-40 mb-8" />
         <div className="grid lg:grid-cols-2 gap-8">
           <Skeleton className="aspect-[4/3] rounded-md" />
@@ -41,7 +43,7 @@ export default function EquipmentDetails() {
 
   if (!item) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-20 text-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-20 text-center flash-page-transition">
         <h2 className="text-2xl font-bold mb-4">Equipment Not Found</h2>
         <p className="text-muted-foreground mb-6">The equipment listing you're looking for doesn't exist.</p>
         <Link href="/equipment/listings">
@@ -63,7 +65,7 @@ export default function EquipmentDetails() {
   ];
 
   return (
-    <div>
+    <div className="flash-page-transition">
       <div className="bg-card border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
           <nav className="flex items-center gap-2 text-sm text-muted-foreground" data-testid="breadcrumb">
@@ -82,10 +84,10 @@ export default function EquipmentDetails() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10" ref={contentRef}>
         <div className="grid lg:grid-cols-5 gap-8">
           <div className="lg:col-span-3">
-            <div className="aspect-[4/3] rounded-md overflow-hidden bg-muted">
+            <div className="flash-reveal-scale aspect-[4/3] rounded-md overflow-hidden bg-muted">
               <img
                 src={item.imageUrl || "/images/cat-bulldozer.png"}
                 alt={`${item.make} ${item.model}`}
@@ -96,7 +98,7 @@ export default function EquipmentDetails() {
           </div>
 
           <div className="lg:col-span-2 space-y-6">
-            <div>
+            <div className="flash-reveal">
               <div className="flex items-center gap-2 mb-2">
                 <Badge className="bg-primary/10 text-primary no-default-active-elevate">
                   {item.category}
@@ -108,11 +110,11 @@ export default function EquipmentDetails() {
               </h1>
             </div>
 
-            <div className="text-3xl font-bold text-accent" data-testid="text-equipment-price">
+            <div className="flash-reveal text-3xl font-bold text-accent" style={{ "--flash-index": 1 } as any} data-testid="text-equipment-price">
               {item.price && item.price !== "CALL" ? item.price : "Call for Price"}
             </div>
 
-            <Card className="p-0 border-card-border divide-y">
+            <Card className="flash-reveal-scale p-0 border-card-border divide-y" style={{ "--flash-index": 2 } as any}>
               {specs.map((spec) => (
                 <div key={spec.label} className="flex items-center justify-between px-5 py-3.5">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -124,7 +126,7 @@ export default function EquipmentDetails() {
               ))}
             </Card>
 
-            <div className="flex flex-col gap-3">
+            <div className="flash-reveal flex flex-col gap-3" style={{ "--flash-index": 3 } as any}>
               <Link href="/contact">
                 <Button className="w-full bg-accent text-accent-foreground gap-2" size="lg" data-testid="button-get-quote-detail">
                   <FileText className="w-4 h-4" />
@@ -139,13 +141,13 @@ export default function EquipmentDetails() {
               </Link>
             </div>
 
-            <p className="text-xs text-muted-foreground leading-relaxed">
+            <p className="flash-reveal text-xs text-muted-foreground leading-relaxed" style={{ "--flash-index": 4 } as any}>
               Availability and pricing subject to change. Contact American Iron LLC for confirmation and formal quote.
             </p>
           </div>
         </div>
 
-        <div className="mt-8">
+        <div className="flash-reveal mt-8" style={{ "--flash-index": 5 } as any}>
           <Link href="/equipment/listings">
             <Button variant="outline" className="gap-2" data-testid="button-back-inventory">
               <ArrowLeft className="w-4 h-4" />

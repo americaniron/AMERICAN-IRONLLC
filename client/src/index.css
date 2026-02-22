@@ -288,14 +288,8 @@
 }
 
 @keyframes flash-fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(32px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(32px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes flash-fade-in {
@@ -304,62 +298,29 @@
 }
 
 @keyframes flash-scale-in {
-  from {
-    opacity: 0;
-    transform: scale(0.92);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 @keyframes flash-slide-left {
-  from {
-    opacity: 0;
-    transform: translateX(40px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes flash-slide-right {
-  from {
-    opacity: 0;
-    transform: translateX(-40px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  from { opacity: 0; transform: translateX(-40px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes flash-counter {
-  from {
-    opacity: 0;
-    transform: translateY(16px) scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  from { opacity: 0; transform: translateY(16px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 @keyframes flash-splash-logo {
-  0% {
-    opacity: 0;
-    transform: scale(0.6);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.05);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
+  0% { opacity: 0; transform: scale(0.6); }
+  50% { opacity: 1; transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 @keyframes flash-splash-bar {
@@ -368,14 +329,8 @@
 }
 
 @keyframes flash-splash-exit {
-  from {
-    opacity: 1;
-    transform: scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: scale(1.1);
-  }
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(1.1); }
 }
 
 @keyframes flash-shimmer {
@@ -383,11 +338,46 @@
   100% { background-position: 200% 0; }
 }
 
+@keyframes flash-slide-down {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes flash-glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 205, 17, 0); }
+  50% { box-shadow: 0 0 20px 4px rgba(255, 205, 17, 0.25); }
+}
+
+@keyframes flash-page-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes flash-blur-in {
+  from { opacity: 0; filter: blur(8px); }
+  to { opacity: 1; filter: blur(0); }
+}
+
+@keyframes flash-line-grow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes flash-icon-pop {
+  0% { opacity: 0; transform: scale(0.5) rotate(-10deg); }
+  60% { transform: scale(1.15) rotate(2deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+@keyframes flash-badge-in {
+  from { opacity: 0; transform: scale(0.8) translateY(4px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
 .flash-reveal {
   opacity: 0;
   transform: translateY(32px);
 }
-
 .flash-reveal.flash-visible {
   animation: flash-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
@@ -396,7 +386,6 @@
   opacity: 0;
   transform: scale(0.92);
 }
-
 .flash-reveal-scale.flash-visible {
   animation: flash-scale-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
@@ -405,7 +394,6 @@
   opacity: 0;
   transform: translateX(-40px);
 }
-
 .flash-reveal-left.flash-visible {
   animation: flash-slide-right 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
@@ -414,23 +402,98 @@
   opacity: 0;
   transform: translateX(40px);
 }
-
 .flash-reveal-right.flash-visible {
   animation: flash-slide-left 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
+.flash-reveal-down {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+.flash-reveal-down.flash-visible {
+  animation: flash-slide-down 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.flash-blur-in {
+  opacity: 0;
+  filter: blur(8px);
+}
+.flash-blur-in.flash-visible {
+  animation: flash-blur-in 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.flash-icon-pop {
+  opacity: 0;
+  transform: scale(0.5);
+}
+.flash-icon-pop.flash-visible {
+  animation: flash-icon-pop 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.flash-badge-in {
+  opacity: 0;
+  transform: scale(0.8) translateY(4px);
+}
+.flash-badge-in.flash-visible {
+  animation: flash-badge-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.flash-line-grow {
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.flash-line-grow.flash-visible {
+  animation: flash-line-grow 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.flash-glow-pulse {
+  animation: flash-glow-pulse 2.5s ease-in-out infinite;
+}
+
 .flash-stagger > .flash-reveal.flash-visible,
-.flash-stagger > .flash-reveal-scale.flash-visible {
+.flash-stagger > .flash-reveal-scale.flash-visible,
+.flash-stagger > .flash-reveal-left.flash-visible,
+.flash-stagger > .flash-reveal-right.flash-visible,
+.flash-stagger > .flash-reveal-down.flash-visible,
+.flash-stagger > .flash-blur-in.flash-visible,
+.flash-stagger > .flash-icon-pop.flash-visible,
+.flash-stagger > .flash-badge-in.flash-visible {
   animation-delay: calc(var(--flash-index, 0) * 0.08s);
+}
+
+.flash-stagger > a > .flash-reveal-scale.flash-visible,
+.flash-stagger > a > .flash-reveal.flash-visible {
+  animation-delay: calc(var(--flash-index, 0) * 0.08s);
+}
+
+.flash-page-transition {
+  animation: flash-page-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.flash-navbar {
+  animation: flash-slide-down 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .flash-reveal,
   .flash-reveal-scale,
   .flash-reveal-left,
-  .flash-reveal-right {
+  .flash-reveal-right,
+  .flash-reveal-down,
+  .flash-blur-in,
+  .flash-icon-pop,
+  .flash-badge-in,
+  .flash-line-grow {
     opacity: 1;
     transform: none;
+    filter: none;
+    animation: none !important;
+  }
+  .flash-glow-pulse {
+    animation: none !important;
+  }
+  .flash-page-transition,
+  .flash-navbar {
     animation: none !important;
   }
 }

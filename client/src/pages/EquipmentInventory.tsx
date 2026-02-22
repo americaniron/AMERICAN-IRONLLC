@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Search, ArrowRight, MapPin, Calendar, Gauge, ChevronRight, ChevronLeft } from "lucide-react";
 import type { Equipment } from "@shared/schema";
+import { useFlashReveal } from "@/hooks/useFlashReveal";
 
 const CATEGORIES = [
   "ALL",
@@ -47,6 +48,9 @@ export default function EquipmentInventory() {
   const [category, setCategory] = useState(initialCategory);
   const [page, setPage] = useState(1);
 
+  const heroRef = useFlashReveal();
+  const gridRef = useFlashReveal();
+
   useEffect(() => {
     setPage(1);
   }, [category, searchTerm]);
@@ -69,7 +73,7 @@ export default function EquipmentInventory() {
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
 
   return (
-    <div>
+    <div className="flash-page-transition">
       <div className="bg-card border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
           <nav className="flex items-center gap-2 text-sm text-muted-foreground" data-testid="breadcrumb">
@@ -88,13 +92,13 @@ export default function EquipmentInventory() {
         </div>
       </div>
 
-      <section className="relative py-16 overflow-hidden">
+      <section className="relative py-16 overflow-hidden" ref={heroRef}>
         <div className="absolute inset-0 bg-primary" />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-primary-foreground mb-4 tracking-tight" data-testid="text-page-title">
+          <h1 className="flash-reveal text-3xl sm:text-4xl lg:text-5xl font-bold text-primary-foreground mb-4 tracking-tight" data-testid="text-page-title">
             {category !== "ALL" ? category : "Equipment Inventory"}
           </h1>
-          <p className="text-primary-foreground/70 text-lg max-w-2xl">
+          <p className="flash-reveal text-primary-foreground/70 text-lg max-w-2xl" style={{ "--flash-index": 1 } as any}>
             {category !== "ALL"
               ? `Browse our ${category.toLowerCase()} inventory. Filter and search across available listings.`
               : "Filter by category and search by make, model, ID, or location across our comprehensive inventory."}
@@ -136,7 +140,7 @@ export default function EquipmentInventory() {
         </div>
       </section>
 
-      <section className="py-8">
+      <section className="py-8" ref={gridRef}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -153,11 +157,12 @@ export default function EquipmentInventory() {
             </div>
           ) : equipment && equipment.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {equipment.map((item) => (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 flash-stagger">
+                {equipment.map((item, i) => (
                   <Link key={item.id} href={`/equipment/details/${item.equipmentId}`}>
                     <Card
-                      className="group overflow-visible hover-elevate cursor-pointer border-card-border h-full"
+                      className="flash-reveal-scale group overflow-visible hover-elevate cursor-pointer border-card-border h-full"
+                      style={{ "--flash-index": i % 8 } as any}
                       data-testid={`card-equipment-${item.equipmentId}`}
                     >
                       <div className="aspect-[4/3] relative rounded-t-md overflow-hidden bg-muted">

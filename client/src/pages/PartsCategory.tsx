@@ -13,6 +13,7 @@ import {
   ShoppingCart,
 } from "lucide-react";
 import type { Part } from "@shared/schema";
+import { useFlashReveal } from "@/hooks/useFlashReveal";
 
 const categoryLabels: Record<string, string> = {
   all: "All Parts",
@@ -33,6 +34,9 @@ export default function PartsCategory() {
   const [searchTerm, setSearchTerm] = useState("");
   const label = categoryLabels[category || "all"] || "Parts";
 
+  const heroRef = useFlashReveal();
+  const tableRef = useFlashReveal();
+
   const queryUrl = (() => {
     const p = new URLSearchParams();
     if (category && category !== "all") p.set("category", category);
@@ -46,7 +50,7 @@ export default function PartsCategory() {
   });
 
   return (
-    <div>
+    <div className="flash-page-transition">
       <div className="bg-card border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
           <nav className="flex items-center gap-2 text-sm text-muted-foreground" data-testid="breadcrumb-parts">
@@ -63,21 +67,21 @@ export default function PartsCategory() {
         </div>
       </div>
 
-      <section className="py-8 border-b">
+      <section className="py-8 border-b" ref={heroRef}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight" data-testid="text-parts-category-title">
+              <h1 className="flash-reveal text-2xl sm:text-3xl font-bold tracking-tight" data-testid="text-parts-category-title">
                 {label}
               </h1>
               {parts && (
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="flash-reveal text-sm text-muted-foreground mt-1" style={{ "--flash-index": 1 } as any}>
                   <span className="font-semibold text-foreground">{parts.length}</span> items found
                 </p>
               )}
             </div>
             <Link href="/quote">
-              <Button className="bg-accent text-accent-foreground gap-2" data-testid="button-quote-from-parts">
+              <Button className="flash-reveal bg-accent text-accent-foreground gap-2" style={{ "--flash-index": 2 } as any} data-testid="button-quote-from-parts">
                 <ShoppingCart className="w-4 h-4" />
                 Request Quote
               </Button>
@@ -97,7 +101,7 @@ export default function PartsCategory() {
         </div>
       </section>
 
-      <section className="py-8">
+      <section className="py-8" ref={tableRef}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           {isLoading ? (
             <div className="space-y-3">
@@ -106,7 +110,7 @@ export default function PartsCategory() {
               ))}
             </div>
           ) : parts && parts.length > 0 ? (
-            <div className="overflow-x-auto">
+            <div className="flash-reveal-scale overflow-x-auto">
               <table className="w-full text-sm" data-testid="table-parts">
                 <thead>
                   <tr className="border-b text-left">
@@ -135,7 +139,7 @@ export default function PartsCategory() {
                         {part.price || "Call"}
                       </td>
                       <td className="py-3 px-4 text-muted-foreground text-xs">
-                        {part.compatibility || "—"}
+                        {part.compatibility || "\u2014"}
                       </td>
                     </tr>
                   ))}

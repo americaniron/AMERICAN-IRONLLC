@@ -24,6 +24,7 @@ import {
   Send,
   Building2,
 } from "lucide-react";
+import { useFlashReveal } from "@/hooks/useFlashReveal";
 
 const contactSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -35,6 +36,8 @@ type ContactFormData = z.infer<typeof contactSchema>;
 
 export default function Contact() {
   const { toast } = useToast();
+  const heroRef = useFlashReveal();
+  const contentRef = useFlashReveal();
 
   const form = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
@@ -55,23 +58,23 @@ export default function Contact() {
   });
 
   return (
-    <div>
-      <section className="relative py-20 overflow-hidden bg-primary">
+    <div className="flash-page-transition">
+      <section className="relative py-20 overflow-hidden bg-primary" ref={heroRef}>
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-primary-foreground mb-4 tracking-tight" data-testid="text-contact-title">
+          <h1 className="flash-reveal text-3xl sm:text-4xl lg:text-5xl font-bold text-primary-foreground mb-4 tracking-tight" data-testid="text-contact-title">
             Global Headquarters
           </h1>
-          <p className="text-primary-foreground/70 text-lg max-w-2xl">
+          <p className="flash-reveal text-primary-foreground/70 text-lg max-w-2xl" style={{ "--flash-index": 1 } as any}>
             Connect with our asset specialists for equipment acquisition, parts procurement, and specialized industrial services.
           </p>
         </div>
       </section>
 
-      <section className="py-16">
+      <section className="py-16" ref={contentRef}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-5 gap-12">
             <div className="lg:col-span-2 space-y-8">
-              <div>
+              <div className="flash-reveal">
                 <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
                   <Building2 className="w-5 h-5 text-accent" />
                   Corporate Office
@@ -91,10 +94,10 @@ export default function Contact() {
                 </div>
               </div>
 
-              <div>
+              <div className="flash-reveal" style={{ "--flash-index": 1 } as any}>
                 <h3 className="font-semibold mb-4">Direct Channels</h3>
                 <div className="space-y-4">
-                  <Card className="p-4 border-card-border">
+                  <Card className="flash-reveal-scale p-4 border-card-border" style={{ "--flash-index": 2 } as any}>
                     <div className="flex items-start gap-3">
                       <div className="w-9 h-9 rounded-md bg-accent/10 flex items-center justify-center shrink-0">
                         <Phone className="w-4.5 h-4.5 text-accent" />
@@ -108,7 +111,7 @@ export default function Contact() {
                     </div>
                   </Card>
 
-                  <Card className="p-4 border-card-border">
+                  <Card className="flash-reveal-scale p-4 border-card-border" style={{ "--flash-index": 3 } as any}>
                     <div className="flex items-start gap-3">
                       <div className="w-9 h-9 rounded-md bg-accent/10 flex items-center justify-center shrink-0">
                         <Mail className="w-4.5 h-4.5 text-accent" />
@@ -122,7 +125,7 @@ export default function Contact() {
                     </div>
                   </Card>
 
-                  <Card className="p-4 border-card-border">
+                  <Card className="flash-reveal-scale p-4 border-card-border" style={{ "--flash-index": 4 } as any}>
                     <div className="flex items-start gap-3">
                       <div className="w-9 h-9 rounded-md bg-accent/10 flex items-center justify-center shrink-0">
                         <MessageCircle className="w-4.5 h-4.5 text-accent" />
@@ -140,7 +143,7 @@ export default function Contact() {
             </div>
 
             <div className="lg:col-span-3">
-              <Card className="p-6 border-card-border">
+              <Card className="flash-reveal-scale p-6 border-card-border" style={{ "--flash-index": 1 } as any}>
                 <h2 className="text-lg font-bold mb-2">Submit a Request for Information</h2>
                 <p className="text-sm text-muted-foreground mb-6">
                   A specialist relevant to your sector will respond within one business cycle.

@@ -17,6 +17,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { FileText, Send, CheckCircle2 } from "lucide-react";
+import { useFlashReveal } from "@/hooks/useFlashReveal";
 
 const quoteSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -31,6 +32,8 @@ type QuoteFormData = z.infer<typeof quoteSchema>;
 
 export default function QuoteRequest() {
   const { toast } = useToast();
+  const heroRef = useFlashReveal();
+  const contentRef = useFlashReveal();
 
   const form = useForm<QuoteFormData>({
     resolver: zodResolver(quoteSchema),
@@ -58,43 +61,43 @@ export default function QuoteRequest() {
   });
 
   return (
-    <div>
-      <section className="relative py-20 overflow-hidden">
+    <div className="flash-page-transition">
+      <section className="relative py-20 overflow-hidden" ref={heroRef}>
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: "url(/images/hero-parts.png)" }}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/70 to-black/50" />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 tracking-tight" data-testid="text-quote-title">
+          <h1 className="flash-reveal text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 tracking-tight" data-testid="text-quote-title">
             Request Parts Quote
           </h1>
-          <p className="text-white/70 text-lg max-w-2xl">
+          <p className="flash-reveal text-white/70 text-lg max-w-2xl" style={{ "--flash-index": 1 } as any}>
             Send part numbers, quantities, and delivery details for a comprehensive quote.
           </p>
         </div>
       </section>
 
-      <section className="py-12">
+      <section className="py-12" ref={contentRef}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-5 gap-8">
             <div className="lg:col-span-2">
-              <h2 className="text-xl font-bold mb-4">What to Include</h2>
-              <ul className="space-y-3 text-sm text-muted-foreground">
+              <h2 className="flash-reveal text-xl font-bold mb-4">What to Include</h2>
+              <ul className="space-y-3 text-sm text-muted-foreground flash-stagger">
                 {[
                   "Part numbers and quantities",
                   "Machine model/serial (if available)",
                   "Shipping destination (city/state/country)",
                   "Preferred delivery time",
                 ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-2.5">
+                  <li key={i} className="flash-reveal-left flex items-start gap-2.5" style={{ "--flash-index": i } as any}>
                     <CheckCircle2 className="w-4 h-4 text-accent mt-0.5 shrink-0" />
                     <span>{item}</span>
                   </li>
                 ))}
               </ul>
 
-              <Card className="mt-6 p-5 border-card-border">
+              <Card className="flash-reveal-scale mt-6 p-5 border-card-border" style={{ "--flash-index": 2 } as any}>
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 bg-accent/10 rounded-md flex items-center justify-center">
                     <FileText className="w-5 h-5 text-accent" />
@@ -111,7 +114,7 @@ export default function QuoteRequest() {
             </div>
 
             <div className="lg:col-span-3">
-              <Card className="p-6 border-card-border">
+              <Card className="flash-reveal-scale p-6 border-card-border" style={{ "--flash-index": 1 } as any}>
                 <h2 className="text-lg font-bold mb-6">Send Quote Request</h2>
 
                 <Form {...form}>

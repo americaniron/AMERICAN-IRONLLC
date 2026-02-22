@@ -51,7 +51,7 @@ export default function EquipmentCategories() {
   const gridRef = useFlashReveal();
 
   return (
-    <div>
+    <div className="flash-page-transition">
       <section className="relative py-20 overflow-hidden" ref={heroRef}>
         <div
           className="absolute inset-0 bg-cover bg-center"
