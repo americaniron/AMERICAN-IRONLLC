@@ -1,21 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowRight } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ArrowRight, Search, Package, Wrench } from "lucide-react";
 import { useFlashReveal } from "@/hooks/useFlashReveal";
-
-import attachmentsImg from "@assets/attachments_1771718821209.jpg";
-import drivetrainImg from "@assets/drivetrain_1771718821209.jpg";
-import electricalImg from "@assets/electrical-and-electronics_1771718821209.jpg";
-import engineImg from "@assets/engine_1771718821209.jpg";
-import filtersImg from "@assets/filters-fluid_1771718821209.jpg";
-import groundEngagingImg from "@assets/ground-engaging-tools_1771718821209.jpg";
-import hosesImg from "@assets/hoses-and-tubes_1771718821209.jpg";
-import hydraulicsImg from "@assets/hydraulics_1771718821209.jpg";
-import undercarriageImg from "@assets/undercarriage_1771718821209.jpg";
-import upgradesImg from "@assets/upgrades-repair-kits_1771718821209.jpg";
 
 const VIDEOS = [
   "/images/parts-bg-1.mp4",
@@ -23,67 +13,55 @@ const VIDEOS = [
   "/images/parts-bg-3.mp4",
 ];
 
-const categories = [
-  {
-    name: "Attachments",
-    slug: "attachments",
-    desc: "Buckets, couplers, forks, and more.",
-    image: attachmentsImg,
-  },
-  {
-    name: "Drivetrain",
-    slug: "drivetrain",
-    desc: "Transmission, torque, axles, and final drives.",
-    image: drivetrainImg,
-  },
-  {
-    name: "Electrical & Electronics",
-    slug: "electrical-and-electronics",
-    desc: "Harnesses, switches, controllers, sensors.",
-    image: electricalImg,
-  },
-  {
-    name: "Engine",
-    slug: "engine",
-    desc: "Gaskets, injectors, belts, sensors, and more.",
-    image: engineImg,
-  },
-  {
-    name: "Filters & Fluids",
-    slug: "filters-and-fluids",
-    desc: "Filters, service items, and fluid components.",
-    image: filtersImg,
-  },
-  {
-    name: "Ground Engaging Tools",
-    slug: "ground-engaging-tools",
-    desc: "Teeth, adapters, edges, and cutting bits.",
-    image: groundEngagingImg,
-  },
-  {
-    name: "Hoses & Tubes",
-    slug: "hoses-and-tubes",
-    desc: "Hoses, tubes, fittings, and clamps.",
-    image: hosesImg,
-  },
-  {
-    name: "Hydraulics",
-    slug: "hydraulics",
-    desc: "Pumps, valves, cylinders, and manifolds.",
-    image: hydraulicsImg,
-  },
-  {
-    name: "Undercarriage",
-    slug: "undercarriage",
-    desc: "Tracks, rollers, idlers, and wear parts.",
-    image: undercarriageImg,
-  },
-  {
-    name: "Upgrades & Repair Kits",
-    slug: "upgrades-repair-kits",
-    desc: "Popular kits and repair items across systems.",
-    image: upgradesImg,
-  },
+const CATEGORY_IMAGES: Record<string, string> = {
+  "Air Inlet & Exhaust": "/images/parts/air-inlet-exhaust.jpg",
+  "Turbochargers": "/images/parts/turbochargers.jpg",
+  "Bearings": "/images/parts/bearings.jpg",
+  "Belts & Hoses": "/images/parts/belts-hoses.jpg",
+  "Braking & Friction": "/images/parts/braking-friction.jpg",
+  "Cooling System": "/images/parts/cooling-system.jpg",
+  "Electrical": "/images/parts/electrical.jpg",
+  "Engine Components": "/images/parts/engine-components.jpg",
+  "Filters": "/images/parts/filters.jpg",
+  "Ground Engaging Tools": "/images/parts/ground-engaging.jpg",
+  "Hardware": "/images/parts/hardware.jpg",
+  "Hydraulic System": "/images/parts/hydraulic-system.jpg",
+  "Gaskets & Seals": "/images/parts/gaskets-seals.jpg",
+  "Undercarriage": "/images/parts/undercarriage.jpg",
+};
+
+const CATEGORY_DESCRIPTIONS: Record<string, string> = {
+  "Air Inlet & Exhaust": "Manifolds, pipes, clamps, and exhaust system components.",
+  "Turbochargers": "Turbochargers, cartridges, and boost system parts.",
+  "Bearings": "Ball, roller, tapered, needle bearings and bushings.",
+  "Belts & Hoses": "V-belts, serpentine belts, and hydraulic hoses.",
+  "Braking & Friction": "Brake shoes, pads, linings, and friction materials.",
+  "Cooling System": "Radiators, water pumps, oil coolers, and thermostats.",
+  "Electrical": "Alternators, starters, sensors, and wiring harnesses.",
+  "Engine Components": "Pistons, heads, connecting rods, and engine internals.",
+  "Filters": "Oil, fuel, air, and hydraulic filters for all equipment.",
+  "Ground Engaging Tools": "Bucket teeth, cutting edges, adapters, and wear parts.",
+  "Hardware": "Bolts, nuts, rod ends, grease fittings, and fasteners.",
+  "Hydraulic System": "Pumps, cylinders, valves, gears, and hose assemblies.",
+  "Gaskets & Seals": "Gasket kits, O-rings, and sealing components.",
+  "Undercarriage": "Track chains, rollers, idlers, sprockets, and pads.",
+};
+
+const CATEGORY_ORDER = [
+  "Hydraulic System",
+  "Engine Components",
+  "Bearings",
+  "Undercarriage",
+  "Filters",
+  "Electrical",
+  "Ground Engaging Tools",
+  "Belts & Hoses",
+  "Braking & Friction",
+  "Hardware",
+  "Cooling System",
+  "Turbochargers",
+  "Air Inlet & Exhaust",
+  "Gaskets & Seals",
 ];
 
 function RotatingVideoBackground() {
@@ -133,7 +111,12 @@ export default function PartsCatalog() {
     queryKey: ["/api/parts/categories/counts"],
   });
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [, setLocation] = useLocation();
+
   const totalItems = counts ? Object.values(counts).reduce((a, b) => a + b, 0) : 0;
+
+  const sortedCategories = CATEGORY_ORDER.filter((cat) => !counts || counts[cat]);
 
   const heroRef = useFlashReveal();
   const gridRef = useFlashReveal();
@@ -143,24 +126,63 @@ export default function PartsCatalog() {
       <section className="relative py-24 overflow-hidden bg-black" ref={heroRef}>
         <RotatingVideoBackground />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center">
+              <Package className="w-5 h-5 text-black" />
+            </div>
+            <span className="text-white/60 text-sm font-medium uppercase tracking-wider">Industrial Parts</span>
+          </div>
           <h1 className="flash-reveal text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 tracking-tight" data-testid="text-parts-title">
             Parts <span className="text-accent-3d">Catalog</span>
           </h1>
           <p className="flash-reveal text-white/70 text-lg max-w-2xl mb-6" style={{ "--flash-index": 1 } as any}>
-            Browse parts by category across our inventory of {totalItems > 0 ? `${totalItems.toLocaleString()}+` : "12,200+"} items in stock.
+            Browse our complete inventory of{" "}
+            <span className="text-accent font-semibold">
+              {totalItems > 0 ? totalItems.toLocaleString() : "17,500"}+
+            </span>{" "}
+            aftermarket parts across {sortedCategories.length} categories.
           </p>
-          <div className="flex flex-wrap gap-3">
+
+          <div className="flash-reveal flex flex-col sm:flex-row gap-3 mb-8" style={{ "--flash-index": 2 } as any}>
+            <div className="relative max-w-md flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50" />
+              <Input
+                placeholder="Search by part number, description, or equipment..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && searchTerm.trim()) {
+                    setLocation(`/parts/all?search=${encodeURIComponent(searchTerm.trim())}`);
+                  }
+                }}
+                className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:bg-white/15"
+                data-testid="input-hero-search-parts"
+              />
+            </div>
             <Link href="/parts/all">
-              <Button className="bg-accent text-accent-foreground gap-2" data-testid="button-view-all-parts">
+              <Button className="bg-accent text-accent-foreground gap-2 h-10" data-testid="button-view-all-parts">
                 View All Parts
                 <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>
             <Link href="/quote">
-              <Button variant="outline" className="text-white border-white/30 bg-white/10 backdrop-blur gap-2" data-testid="button-request-quote">
+              <Button variant="outline" className="text-white border-white/30 bg-white/10 backdrop-blur gap-2 h-10" data-testid="button-request-quote">
+                <Wrench className="w-4 h-4" />
                 Request Quote
               </Button>
             </Link>
+          </div>
+
+          <div className="flex flex-wrap gap-6 text-sm">
+            <div className="text-white/60">
+              <span className="text-2xl font-bold text-white">{sortedCategories.length}</span> Categories
+            </div>
+            <div className="text-white/60">
+              <span className="text-2xl font-bold text-accent">{totalItems > 0 ? totalItems.toLocaleString() : "17,500"}+</span> Parts
+            </div>
+            <div className="text-white/60">
+              <span className="text-2xl font-bold text-white">100%</span> Aftermarket
+            </div>
           </div>
         </div>
       </section>
@@ -171,46 +193,57 @@ export default function PartsCatalog() {
             <div>
               <h2 className="flash-reveal text-2xl font-bold tracking-tight">Browse by Category</h2>
               <p className="text-muted-foreground mt-1">
-                {totalItems > 0 ? (
-                  <>Inventory items: <span className="font-semibold text-foreground">{totalItems.toLocaleString()}</span></>
-                ) : (
-                  <>Inventory items: <span className="font-semibold text-foreground">12,200+</span></>
-                )}
+                Select a category to explore parts and build your quote.
               </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 flash-stagger">
-            {categories.map((cat, i) => (
-              <Link key={cat.slug} href={`/parts/${cat.slug}`}>
-                <Card
-                  className="flash-reveal-scale group overflow-visible hover-elevate cursor-pointer border-card-border h-full"
-                  style={{ "--flash-index": i } as any}
-                  data-testid={`card-parts-${cat.slug}`}
-                >
-                  <div className="aspect-[3/2] relative rounded-t-md overflow-hidden bg-white">
-                    <img
-                      src={cat.image}
-                      alt={cat.name}
-                      className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-semibold text-sm mb-1">{cat.name}</h3>
-                    <p className="text-xs text-muted-foreground leading-relaxed">{cat.desc}</p>
-                    {counts && counts[cat.slug] && (
-                      <p className="text-xs text-muted-foreground mt-2 font-medium">{counts[cat.slug].toLocaleString()} items</p>
-                    )}
-                  </div>
-                </Card>
-              </Link>
-            ))}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 flash-stagger">
+            {sortedCategories.map((cat, i) => {
+              const count = counts?.[cat] || 0;
+              const slug = encodeURIComponent(cat);
+              return (
+                <Link key={cat} href={`/parts/${slug}`}>
+                  <Card
+                    className="flash-reveal-scale group overflow-hidden hover-elevate cursor-pointer border-card-border h-full"
+                    style={{ "--flash-index": i } as any}
+                    data-testid={`card-parts-${cat.toLowerCase().replace(/\s+/g, "-")}`}
+                  >
+                    <div className="aspect-[16/9] relative overflow-hidden bg-black">
+                      <img
+                        src={CATEGORY_IMAGES[cat] || "/images/parts/generic-part.jpg"}
+                        alt={cat}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-80 group-hover:opacity-100"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                      <div className="absolute bottom-3 left-4 right-4">
+                        <h3 className="font-bold text-white text-base">{cat}</h3>
+                      </div>
+                      {count > 0 && (
+                        <div className="absolute top-3 right-3 bg-accent text-black text-xs font-bold px-2 py-1 rounded">
+                          {count.toLocaleString()}
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-4">
+                      <p className="text-xs text-muted-foreground leading-relaxed mb-3">
+                        {CATEGORY_DESCRIPTIONS[cat] || "Browse parts in this category."}
+                      </p>
+                      <div className="flex items-center text-xs text-accent font-medium group-hover:underline">
+                        Browse Parts <ArrowRight className="w-3 h-3 ml-1" />
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
+              );
+            })}
           </div>
 
           <div className="mt-12 text-center">
             <Link href="/parts/all">
               <Button size="lg" className="bg-accent text-accent-foreground gap-2 text-base px-8" data-testid="button-view-all-parts-bottom">
-                View All Parts
+                View All {totalItems > 0 ? totalItems.toLocaleString() : "17,500"}+ Parts
                 <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>

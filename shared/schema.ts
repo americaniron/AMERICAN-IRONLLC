@@ -22,8 +22,13 @@ export const parts = pgTable("parts", {
   partNumber: varchar("part_number", { length: 50 }).notNull(),
   description: text("description").notNull(),
   category: varchar("category", { length: 50 }).notNull(),
+  subcategory: varchar("subcategory", { length: 100 }),
   price: varchar("price", { length: 50 }),
   compatibility: text("compatibility"),
+  engineModel: text("engine_model"),
+  gasket: varchar("gasket", { length: 50 }),
+  equipment: text("equipment"),
+  imageUrl: text("image_url"),
 });
 
 export const quoteRequests = pgTable("quote_requests", {

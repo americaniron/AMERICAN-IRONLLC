@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
@@ -16,8 +17,9 @@ import {
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { FileText, Send, CheckCircle2 } from "lucide-react";
+import { FileText, Send, CheckCircle2, X, Minus, Plus } from "lucide-react";
 import { useFlashReveal } from "@/hooks/useFlashReveal";
+import { useQuoteCart } from "@/hooks/useQuoteCart";
 
 const quoteSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -34,6 +36,7 @@ export default function QuoteRequest() {
   const { toast } = useToast();
   const heroRef = useFlashReveal();
   const contentRef = useFlashReveal();
+  const { items: cartItems, removeItem, updateQuantity, clearCart } = useQuoteCart();
 
   const form = useForm<QuoteFormData>({
     resolver: zodResolver(quoteSchema),
@@ -47,6 +50,17 @@ export default function QuoteRequest() {
     },
   });
 
+  useEffect(() => {
+    if (cartItems.length > 0) {
+      const itemsText = cartItems
+        .map((item) => `${item.partNumber} x${item.quantity}`)
+        .join(", ");
+      form.setValue("items", itemsText);
+    } else {
+      form.setValue("items", "");
+    }
+  }, [cartItems, form]);
+
   const mutation = useMutation({
     mutationFn: async (data: QuoteFormData) => {
       return apiRequest("POST", "/api/quotes", data);
@@ -54,6 +68,7 @@ export default function QuoteRequest() {
     onSuccess: () => {
       toast({ title: "Quote Request Sent", description: "We'll respond within one business day." });
       form.reset();
+      clearCart();
     },
     onError: () => {
       toast({ title: "Error", description: "Failed to submit. Please try again.", variant: "destructive" });
@@ -77,6 +92,54 @@ export default function QuoteRequest() {
           </p>
         </div>
       </section>
+
+      {cartItems.length > 0 && (
+        <section className="py-6 border-b bg-muted/30">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold">Quote Items ({cartItems.length})</h2>
+              <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={clearCart} data-testid="button-clear-cart">
+                Clear All
+              </Button>
+            </div>
+            <div className="space-y-2">
+              {cartItems.map((item) => (
+                <div key={item.partNumber} className="flex items-center gap-3 bg-card rounded-lg p-3 border" data-testid={`cart-item-${item.partNumber}`}>
+                  <div className="flex-1 min-w-0">
+                    <span className="font-mono font-medium text-accent text-sm">{item.partNumber}</span>
+                    <span className="text-muted-foreground text-xs ml-2">{item.description}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button
+                      onClick={() => updateQuantity(item.partNumber, item.quantity - 1)}
+                      className="w-6 h-6 rounded border flex items-center justify-center hover:bg-muted transition-colors"
+                      disabled={item.quantity <= 1}
+                      data-testid={`button-qty-minus-${item.partNumber}`}
+                    >
+                      <Minus className="w-3 h-3" />
+                    </button>
+                    <span className="w-8 text-center text-sm font-medium" data-testid={`text-qty-${item.partNumber}`}>{item.quantity}</span>
+                    <button
+                      onClick={() => updateQuantity(item.partNumber, item.quantity + 1)}
+                      className="w-6 h-6 rounded border flex items-center justify-center hover:bg-muted transition-colors"
+                      data-testid={`button-qty-plus-${item.partNumber}`}
+                    >
+                      <Plus className="w-3 h-3" />
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => removeItem(item.partNumber)}
+                    className="w-7 h-7 rounded-md flex items-center justify-center text-muted-foreground hover:text-red-500 hover:bg-red-50 transition-colors"
+                    data-testid={`button-remove-${item.partNumber}`}
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="py-12" ref={contentRef}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6">

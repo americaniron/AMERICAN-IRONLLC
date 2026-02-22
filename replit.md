@@ -47,7 +47,7 @@ Preferred communication style: Simple, everyday language.
 - **Connection**: `DATABASE_URL` environment variable required, uses `pg.Pool`
 - **Tables**:
   - `equipment` — Heavy equipment listings (id, equipmentId, make, model, year, meter, price, location, category, imageUrl)
-  - `parts` — Parts catalog (id, partNumber, description, category, price, compatibility)
+  - `parts` — Parts catalog (id, partNumber, description, category, subcategory, price, compatibility, engineModel, gasket, equipment, imageUrl) — 17,554 items from parsed Costex catalog across 14 categories
   - `quote_requests` — Quote request submissions (name, email, phone, shipTo, notes, items)
   - `contact_inquiries` — Contact form submissions (name, email, message)
   - `users` — User accounts (id, username) — exists in schema but auth not fully implemented
@@ -57,7 +57,9 @@ Preferred communication style: Simple, everyday language.
 ### API Endpoints
 - `GET /api/equipment` — List equipment with optional `category` and `search` query filters
 - `GET /api/equipment/:id` — Get single equipment item by equipmentId
-- `GET /api/parts` — List parts with optional `category` and `search` query filters
+- `GET /api/parts` — List parts with pagination and filters (`category`, `subcategory`, `search`, `page`, `limit`); returns `{ items, total }`
+- `GET /api/parts/subcategories/counts` — Get part counts by subcategory, optionally filtered by `category`
+- `GET /api/parts/:id` — Get single part by database ID
 - `POST /api/quotes` — Submit a quote request (validated with Zod)
 - `POST /api/contact` — Submit a contact inquiry (validated with Zod)
 - `POST /api/estimate` — IRON Estimator: AI-powered equipment estimator (streaming SSE response, uses OpenAI gpt-5.2 with real inventory data)

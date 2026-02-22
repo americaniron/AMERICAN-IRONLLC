@@ -31,8 +31,11 @@ export interface IStorage {
   createEquipment(data: InsertEquipment): Promise<Equipment>;
   getEquipmentCategoryCounts(): Promise<Record<string, number>>;
 
-  getParts(filters?: { category?: string; search?: string }): Promise<Part[]>;
+  getParts(filters?: { category?: string; subcategory?: string; search?: string; page?: number; limit?: number }): Promise<{ items: Part[]; total: number }>;
+  getPartById(id: number): Promise<Part | undefined>;
+  getPartsByNumbers(partNumbers: string[]): Promise<Part[]>;
   createPart(data: InsertPart): Promise<Part>;
+  getPartsSubcategoryCounts(category?: string): Promise<Record<string, number>>;
 
   createQuoteRequest(data: InsertQuoteRequest): Promise<QuoteRequest>;
   createContactInquiry(data: InsertContactInquiry): Promise<ContactInquiry>;
@@ -136,13 +139,19 @@ export class DatabaseStorage implements IStorage {
     return item;
   }
 
-  async getParts(filters?: { category?: string; search?: string }): Promise<Part[]> {
-    let query = db.select().from(parts);
+  async getParts(filters?: { category?: string; subcategory?: string; search?: string; page?: number; limit?: number }): Promise<{ items: Part[]; total: number }> {
+    const page = filters?.page || 1;
+    const limit = filters?.limit || 50;
+    const offset = (page - 1) * limit;
 
     const conditions = [];
 
     if (filters?.category) {
       conditions.push(eq(parts.category, filters.category));
+    }
+
+    if (filters?.subcategory) {
+      conditions.push(eq(parts.subcategory, filters.subcategory));
     }
 
     if (filters?.search) {
@@ -151,25 +160,71 @@ export class DatabaseStorage implements IStorage {
         or(
           ilike(parts.partNumber, searchTerm),
           ilike(parts.description, searchTerm),
-          ilike(parts.compatibility, searchTerm),
+          ilike(parts.equipment, searchTerm),
+          ilike(parts.engineModel, searchTerm),
         )!
       );
     }
 
+    let whereClause: any = undefined;
     if (conditions.length > 0) {
       let combined = conditions[0]!;
       for (let i = 1; i < conditions.length; i++) {
         combined = sql`${combined} AND ${conditions[i]}`;
       }
-      query = query.where(combined) as any;
+      whereClause = combined;
     }
 
-    return query.limit(200);
+    const countQuery = db.select({ count: sql<number>`count(*)` }).from(parts);
+    if (whereClause) {
+      countQuery.where(whereClause);
+    }
+    const [countResult] = await countQuery;
+    const total = Number(countResult.count);
+
+    let itemsQuery = db.select().from(parts);
+    if (whereClause) {
+      itemsQuery = itemsQuery.where(whereClause) as any;
+    }
+    const items = await (itemsQuery as any).limit(limit).offset(offset);
+
+    return { items, total };
+  }
+
+  async getPartById(id: number): Promise<Part | undefined> {
+    const [item] = await db.select().from(parts).where(eq(parts.id, id));
+    return item;
+  }
+
+  async getPartsByNumbers(partNumbers: string[]): Promise<Part[]> {
+    if (partNumbers.length === 0) return [];
+    return db.select().from(parts).where(sql`${parts.partNumber} = ANY(${partNumbers})`);
   }
 
   async createPart(data: InsertPart): Promise<Part> {
     const [item] = await db.insert(parts).values(data).returning();
     return item;
+  }
+
+  async getPartsSubcategoryCounts(category?: string): Promise<Record<string, number>> {
+    let query = db
+      .select({
+        subcategory: parts.subcategory,
+        count: sql<number>`count(*)`,
+      })
+      .from(parts)
+      .groupBy(parts.subcategory);
+
+    if (category) {
+      query = query.where(eq(parts.category, category)) as any;
+    }
+
+    const results = await query;
+    const counts: Record<string, number> = {};
+    for (const row of results) {
+      counts[row.subcategory || "Other"] = Number(row.count);
+    }
+    return counts;
   }
 
   async createQuoteRequest(data: InsertQuoteRequest): Promise<QuoteRequest> {

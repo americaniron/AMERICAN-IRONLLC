@@ -70,11 +70,36 @@ export async function registerRoutes(
   app.get("/api/parts", async (req, res) => {
     try {
       const category = req.query.category as string | undefined;
+      const subcategory = req.query.subcategory as string | undefined;
       const search = req.query.search as string | undefined;
-      const items = await storage.getParts({ category, search });
-      res.json(items);
+      const page = req.query.page ? parseInt(req.query.page as string) : 1;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+      const result = await storage.getParts({ category, subcategory, search, page, limit });
+      res.json(result);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch parts" });
+    }
+  });
+
+  app.get("/api/parts/subcategories/counts", async (req, res) => {
+    try {
+      const category = req.query.category as string | undefined;
+      const counts = await storage.getPartsSubcategoryCounts(category);
+      res.json(counts);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch subcategory counts" });
+    }
+  });
+
+  app.get("/api/parts/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) return res.status(400).json({ error: "Invalid part ID" });
+      const item = await storage.getPartById(id);
+      if (!item) return res.status(404).json({ error: "Part not found" });
+      res.json(item);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch part" });
     }
   });
 
