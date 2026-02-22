@@ -40,6 +40,7 @@ export default function Footer() {
               <FooterLink href="/services/inspection">Inspection & Auditing</FooterLink>
               <FooterLink href="/services/transportation">Transportation</FooterLink>
               <FooterLink href="/services/shipping">Shipping & Forwarding</FooterLink>
+              <FooterLink href="/services/estimator">IRON Estimator</FooterLink>
             </ul>
           </div>
 
