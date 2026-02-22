@@ -19,7 +19,7 @@ const services = [
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [location] = useLocation();
+  const [location, setLoc] = useLocation();
 
   return (
     <>
@@ -84,10 +84,13 @@ export default function Navbar() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="w-56">
                   {services.map((s) => (
-                    <DropdownMenuItem key={s.href} asChild>
-                      <Link href={s.href} data-testid={`link-${s.href.split("/").pop()}`}>
-                        {s.name}
-                      </Link>
+                    <DropdownMenuItem
+                      key={s.href}
+                      className="cursor-pointer"
+                      onSelect={() => setLoc(s.href)}
+                      data-testid={`link-${s.href.split("/").pop()}`}
+                    >
+                      {s.name}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
