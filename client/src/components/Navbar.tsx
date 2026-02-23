@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Menu, X, Phone, Mail, ChevronDown, User, LogIn } from "lucide-react";
 import { SiFacebook, SiX, SiInstagram, SiLinkedin, SiYoutube, SiWhatsapp } from "react-icons/si";
@@ -22,8 +22,20 @@ const services = [
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [servicesOpen, setServicesOpen] = useState(false);
+  const servicesRef = useRef<HTMLDivElement>(null);
   const [location, setLoc] = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (servicesRef.current && !servicesRef.current.contains(e.target as Node)) {
+        setServicesOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <>
@@ -81,33 +93,34 @@ export default function Navbar() {
               <NavLink href="/parts" active={location === "/parts"}>Parts</NavLink>
               <NavLink href="/power-units" active={location.startsWith("/power-units")}>Power Units</NavLink>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    className={`px-3 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-1 ${
-                      location.startsWith("/services") && location !== "/services/estimator"
-                        ? "text-accent"
-                        : "text-foreground/70"
-                    }`}
-                    data-testid="button-services-menu"
-                  >
-                    Services
-                    <ChevronDown className="w-3.5 h-3.5" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-56 z-[100]">
-                  {services.map((s) => (
-                    <DropdownMenuItem
-                      key={s.href}
-                      className="cursor-pointer"
-                      onSelect={() => setLoc(s.href)}
-                      data-testid={`link-${s.href.split("/").pop()}`}
-                    >
-                      {s.name}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="relative" ref={servicesRef}>
+                <button
+                  onClick={() => setServicesOpen(!servicesOpen)}
+                  className={`px-3 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-1 ${
+                    location.startsWith("/services") && location !== "/services/estimator"
+                      ? "text-accent"
+                      : "text-foreground/70"
+                  }`}
+                  data-testid="button-services-menu"
+                >
+                  Services
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${servicesOpen ? "rotate-180" : ""}`} />
+                </button>
+                {servicesOpen && (
+                  <div className="absolute top-full left-0 mt-1 w-56 rounded-md border bg-popover p-1 text-popover-foreground shadow-md" style={{ zIndex: 9999 }}>
+                    {services.map((s) => (
+                      <Link key={s.href} href={s.href} onClick={() => setServicesOpen(false)}>
+                        <div
+                          className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+                          data-testid={`link-${s.href.split("/").pop()}`}
+                        >
+                          {s.name}
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
 
               <NavLink href="/services/estimator" active={location === "/services/estimator"}>IRON Estimator</NavLink>
               <NavLink href="/contact" active={location === "/contact"}>Contact</NavLink>
