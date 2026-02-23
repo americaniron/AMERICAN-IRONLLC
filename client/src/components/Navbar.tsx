@@ -61,7 +61,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      <header className="flash-navbar sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b" style={{ animationDelay: "0.1s", WebkitBackfaceVisibility: "hidden" as any }}>
+      <header className="flash-navbar sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b" style={{ animationDelay: "0.1s" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16 lg:h-18">
             <Link href="/" data-testid="link-home">
@@ -95,7 +95,7 @@ export default function Navbar() {
                     <ChevronDown className="w-3.5 h-3.5" />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-56">
+                <DropdownMenuContent align="start" className="w-56 z-[100]">
                   {services.map((s) => (
                     <DropdownMenuItem
                       key={s.href}
