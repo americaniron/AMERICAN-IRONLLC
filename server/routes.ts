@@ -716,6 +716,180 @@ Provide a thorough, institutional-grade estimate with specific equipment recomme
     }
   });
 
+  // UPS Rating API
+  const upsRateSchema = z.object({
+    originCity: z.string().min(1),
+    originState: z.string().min(1).max(5),
+    originPostal: z.string().min(1),
+    originCountry: z.string().length(2).default("US"),
+    destCity: z.string().min(1),
+    destState: z.string().max(5).optional().default(""),
+    destPostal: z.string().min(1),
+    destCountry: z.string().length(2).default("US"),
+    weightLbs: z.number().positive().max(150),
+    lengthIn: z.number().positive().max(108),
+    widthIn: z.number().positive().max(108),
+    heightIn: z.number().positive().max(108),
+  });
+
+  let upsAccessToken: string | null = null;
+  let upsTokenExpiry = 0;
+
+  async function getUPSToken(): Promise<string> {
+    if (upsAccessToken && Date.now() < upsTokenExpiry) {
+      return upsAccessToken;
+    }
+    const clientId = process.env.UPS_CLIENT_ID;
+    const clientSecret = process.env.UPS_CLIENT_SECRET;
+    if (!clientId || !clientSecret) {
+      throw new Error("UPS credentials not configured");
+    }
+    const resp = await fetch("https://onlinetools.ups.com/security/v1/oauth/token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: "Basic " + Buffer.from(`${clientId}:${clientSecret}`).toString("base64"),
+      },
+      body: "grant_type=client_credentials",
+    });
+    if (!resp.ok) {
+      const errText = await resp.text();
+      console.error("UPS OAuth error:", resp.status, errText);
+      throw new Error(`UPS authentication failed: ${resp.status}`);
+    }
+    const data = await resp.json() as any;
+    upsAccessToken = data.access_token;
+    upsTokenExpiry = Date.now() + (data.expires_in - 60) * 1000;
+    return upsAccessToken!;
+  }
+
+  app.post("/api/shipping/ups-rates", async (req, res) => {
+    try {
+      const parsed = upsRateSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ error: "Validation error", details: parsed.error.issues });
+      }
+      const d = parsed.data;
+      const accountNumber = process.env.UPS_ACCOUNT_NUMBER;
+      if (!accountNumber) {
+        return res.status(500).json({ error: "UPS account not configured" });
+      }
+
+      const token = await getUPSToken();
+
+      const payload = {
+        RateRequest: {
+          Request: {
+            SubVersion: "2205",
+            TransactionReference: { CustomerContext: "Rate Request" },
+          },
+          Shipment: {
+            Shipper: {
+              ShipperNumber: accountNumber,
+              Address: {
+                City: d.originCity,
+                StateProvinceCode: d.originState,
+                PostalCode: d.originPostal,
+                CountryCode: d.originCountry,
+              },
+            },
+            ShipTo: {
+              Address: {
+                City: d.destCity,
+                StateProvinceCode: d.destState,
+                PostalCode: d.destPostal,
+                CountryCode: d.destCountry,
+              },
+            },
+            ShipFrom: {
+              Address: {
+                City: d.originCity,
+                StateProvinceCode: d.originState,
+                PostalCode: d.originPostal,
+                CountryCode: d.originCountry,
+              },
+            },
+            Package: {
+              PackagingType: { Code: "02" },
+              Dimensions: {
+                UnitOfMeasurement: { Code: "IN" },
+                Length: String(d.lengthIn),
+                Width: String(d.widthIn),
+                Height: String(d.heightIn),
+              },
+              PackageWeight: {
+                UnitOfMeasurement: { Code: "LBS" },
+                Weight: String(d.weightLbs),
+              },
+            },
+          },
+        },
+      };
+
+      const upsResp = await fetch("https://onlinetools.ups.com/api/rating/v2403/Shop", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          transId: `ami-${Date.now()}`,
+          transactionSrc: "AmericanIronLLC",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!upsResp.ok) {
+        const errBody = await upsResp.text();
+        console.error("UPS Rating error:", upsResp.status, errBody);
+        return res.status(502).json({ error: "Unable to retrieve UPS rates. Please verify the addresses and try again." });
+      }
+
+      const upsData = await upsResp.json() as any;
+      const ratedShipments = upsData?.RateResponse?.RatedShipment || [];
+
+      const serviceNames: Record<string, string> = {
+        "01": "UPS Next Day Air",
+        "02": "UPS 2nd Day Air",
+        "03": "UPS Ground",
+        "07": "UPS Worldwide Express",
+        "08": "UPS Worldwide Expedited",
+        "11": "UPS Standard",
+        "12": "UPS 3 Day Select",
+        "13": "UPS Next Day Air Saver",
+        "14": "UPS Next Day Air Early",
+        "54": "UPS Worldwide Express Plus",
+        "59": "UPS 2nd Day Air A.M.",
+        "65": "UPS Worldwide Saver",
+        "82": "UPS Today Standard",
+        "83": "UPS Today Dedicated Courier",
+        "84": "UPS Today Intercity",
+        "85": "UPS Today Express",
+        "86": "UPS Today Express Saver",
+        "96": "UPS Worldwide Express Freight",
+      };
+
+      const rates = ratedShipments.map((rs: any) => {
+        const serviceCode = rs.Service?.Code || "";
+        return {
+          serviceCode,
+          serviceName: serviceNames[serviceCode] || `UPS Service ${serviceCode}`,
+          totalCharges: rs.TotalCharges?.MonetaryValue || "0",
+          currency: rs.TotalCharges?.CurrencyCode || "USD",
+          guaranteedDays: rs.GuaranteedDelivery?.BusinessDaysInTransit || null,
+          deliveryByTime: rs.GuaranteedDelivery?.DeliveryByTime || null,
+          billingWeight: rs.BillingWeight?.Weight || null,
+          billingWeightUnit: rs.BillingWeight?.UnitOfMeasurement?.Code || "LBS",
+        };
+      });
+
+      rates.sort((a: any, b: any) => parseFloat(a.totalCharges) - parseFloat(b.totalCharges));
+
+      res.json({ rates, origin: `${d.originCity}, ${d.originState} ${d.originPostal}`, destination: `${d.destCity}, ${d.destState || ""} ${d.destPostal} ${d.destCountry}` });
+    } catch (error: any) {
+      console.error("UPS rate error:", error);
+      res.status(500).json({ error: "Failed to fetch UPS rates", message: error.message });
+    }
+  });
+
   app.get("/api/portal/profile", isAuthenticated, async (req: any, res) => {
     try {
       const claims = req.user?.claims;

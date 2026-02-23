@@ -68,6 +68,12 @@ Preferred communication style: Simple, everyday language.
 - `GET /api/power-units/:id` — Get single power unit by database ID
 - `POST /api/estimate` — IRON Estimator: AI-powered equipment estimator (streaming SSE response, uses OpenAI gpt-5.2 with real inventory data)
 - `POST /api/quotes/send-email` — Send quote email with PDF attachment (uses Resend API + PDFKit); accepts { email, itemType, itemId, quoteNumber, quoteDate }
+- `POST /api/shipping/ups-rates` — Live UPS rate shopping (OAuth 2.0 + Rating API); accepts origin/destination addresses + package dimensions, returns available services with pricing
+
+### Shipping Integration
+- **UPS Rating API**: Live rate quotes via OAuth 2.0 authentication, token caching, and rate shopping across all UPS services. Requires `UPS_CLIENT_ID`, `UPS_CLIENT_SECRET`, `UPS_ACCOUNT_NUMBER` secrets.
+- **Maersk**: Ocean freight and air cargo quotes linked to Maersk's online quote tools at maersk.com/onlinequote/ (API integration ready for when Maersk API access is approved)
+- **Shipping page**: Tabbed interface at `/services/shipping` with UPS live rate calculator and Maersk ocean/air freight section
 
 ### AI Integration
 - **Provider**: Replit AI Integrations (OpenAI-compatible, no API key needed)
