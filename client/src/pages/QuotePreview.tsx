@@ -34,7 +34,7 @@ function generateQuoteNumber() {
   const m = String(now.getMonth() + 1).padStart(2, "0");
   const d = String(now.getDate()).padStart(2, "0");
   const r = Math.floor(1000 + Math.random() * 9000);
-  return `AI-${y}${m}${d}-${r}`;
+  return `AMI-${y}${m}${d}-${r}`;
 }
 
 function formatDate(date: Date) {
@@ -92,7 +92,7 @@ function powerUnitToQuoteItem(item: PowerUnit): QuoteItem {
       ...(item.condition ? [{ label: "Condition", value: item.condition }] : []),
       ...(item.location ? [{ label: "Location", value: item.location }] : []),
     ],
-    price: item.price ? `$${Number(item.price).toLocaleString()}` : "Call for Price",
+    price: item.price && !isNaN(Number(item.price)) ? `$${Number(item.price).toLocaleString()}` : "Call for Price",
     imageUrl: item.imageUrl,
     rawId: item.id,
   };
@@ -249,14 +249,14 @@ export default function QuotePreview() {
           id="quote-template"
           className="bg-white text-black rounded-lg border print:border-none print:shadow-none print:rounded-none"
         >
-          <div className="bg-black text-white px-8 py-6 rounded-t-lg print:rounded-none flex items-center justify-between">
+          <div className="px-8 py-6 rounded-t-lg print:rounded-none flex items-center justify-between" style={{ backgroundColor: "#FFCD11" }}>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight" style={{ color: "#FFCD11" }}>
+              <h1 className="text-2xl font-bold tracking-tight text-black">
                 AMERICAN IRON LLC
               </h1>
-              <p className="text-white/70 text-sm mt-1">Heavy Equipment & Industrial Parts</p>
+              <p className="text-black/70 text-sm mt-1">Heavy Equipment & Industrial Parts</p>
             </div>
-            <div className="text-right text-sm text-white/70">
+            <div className="text-right text-sm text-black/70">
               <div className="flex items-center gap-1.5 justify-end">
                 <Phone className="w-3.5 h-3.5" />
                 +1 (850) 777-3797

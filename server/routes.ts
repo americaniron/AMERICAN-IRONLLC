@@ -550,10 +550,10 @@ Provide a thorough, institutional-grade estimate with specific equipment recomme
         doc.on("end", () => resolve(Buffer.concat(chunks)));
         doc.on("error", reject);
 
-        doc.rect(0, 0, doc.page.width, 80).fill("#000000");
-        doc.fontSize(22).fill("#FFCD11").text("AMERICAN IRON LLC", 50, 25, { continued: false });
-        doc.fontSize(10).fill("#FFFFFF").text("Heavy Equipment & Industrial Parts", 50, 52);
-        doc.fill("#CCCCCC").text("+1 (850) 777-3797 | info@americanironus.com | Tampa, FL", 300, 30, { align: "right", width: 220 });
+        doc.rect(0, 0, doc.page.width, 80).fill("#FFCD11");
+        doc.fontSize(22).fill("#000000").text("AMERICAN IRON LLC", 50, 25, { continued: false });
+        doc.fontSize(10).fill("#333333").text("Heavy Equipment & Industrial Parts", 50, 52);
+        doc.fill("#333333").text("+1 (850) 777-3797 | info@americanironus.com | Tampa, FL", 300, 30, { align: "right", width: 220 });
 
         doc.moveDown(2);
         doc.y = 100;
