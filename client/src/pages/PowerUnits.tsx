@@ -14,7 +14,7 @@ const POWER_CATEGORIES = [
   { name: "Generator Sets", label: "Generator Sets", image: generatorSetsImg, description: "20kW to 2,000kW diesel and natural gas generator sets" },
   { name: "Marine Engines", label: "Marine Engines", image: marineEnginesImg, description: "High-performance marine propulsion and auxiliary engines" },
   { name: "Power Units", label: "Power Units", image: powerUnitsImg, description: "Standalone diesel and gas power units for industrial applications" },
-  { name: "Industrial Generators", label: "Industrial Generators", image: industrialGeneratorsImg, description: "Heavy-duty industrial and standby generator systems" },
+  { name: "Industrial Engines", label: "Industrial Engines", image: industrialGeneratorsImg, description: "Heavy-duty industrial and standby engine systems" },
 ];
 
 export default function PowerUnits() {

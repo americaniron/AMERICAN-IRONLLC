@@ -309,6 +309,9 @@ export class DatabaseStorage implements IStorage {
           ilike(powerUnits.model, searchTerm),
           ilike(powerUnits.stockNumber, searchTerm),
           ilike(powerUnits.condition, searchTerm),
+          ilike(powerUnits.brand, searchTerm),
+          ilike(powerUnits.fuelType, searchTerm),
+          ilike(powerUnits.unitType, searchTerm),
         )!
       );
     }

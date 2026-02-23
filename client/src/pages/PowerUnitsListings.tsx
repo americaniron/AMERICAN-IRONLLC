@@ -12,7 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, ArrowRight, Zap, Gauge, Calendar, ChevronRight, ChevronLeft, DollarSign } from "lucide-react";
+import { Search, ArrowRight, Zap, Gauge, Calendar, ChevronRight, ChevronLeft, DollarSign, Clock, Fuel, Shield } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import type { PowerUnit } from "@shared/schema";
 import { useFlashReveal } from "@/hooks/useFlashReveal";
 
@@ -25,10 +26,10 @@ const CATEGORY_IMAGES: Record<string, string> = {
   "Generator Sets": generatorSetsImg,
   "Marine Engines": marineEnginesImg,
   "Power Units": powerUnitsImg,
-  "Industrial Generators": industrialGeneratorsImg,
+  "Industrial Engines": industrialGeneratorsImg,
 };
 
-const CATEGORIES = ["Generator Sets", "Marine Engines", "Power Units", "Industrial Generators"];
+const CATEGORIES = ["Generator Sets", "Marine Engines", "Power Units", "Industrial Engines"];
 
 export default function PowerUnitsListings() {
   const [location] = useLocation();
@@ -158,22 +159,25 @@ export default function PowerUnitsListings() {
                       </div>
                     </div>
                     <div className="p-4">
-                      <h3 className="font-bold text-base mb-2 line-clamp-1" data-testid={`text-model-${item.id}`}>{item.model}</h3>
-                      <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground mb-3">
-                        <span className="flex items-center gap-1">
-                          <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded">SN: {item.stockNumber}</span>
-                        </span>
-                        {item.year && (
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-3.5 h-3.5" />
-                            {item.year}
-                          </span>
+                      <h3 className="font-bold text-base mb-1 line-clamp-1" data-testid={`text-model-${item.id}`}>{item.model}</h3>
+                      <div className="flex flex-wrap gap-1.5 mb-2">
+                        {item.condition && item.condition !== 'N/A' && (
+                          <Badge variant="secondary" className="text-[10px] font-medium" data-testid={`badge-condition-${item.id}`}>
+                            <Shield className="w-2.5 h-2.5 mr-0.5" />
+                            {item.condition}
+                          </Badge>
+                        )}
+                        {item.fuelType && item.fuelType !== 'N/A' && (
+                          <Badge variant="outline" className="text-[10px] font-medium">
+                            <Fuel className="w-2.5 h-2.5 mr-0.5" />
+                            {item.fuelType}
+                          </Badge>
                         )}
                       </div>
-                      <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground mb-3">
+                      <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground mb-2">
                         {item.hp && (
-                          <span className="flex items-center gap-1">
-                            <Gauge className="w-3.5 h-3.5" />
+                          <span className="flex items-center gap-0.5">
+                            <Gauge className="w-3 h-3" />
                             {item.hp} HP
                           </span>
                         )}
@@ -183,18 +187,32 @@ export default function PowerUnitsListings() {
                         {item.rpm && (
                           <span>{item.rpm} RPM</span>
                         )}
+                        {item.hours && item.hours !== 'N/A' && item.hours !== '0' && (
+                          <span className="flex items-center gap-0.5">
+                            <Clock className="w-3 h-3" />
+                            {Number(item.hours).toLocaleString()} hrs
+                          </span>
+                        )}
                       </div>
-                      {item.condition && (
-                        <p className="text-xs text-muted-foreground mb-2">{item.condition}</p>
-                      )}
+                      <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground mb-2">
+                        {item.enclosure && item.enclosure !== 'N/A' && (
+                          <span>{item.enclosure}</span>
+                        )}
+                        {item.volts && item.volts !== 'N/A' && (
+                          <span>{item.volts}V</span>
+                        )}
+                        {item.tierRating && item.tierRating !== 'N/A' && (
+                          <span>Tier {item.tierRating}</span>
+                        )}
+                      </div>
                       <div className="flex items-center justify-between mt-2 pt-2 border-t">
-                        {item.price ? (
+                        {item.price && !isNaN(Number(item.price)) ? (
                           <span className="font-bold text-accent flex items-center gap-1" data-testid={`text-price-${item.id}`}>
                             <DollarSign className="w-4 h-4" />
                             {Number(item.price).toLocaleString()}
                           </span>
                         ) : (
-                          <span className="font-semibold text-accent" data-testid={`text-price-${item.id}`}>Call for Price</span>
+                          <span className="font-semibold text-accent text-sm" data-testid={`text-price-${item.id}`}>Call for Price</span>
                         )}
                         <Link href={`/quote/item/power-unit/${item.id}`}>
                           <Button size="sm" variant="outline" className="gap-1 text-xs" data-testid={`button-quote-${item.id}`}>
