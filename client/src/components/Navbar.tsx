@@ -132,33 +132,41 @@ export default function Navbar() {
               </Link>
 
               {isAuthenticated ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button className="flex items-center gap-1.5 px-2 py-1.5 rounded-md hover:bg-muted transition-colors" data-testid="button-user-menu">
-                      {user?.profileImageUrl ? (
-                        <img src={user.profileImageUrl} alt="" className="w-7 h-7 rounded-full object-cover" />
-                      ) : (
-                        <div className="w-7 h-7 rounded-full bg-accent/20 flex items-center justify-center">
-                          <User className="w-4 h-4 text-accent" />
-                        </div>
-                      )}
-                      <ChevronDown className="w-3 h-3 text-muted-foreground hidden sm:block" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    <div className="px-2 py-1.5 text-xs text-muted-foreground truncate">
-                      {user?.email || user?.firstName || "Account"}
-                    </div>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className="cursor-pointer" onSelect={() => setLoc("/portal")} data-testid="link-my-portal">
-                      <User className="w-4 h-4 mr-2" /> My Portal
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className="cursor-pointer text-destructive" onSelect={() => logout()} data-testid="link-logout">
-                      Sign Out
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <>
+                  <Link href="/portal">
+                    <Button size="sm" variant="outline" className="hidden sm:flex gap-1.5" data-testid="button-my-portal">
+                      <User className="w-3.5 h-3.5" />
+                      My Portal
+                    </Button>
+                  </Link>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="flex items-center gap-1.5 px-2 py-1.5 rounded-md hover:bg-muted transition-colors" data-testid="button-user-menu">
+                        {user?.profileImageUrl ? (
+                          <img src={user.profileImageUrl} alt="" className="w-7 h-7 rounded-full object-cover" />
+                        ) : (
+                          <div className="w-7 h-7 rounded-full bg-accent/20 flex items-center justify-center">
+                            <User className="w-4 h-4 text-accent" />
+                          </div>
+                        )}
+                        <ChevronDown className="w-3 h-3 text-muted-foreground hidden sm:block" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <div className="px-2 py-1.5 text-xs text-muted-foreground truncate">
+                        {user?.email || user?.firstName || "Account"}
+                      </div>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem className="cursor-pointer" onSelect={() => setLoc("/portal")} data-testid="link-my-portal">
+                        <User className="w-4 h-4 mr-2" /> My Portal
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem className="cursor-pointer text-destructive" onSelect={() => logout()} data-testid="link-logout">
+                        Sign Out
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </>
               ) : (
                 <a href="/api/login" data-testid="button-sign-in">
                   <Button size="sm" variant="outline" className="hidden sm:flex gap-1.5">
