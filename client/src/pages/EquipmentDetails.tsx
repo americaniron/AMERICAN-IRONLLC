@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import type { Equipment } from "@shared/schema";
 import { useFlashReveal } from "@/hooks/useFlashReveal";
+import { getCategoryImage } from "@/lib/equipmentImages";
 
 export default function EquipmentDetails() {
   const { id } = useParams<{ id: string }>();
@@ -89,7 +90,7 @@ export default function EquipmentDetails() {
           <div className="lg:col-span-3">
             <div className="flash-reveal-scale aspect-[4/3] rounded-md overflow-hidden bg-muted">
               <img
-                src={item.imageUrl || "/images/cat-bulldozer.png"}
+                src={item.imageUrl || getCategoryImage(item.category)}
                 alt={`${item.make} ${item.model}`}
                 className="w-full h-full object-cover"
                 data-testid="img-equipment"
