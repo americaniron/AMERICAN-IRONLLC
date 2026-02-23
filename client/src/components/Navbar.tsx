@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Menu, X, Phone, Mail, ChevronDown, User, LogIn } from "lucide-react";
-import { SiFacebook, SiX, SiInstagram, SiLinkedin, SiYoutube } from "react-icons/si";
+import { SiFacebook, SiX, SiInstagram, SiLinkedin, SiYoutube, SiWhatsapp } from "react-icons/si";
 import logoImg from "@assets/american-iron-logo_1771736779986.png";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
@@ -114,6 +114,17 @@ export default function Navbar() {
             </nav>
 
             <div className="flex items-center gap-3">
+              <a
+                href="https://wa.me/18132006088"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid="button-whatsapp-nav"
+              >
+                <Button size="sm" variant="outline" className="hidden sm:flex gap-1.5 border-green-500 text-green-600 hover:bg-green-500 hover:text-white dark:border-green-400 dark:text-green-400 dark:hover:bg-green-500 dark:hover:text-white">
+                  <SiWhatsapp className="w-4 h-4" />
+                  WhatsApp
+                </Button>
+              </a>
               <Link href="/quote">
                 <Button size="sm" className="hidden sm:flex bg-accent text-accent-foreground flash-glow-pulse" data-testid="button-get-quote">
                   Request Quote
@@ -183,6 +194,17 @@ export default function Navbar() {
               ))}
               <MobileLink href="/services/estimator" onClick={() => setMobileOpen(false)}>IRON Estimator</MobileLink>
               <MobileLink href="/quote" onClick={() => setMobileOpen(false)}>Request Quote</MobileLink>
+              <a
+                href="https://wa.me/18132006088"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium rounded-md text-green-600 dark:text-green-400 transition-colors hover:bg-green-50 dark:hover:bg-green-900/20"
+                onClick={() => setMobileOpen(false)}
+                data-testid="mobile-link-whatsapp"
+              >
+                <SiWhatsapp className="w-4 h-4" />
+                WhatsApp Us
+              </a>
               <MobileLink href="/contact" onClick={() => setMobileOpen(false)}>Contact Us</MobileLink>
               <div className="border-t my-2" />
               {isAuthenticated ? (

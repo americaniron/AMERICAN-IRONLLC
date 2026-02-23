@@ -23,7 +23,9 @@ import {
   MessageCircle,
   Send,
   Building2,
+  ExternalLink,
 } from "lucide-react";
+import { SiWhatsapp } from "react-icons/si";
 import { useFlashReveal } from "@/hooks/useFlashReveal";
 
 const contactSchema = z.object({
@@ -139,6 +141,30 @@ export default function Contact() {
                     </div>
                   </Card>
                 </div>
+              </div>
+
+              <div className="flash-reveal" style={{ "--flash-index": 5 } as any}>
+                <a
+                  href="https://wa.me/18132006088"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                  data-testid="link-whatsapp-cta"
+                >
+                  <Card className="p-5 bg-green-600 dark:bg-green-700 border-green-500 hover:bg-green-700 dark:hover:bg-green-600 transition-colors cursor-pointer group">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                        <SiWhatsapp className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-bold text-white text-sm">Chat with us on WhatsApp</div>
+                        <div className="text-white/80 text-xs mt-0.5">Get instant responses for quotes, parts inquiries, and equipment availability</div>
+                        <div className="text-white/90 text-sm font-semibold mt-1">+1 813 200 6088</div>
+                      </div>
+                      <ExternalLink className="w-5 h-5 text-white/60 group-hover:text-white transition-colors shrink-0" />
+                    </div>
+                  </Card>
+                </a>
               </div>
             </div>
 
