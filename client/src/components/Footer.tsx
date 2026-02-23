@@ -57,6 +57,7 @@ export default function Footer() {
             <ul className="space-y-2.5">
               <FooterLink href="/equipment">Equipment Inventory</FooterLink>
               <FooterLink href="/parts">Parts Catalog</FooterLink>
+              <FooterLink href="/power-units">Power Units & Generators</FooterLink>
               <FooterLink href="/quote">Request a Quote</FooterLink>
             </ul>
           </div>
