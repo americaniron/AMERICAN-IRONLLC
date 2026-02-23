@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const FLASH_SELECTORS = [
   ".flash-reveal",
@@ -13,10 +13,13 @@ const FLASH_SELECTORS = [
 ].join(", ");
 
 export function useFlashReveal(threshold = 0.15) {
-  const ref = useRef<HTMLDivElement>(null);
+  const [el, setEl] = useState<HTMLDivElement | null>(null);
+
+  const ref = useCallback((node: HTMLDivElement | null) => {
+    setEl(node);
+  }, []);
 
   useEffect(() => {
-    const el = ref.current;
     if (!el) return;
 
     const observed = new WeakSet<Element>();
@@ -52,7 +55,7 @@ export function useFlashReveal(threshold = 0.15) {
       io.disconnect();
       mo.disconnect();
     };
-  }, [threshold]);
+  }, [el, threshold]);
 
   return ref;
 }
