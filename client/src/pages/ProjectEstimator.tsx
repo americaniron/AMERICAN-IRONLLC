@@ -6,13 +6,7 @@ import { Input } from "@/components/ui/input";
 import DOMPurify from "dompurify";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { ChevronDown as SelectChevron } from "lucide-react";
 import {
   Calculator,
   MapPin,
@@ -541,18 +535,21 @@ export default function ProjectEstimator() {
                         </div>
                         Project Type *
                       </Label>
-                      <Select value={projectType} onValueChange={setProjectType}>
-                        <SelectTrigger className="bg-muted/30" data-testid="select-project-type">
-                          <SelectValue placeholder="Select project type" />
-                        </SelectTrigger>
-                        <SelectContent>
+                      <div className="relative">
+                        <select
+                          id="projectType"
+                          value={projectType}
+                          onChange={(e) => setProjectType(e.target.value)}
+                          className="flex h-9 w-full appearance-none items-center rounded-md border border-input bg-muted/30 px-3 py-2 pr-8 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-pointer"
+                          data-testid="select-project-type"
+                        >
+                          <option value="" disabled>Select project type</option>
                           {PROJECT_TYPES.map((type) => (
-                            <SelectItem key={type} value={type} data-testid={`option-type-${type.toLowerCase().replace(/\s/g, "-")}`}>
-                              {type}
-                            </SelectItem>
+                            <option key={type} value={type}>{type}</option>
                           ))}
-                        </SelectContent>
-                      </Select>
+                        </select>
+                        <SelectChevron className="absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50 pointer-events-none" />
+                      </div>
                       <div className="iron-input-indicator" />
                     </div>
 
@@ -583,18 +580,21 @@ export default function ProjectEstimator() {
                         </div>
                         Terrain Type *
                       </Label>
-                      <Select value={terrain} onValueChange={setTerrain}>
-                        <SelectTrigger className="bg-muted/30" data-testid="select-terrain">
-                          <SelectValue placeholder="Select terrain type" />
-                        </SelectTrigger>
-                        <SelectContent>
+                      <div className="relative">
+                        <select
+                          id="terrain"
+                          value={terrain}
+                          onChange={(e) => setTerrain(e.target.value)}
+                          className="flex h-9 w-full appearance-none items-center rounded-md border border-input bg-muted/30 px-3 py-2 pr-8 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-pointer"
+                          data-testid="select-terrain"
+                        >
+                          <option value="" disabled>Select terrain type</option>
                           {TERRAIN_TYPES.map((type) => (
-                            <SelectItem key={type} value={type} data-testid={`option-terrain-${type.toLowerCase().replace(/\s/g, "-")}`}>
-                              {type}
-                            </SelectItem>
+                            <option key={type} value={type}>{type}</option>
                           ))}
-                        </SelectContent>
-                      </Select>
+                        </select>
+                        <SelectChevron className="absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50 pointer-events-none" />
+                      </div>
                       <div className="iron-input-indicator" />
                     </div>
 
@@ -606,18 +606,21 @@ export default function ProjectEstimator() {
                         </div>
                         Project Size *
                       </Label>
-                      <Select value={projectSize} onValueChange={setProjectSize}>
-                        <SelectTrigger className="bg-muted/30" data-testid="select-project-size">
-                          <SelectValue placeholder="Select project size" />
-                        </SelectTrigger>
-                        <SelectContent>
+                      <div className="relative">
+                        <select
+                          id="projectSize"
+                          value={projectSize}
+                          onChange={(e) => setProjectSize(e.target.value)}
+                          className="flex h-9 w-full appearance-none items-center rounded-md border border-input bg-muted/30 px-3 py-2 pr-8 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-pointer"
+                          data-testid="select-project-size"
+                        >
+                          <option value="" disabled>Select project size</option>
                           {PROJECT_SIZES.map((size) => (
-                            <SelectItem key={size} value={size} data-testid={`option-size-${size.toLowerCase().replace(/\s/g, "-")}`}>
-                              {size}
-                            </SelectItem>
+                            <option key={size} value={size}>{size}</option>
                           ))}
-                        </SelectContent>
-                      </Select>
+                        </select>
+                        <SelectChevron className="absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50 pointer-events-none" />
+                      </div>
                       <div className="iron-input-indicator" />
                     </div>
 
@@ -629,18 +632,21 @@ export default function ProjectEstimator() {
                         </div>
                         Estimated Duration *
                       </Label>
-                      <Select value={duration} onValueChange={setDuration}>
-                        <SelectTrigger className="bg-muted/30" data-testid="select-duration">
-                          <SelectValue placeholder="Select duration" />
-                        </SelectTrigger>
-                        <SelectContent>
+                      <div className="relative">
+                        <select
+                          id="duration"
+                          value={duration}
+                          onChange={(e) => setDuration(e.target.value)}
+                          className="flex h-9 w-full appearance-none items-center rounded-md border border-input bg-muted/30 px-3 py-2 pr-8 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-pointer"
+                          data-testid="select-duration"
+                        >
+                          <option value="" disabled>Select duration</option>
                           {DURATIONS.map((d) => (
-                            <SelectItem key={d} value={d} data-testid={`option-duration-${d.toLowerCase().replace(/\s/g, "-")}`}>
-                              {d}
-                            </SelectItem>
+                            <option key={d} value={d}>{d}</option>
                           ))}
-                        </SelectContent>
-                      </Select>
+                        </select>
+                        <SelectChevron className="absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50 pointer-events-none" />
+                      </div>
                       <div className="iron-input-indicator" />
                     </div>
                   </div>
