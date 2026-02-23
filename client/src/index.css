@@ -673,7 +673,6 @@
   position: relative;
   border: 1px solid hsl(var(--accent) / 0.2);
   background: linear-gradient(145deg, hsl(var(--card)), hsl(var(--background)));
-  overflow: hidden;
 }
 .iron-panel::before {
   content: '';
