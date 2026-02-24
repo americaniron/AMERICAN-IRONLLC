@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Menu, X, Phone, Mail, ChevronDown, User, LogIn } from "lucide-react";
 import { SiFacebook, SiX, SiInstagram, SiLinkedin, SiYoutube, SiWhatsapp } from "react-icons/si";
-import logoImg from "@assets/american-iron-logo_1771736779986.png";
+import logoImg from "@assets/american_iron_new_logo_1771911523492.png";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -75,13 +75,16 @@ export default function Navbar() {
 
       <header className="flash-navbar sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b" style={{ animationDelay: "0.1s" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between h-16 lg:h-18">
+          <div className="flex items-center justify-between h-18 lg:h-20">
             <Link href="/" data-testid="link-home">
               <div className="flex items-center gap-2 cursor-pointer">
                 <img
                   src={logoImg}
                   alt="American Iron LLC"
-                  className="h-12 w-auto object-contain mix-blend-multiply dark:mix-blend-screen dark:invert"
+                  className="h-16 w-auto object-contain drop-shadow-[0_4px_12px_rgba(255,205,17,0.3)]"
+                  style={{
+                    filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.4)) drop-shadow(0 6px 12px rgba(255,205,17,0.15))",
+                  }}
                   data-testid="img-logo"
                 />
               </div>

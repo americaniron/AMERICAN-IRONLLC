@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { Phone, Mail, MapPin, MessageCircle } from "lucide-react";
 import { SiFacebook, SiX, SiInstagram, SiLinkedin, SiYoutube } from "react-icons/si";
-import logoImg from "@assets/american-iron-logo_1771736779986.png";
+import logoImg from "@assets/american_iron_new_logo_1771911523492.png";
 import { useFlashReveal } from "@/hooks/useFlashReveal";
 
 const socialLinks = [
@@ -24,8 +24,10 @@ export default function Footer() {
               <img
                 src={logoImg}
                 alt="American Iron LLC"
-                className="h-14 w-auto object-contain"
-                style={{ filter: "brightness(0) invert(1)" }}
+                className="h-20 w-auto object-contain"
+                style={{
+                  filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.5)) drop-shadow(0 6px 16px rgba(255,205,17,0.2))",
+                }}
                 data-testid="img-footer-logo"
               />
             </div>

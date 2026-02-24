@@ -7,6 +7,8 @@ import OpenAI from "openai";
 import { z } from "zod";
 import { Resend } from "resend";
 import PDFDocument from "pdfkit";
+import * as fs from "fs";
+import * as path from "path";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -544,6 +546,8 @@ Provide a thorough, institutional-grade estimate with specific equipment recomme
       const formatDate = (d: Date) =>
         d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 
+      const logoPath = path.resolve(process.cwd(), "client", "public", "images", "american-iron-logo.png");
+
       const pdfBuffer = await new Promise<Buffer>((resolve, reject) => {
         const doc = new PDFDocument({ size: "LETTER", margin: 50 });
         const chunks: Buffer[] = [];
@@ -551,21 +555,35 @@ Provide a thorough, institutional-grade estimate with specific equipment recomme
         doc.on("end", () => resolve(Buffer.concat(chunks)));
         doc.on("error", reject);
 
-        doc.rect(0, 0, doc.page.width, 80).fill("#FFCD11");
-        doc.fontSize(22).fill("#000000").text("AMERICAN IRON LLC", 50, 25, { continued: false });
-        doc.fontSize(10).fill("#333333").text("Heavy Equipment & Industrial Parts", 50, 52);
-        doc.fill("#333333").text("+1 (850) 777-3797 | info@americanironus.com | Tampa, FL", 300, 30, { align: "right", width: 220 });
+        doc.rect(0, 0, doc.page.width, 90).fill("#1a1a1a");
+        doc.rect(0, 86, doc.page.width, 4).fill("#FFCD11");
+
+        try {
+          if (fs.existsSync(logoPath)) {
+            doc.image(logoPath, 40, 8, { height: 72 });
+          } else {
+            doc.fontSize(22).fill("#FFCD11").text("AMERICAN IRON LLC", 50, 25);
+            doc.fontSize(10).fill("#999999").text("Heavy Equipment & Industrial Parts", 50, 55);
+          }
+        } catch (e) {
+          doc.fontSize(22).fill("#FFCD11").text("AMERICAN IRON LLC", 50, 25);
+          doc.fontSize(10).fill("#999999").text("Heavy Equipment & Industrial Parts", 50, 55);
+        }
+
+        doc.fontSize(10).fill("#CCCCCC").text("+1 (850) 777-3797", 350, 25, { align: "right", width: 210 });
+        doc.fill("#CCCCCC").text("info@americanironus.com", 350, 40, { align: "right", width: 210 });
+        doc.fill("#CCCCCC").text("Tampa, FL 33618, USA", 350, 55, { align: "right", width: 210 });
 
         doc.moveDown(2);
-        doc.y = 100;
+        doc.y = 110;
         doc.fontSize(18).fill("#000000").text("QUOTATION", 50);
-        doc.fontSize(10).fill("#666666").text(`Quote #: ${quoteNumber}`, 400, 100, { align: "right", width: 160 });
-        doc.text(`Date: ${formatDate(dateObj)}`, 400, 115, { align: "right", width: 160 });
-        doc.text(`Valid Until: ${formatDate(validTo)}`, 400, 130, { align: "right", width: 160 });
+        doc.fontSize(10).fill("#666666").text(`Quote #: ${quoteNumber}`, 400, 110, { align: "right", width: 160 });
+        doc.text(`Date: ${formatDate(dateObj)}`, 400, 125, { align: "right", width: 160 });
+        doc.text(`Valid Until: ${formatDate(validTo)}`, 400, 140, { align: "right", width: 160 });
 
-        doc.moveTo(50, 155).lineTo(562, 155).stroke("#CCCCCC");
+        doc.moveTo(50, 165).lineTo(562, 165).stroke("#CCCCCC");
 
-        doc.y = 170;
+        doc.y = 180;
         doc.fontSize(14).fill("#000000").text(itemTitle, 50);
         doc.fontSize(10).fill("#666666").text(`${itemIdentifier} | ${itemCategory}`, 50);
 

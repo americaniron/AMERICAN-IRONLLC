@@ -6,6 +6,7 @@ import { isUnauthorizedError } from "@/lib/auth-utils";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import logoImg from "@assets/american_iron_new_logo_1771911523492.png";
 import {
   User,
   FileText,
@@ -101,6 +102,17 @@ export default function CustomerPortal() {
     <div className="min-h-screen bg-muted/30">
       <section className="bg-primary py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center gap-4 mb-6">
+            <img
+              src={logoImg}
+              alt="American Iron LLC"
+              className="h-14 w-auto object-contain"
+              style={{ filter: "drop-shadow(0 2px 6px rgba(255,205,17,0.3))" }}
+              data-testid="img-portal-logo"
+            />
+            <div className="h-10 w-px bg-primary-foreground/20" />
+            <span className="text-primary-foreground/60 text-sm font-medium uppercase tracking-wider">Customer Portal</span>
+          </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               {user?.profileImageUrl ? (

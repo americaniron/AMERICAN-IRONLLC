@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import logoImg from "@assets/american_iron_new_logo_1771911523492.png";
 import {
   Dialog,
   DialogContent,
@@ -324,14 +325,17 @@ export default function QuotePreview() {
           id="quote-template"
           className="bg-white text-black rounded-lg border print:border-none print:shadow-none print:rounded-none"
         >
-          <div className="px-8 py-6 rounded-t-lg print:rounded-none flex items-center justify-between" style={{ backgroundColor: "#FFCD11" }}>
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight text-black">
-                AMERICAN IRON LLC
-              </h1>
-              <p className="text-black/70 text-sm mt-1">Heavy Equipment & Industrial Parts</p>
+          <div className="px-8 py-5 rounded-t-lg print:rounded-none flex items-center justify-between" style={{ backgroundColor: "#1a1a1a" }}>
+            <div className="flex items-center gap-4">
+              <img
+                src={logoImg}
+                alt="American Iron LLC"
+                className="h-16 w-auto object-contain"
+                style={{ filter: "drop-shadow(0 2px 8px rgba(255,205,17,0.3))" }}
+                data-testid="img-quote-logo"
+              />
             </div>
-            <div className="text-right text-sm text-black/70">
+            <div className="text-right text-sm text-white/70">
               <div className="flex items-center gap-1.5 justify-end">
                 <Phone className="w-3.5 h-3.5" />
                 +1 (850) 777-3797
@@ -350,6 +354,7 @@ export default function QuotePreview() {
               </div>
             </div>
           </div>
+          <div className="h-1 w-full" style={{ backgroundColor: "#FFCD11" }} />
 
           <div className="px-8 py-6 border-b flex items-center justify-between">
             <div>
