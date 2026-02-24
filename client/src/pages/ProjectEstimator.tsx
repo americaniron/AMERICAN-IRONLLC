@@ -29,6 +29,9 @@ import {
   Target,
   BarChart3,
   Layers,
+  Mail,
+  Phone,
+  Building2,
 } from "lucide-react";
 import { useFlashReveal } from "@/hooks/useFlashReveal";
 import { useToast } from "@/hooks/use-toast";
@@ -196,6 +199,9 @@ export default function ProjectEstimator() {
   const [terrain, setTerrain] = useState("");
   const [projectSize, setProjectSize] = useState("");
   const [duration, setDuration] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [businessName, setBusinessName] = useState("");
   const [additionalDetails, setAdditionalDetails] = useState("");
 
   const [isGenerating, setIsGenerating] = useState(false);
@@ -204,7 +210,7 @@ export default function ProjectEstimator() {
 
   const resultContainerRef = useRef<HTMLDivElement>(null);
 
-  const filledFields = [projectName, projectType, location, terrain, projectSize, duration].filter(Boolean).length;
+  const filledFields = [projectName, projectType, location, terrain, projectSize, duration, email, phone, businessName].filter(Boolean).length;
 
   useEffect(() => {
     if (showResult && resultContainerRef.current) {
@@ -215,7 +221,7 @@ export default function ProjectEstimator() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!projectName || !projectType || !location || !terrain || !projectSize || !duration) {
+    if (!projectName || !projectType || !location || !terrain || !projectSize || !duration || !email || !phone || !businessName) {
       toast({
         title: "Missing Fields",
         description: "Please fill in all required fields before generating an estimate.",
@@ -239,6 +245,9 @@ export default function ProjectEstimator() {
           terrain,
           projectSize,
           duration,
+          email,
+          phone,
+          businessName,
           additionalDetails,
         }),
       });
@@ -297,6 +306,9 @@ export default function ProjectEstimator() {
     setTerrain("");
     setProjectSize("");
     setDuration("");
+    setEmail("");
+    setPhone("");
+    setBusinessName("");
     setAdditionalDetails("");
     setEstimateResult("");
     setShowResult(false);
@@ -477,26 +489,26 @@ export default function ProjectEstimator() {
                       <p className="text-sm text-muted-foreground">Configure project parameters for AI analysis</p>
                     </div>
                   </div>
-                  <FieldCompletionRing filled={filledFields} total={6} />
+                  <FieldCompletionRing filled={filledFields} total={9} />
                 </div>
 
                 {/* Readiness Gauge */}
                 <div className="mb-8 p-4 rounded-lg bg-muted/30 border border-border/50">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Estimation Readiness</span>
-                    <span className="text-xs font-bold text-accent">{Math.round((filledFields / 6) * 100)}%</span>
+                    <span className="text-xs font-bold text-accent">{Math.round((filledFields / 9) * 100)}%</span>
                   </div>
                   <div className="h-2 rounded-full bg-muted overflow-hidden">
                     <div
                       className="h-full rounded-full bg-gradient-to-r from-accent/70 to-accent transition-all duration-700 ease-out"
-                      style={{ width: `${(filledFields / 6) * 100}%` }}
+                      style={{ width: `${(filledFields / 9) * 100}%` }}
                     />
                   </div>
                   <div className="flex justify-between mt-2">
-                    {["Name", "Type", "Location", "Terrain", "Size", "Duration"].map((label, idx) => (
+                    {["Name", "Type", "Location", "Terrain", "Size", "Duration", "Email", "Phone", "Business"].map((label, idx) => (
                       <div key={label} className="flex flex-col items-center gap-1">
                         <div className={`w-2 h-2 rounded-full transition-colors duration-300 ${
-                          [projectName, projectType, location, terrain, projectSize, duration][idx]
+                          [projectName, projectType, location, terrain, projectSize, duration, email, phone, businessName][idx]
                             ? "bg-accent"
                             : "bg-muted-foreground/30"
                         }`} />
@@ -647,6 +659,67 @@ export default function ProjectEstimator() {
                         </select>
                         <SelectChevron className="absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50 pointer-events-none" />
                       </div>
+                      <div className="iron-input-indicator" />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Email */}
+                    <div className="iron-input-group space-y-2">
+                      <Label htmlFor="email" className="flex items-center gap-2 text-sm font-semibold">
+                        <div className="w-6 h-6 rounded bg-accent/10 flex items-center justify-center">
+                          <Mail className="w-3.5 h-3.5 text-accent" />
+                        </div>
+                        Email Address *
+                      </Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="e.g. john@company.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="bg-muted/30"
+                        data-testid="input-email"
+                      />
+                      <div className="iron-input-indicator" />
+                    </div>
+
+                    {/* Phone */}
+                    <div className="iron-input-group space-y-2">
+                      <Label htmlFor="phone" className="flex items-center gap-2 text-sm font-semibold">
+                        <div className="w-6 h-6 rounded bg-accent/10 flex items-center justify-center">
+                          <Phone className="w-3.5 h-3.5 text-accent" />
+                        </div>
+                        Phone Number *
+                      </Label>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        placeholder="e.g. (850) 777-3797"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        className="bg-muted/30"
+                        data-testid="input-phone"
+                      />
+                      <div className="iron-input-indicator" />
+                    </div>
+
+                    {/* Business Name */}
+                    <div className="iron-input-group space-y-2">
+                      <Label htmlFor="businessName" className="flex items-center gap-2 text-sm font-semibold">
+                        <div className="w-6 h-6 rounded bg-accent/10 flex items-center justify-center">
+                          <Building2 className="w-3.5 h-3.5 text-accent" />
+                        </div>
+                        Business Name *
+                      </Label>
+                      <Input
+                        id="businessName"
+                        placeholder="e.g. ABC Construction Inc."
+                        value={businessName}
+                        onChange={(e) => setBusinessName(e.target.value)}
+                        className="bg-muted/30"
+                        data-testid="input-business-name"
+                      />
                       <div className="iron-input-indicator" />
                     </div>
                   </div>

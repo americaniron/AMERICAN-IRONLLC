@@ -118,7 +118,7 @@ export default function EquipmentCategories() {
             {EQUIPMENT_CATEGORIES.map((cat, i) => (
               <Link
                 key={cat.name}
-                href={`/equipment/listings?category=${encodeURIComponent(cat.name)}`}
+                href={cat.name === "OTHER EQUIPMENT" ? "/equipment/other" : `/equipment/listings?category=${encodeURIComponent(cat.name)}`}
               >
                 <Card
                   className="flash-reveal-scale group overflow-visible hover-elevate cursor-pointer border-card-border h-full"

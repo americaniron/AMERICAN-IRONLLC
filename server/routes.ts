@@ -28,6 +28,9 @@ const estimateRequestSchema = z.object({
   terrain: z.string().min(1).max(100),
   projectSize: z.string().min(1).max(100),
   duration: z.string().min(1).max(100),
+  email: z.string().email().max(200),
+  phone: z.string().min(1).max(30),
+  businessName: z.string().min(1).max(200),
   additionalDetails: z.string().max(2000).optional().nullable(),
 });
 
@@ -44,9 +47,10 @@ export async function registerRoutes(
     try {
       const category = req.query.category as string | undefined;
       const search = req.query.search as string | undefined;
+      const make = req.query.make as string | undefined;
       const page = req.query.page ? parseInt(req.query.page as string) : 1;
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 24;
-      const result = await storage.getEquipment({ category, search, page, limit });
+      const result = await storage.getEquipment({ category, search, make, page, limit });
       res.json(result);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch equipment" });
@@ -59,6 +63,16 @@ export async function registerRoutes(
       res.json(counts);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch category counts" });
+    }
+  });
+
+  app.get("/api/equipment/brands/counts", async (req, res) => {
+    try {
+      const category = (req.query.category as string) || "OTHER EQUIPMENT";
+      const counts = await storage.getEquipmentBrandCounts(category);
+      res.json(counts);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch brand counts" });
     }
   });
 
@@ -395,30 +409,43 @@ Total Parts Items: ${Object.values(partsCategoryCounts).reduce((a: number, b: nu
 
 ${inventoryContext}
 
-You must generate a detailed, institutional-quality estimate that includes:
+You must generate a detailed, institutional-quality estimate. IMPORTANT FORMATTING RULES:
+- Use markdown tables (with | column | separators |) for ALL equipment lists, cost breakdowns, and summaries
+- For each piece of equipment, ALWAYS recommend specific brand AND model (e.g., "Caterpillar 320 GC", "John Deere 850L", "Komatsu PC200-11")
+- Include brand recommendations based on terrain, project type, and industry best practices
+- Structure your response with clear ## section headers
 
-1. **Primary Equipment Requirements**: List each piece of heavy equipment needed with specific make/model recommendations from our inventory categories (Excavators, Bulldozers, Wheel Loaders, Articulated Trucks, Motor Graders, Compactors, Scrapers, Track Dozers, Backhoes, Skidsteers, Telehandlers, etc.), quantities needed, and estimated costs based on our pricing.
+Your estimate MUST include these sections with tables:
 
-2. **Supporting Equipment**: Forklifts, telehandlers, skidsteers, compactors, and other support machinery needed.
+## 1. Primary Equipment Requirements
+Present as a table with columns: Equipment Type | Recommended Brand & Model | Quantity | Est. Unit Cost | Est. Total
+Include specific brand/model for every line item.
 
-3. **Power Generation**: Generators and power units required for the project scope and location.
+## 2. Supporting Equipment
+Table format: Equipment | Brand & Model | Qty | Est. Cost
 
-4. **Transportation & Logistics**: Estimated transport costs for equipment mobilization/demobilization based on the project location relative to our Tampa, FL headquarters.
+## 3. Power Generation Requirements  
+Table format: Generator/Power Unit | Brand & Model | kW/HP Rating | Qty | Est. Cost
 
-5. **Maintenance & Parts Budget**: Estimated maintenance costs and replacement parts budget based on project duration, including filters, hydraulic components, undercarriage parts, engine components, etc. from our 12,200+ parts catalog.
+## 4. Transportation & Logistics
+Table format: Service | Description | Est. Cost
+Include mobilization/demobilization from Tampa, FL.
 
-6. **Personnel Considerations**: Estimated operator and maintenance crew requirements.
+## 5. Maintenance & Parts Budget
+Table format: Category | Components | Monthly Budget | Project Total
+Reference our 12,200+ parts catalog.
 
-7. **Cost Summary**: 
-   - Equipment Purchase/Rental Costs
-   - Transportation Costs
-   - Maintenance & Parts Reserve
-   - Support Equipment Costs
-   - Total Estimated Project Equipment Budget
+## 6. Personnel Requirements
+Table format: Role | Quantity | Duration | Notes
 
-Format your response as a structured, professional report with clear sections, bullet points, and cost breakdowns. Use real pricing ranges based on the inventory data provided. Be specific with equipment models and quantities. Consider the terrain type, project size, duration, and location when making recommendations.
+## 7. Project Cost Summary
+Present a final summary table:
+| Cost Category | Low Estimate | Mid Estimate | High Estimate |
+Include subtotals and grand total.
 
-Always provide cost ranges (low-mid-high) to give the client flexibility in budgeting. Include a note that actual pricing may vary and encourage the visitor to request a formal quote through American Iron LLC for exact pricing.`;
+Use real pricing ranges based on inventory data. Be specific with brand/model recommendations — choose brands known for reliability in the given terrain and project type. Consider Caterpillar, Komatsu, John Deere, Volvo, Case, Bobcat, Kubota, Liebherr, Hitachi, Doosan, and other major manufacturers.
+
+End with a note that actual pricing may vary and encourage the visitor to request a formal quote through American Iron LLC for exact pricing.`;
 
       res.setHeader("Content-Type", "text/event-stream");
       res.setHeader("Cache-Control", "no-cache");
@@ -438,9 +465,12 @@ Always provide cost ranges (low-mid-high) to give the client flexibility in budg
 **Terrain Type:** ${terrain}
 **Project Size/Scale:** ${projectSize}
 **Estimated Duration:** ${duration}
+**Contact Email:** ${parsed.data.email}
+**Contact Phone:** ${parsed.data.phone}
+**Business Name:** ${parsed.data.businessName}
 ${additionalDetails ? `**Additional Details:** ${additionalDetails}` : ""}
 
-Provide a thorough, institutional-grade estimate with specific equipment recommendations, quantities, cost breakdowns, and a comprehensive budget summary.`,
+Provide a thorough, institutional-grade estimate with specific brand and model recommendations, quantities, cost breakdowns in tables, and a comprehensive budget summary table.`,
           },
         ],
         stream: true,
@@ -570,9 +600,8 @@ Provide a thorough, institutional-grade estimate with specific equipment recomme
           doc.fontSize(10).fill("#999999").text("Heavy Equipment & Industrial Parts", 50, 55);
         }
 
-        doc.fontSize(10).fill("#CCCCCC").text("+1 (850) 777-3797", 350, 25, { align: "right", width: 210 });
-        doc.fill("#CCCCCC").text("info@americanironus.com", 350, 40, { align: "right", width: 210 });
-        doc.fill("#CCCCCC").text("Tampa, FL 33618, USA", 350, 55, { align: "right", width: 210 });
+        doc.fontSize(10).fill("#CCCCCC").text("www.americanironus.com", 350, 35, { align: "right", width: 210 });
+        doc.fill("#CCCCCC").text("Tampa, FL 33618, USA", 350, 50, { align: "right", width: 210 });
 
         doc.moveDown(2);
         doc.y = 110;

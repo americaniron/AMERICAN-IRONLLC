@@ -28,10 +28,11 @@ import { db } from "./db";
 import { eq, ilike, or, sql, desc } from "drizzle-orm";
 
 export interface IStorage {
-  getEquipment(filters?: { category?: string; search?: string; page?: number; limit?: number }): Promise<{ items: Equipment[]; total: number }>;
+  getEquipment(filters?: { category?: string; search?: string; make?: string; page?: number; limit?: number }): Promise<{ items: Equipment[]; total: number }>;
   getEquipmentById(equipmentId: string): Promise<Equipment | undefined>;
   createEquipment(data: InsertEquipment): Promise<Equipment>;
   getEquipmentCategoryCounts(): Promise<Record<string, number>>;
+  getEquipmentBrandCounts(category: string): Promise<Record<string, number>>;
 
   getParts(filters?: { category?: string; subcategory?: string; search?: string; page?: number; limit?: number }): Promise<{ items: Part[]; total: number }>;
   getPartById(id: number): Promise<Part | undefined>;
@@ -62,7 +63,7 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
-  async getEquipment(filters?: { category?: string; search?: string; page?: number; limit?: number }): Promise<{ items: Equipment[]; total: number }> {
+  async getEquipment(filters?: { category?: string; search?: string; make?: string; page?: number; limit?: number }): Promise<{ items: Equipment[]; total: number }> {
     const page = filters?.page || 1;
     const limit = filters?.limit || 24;
     const offset = (page - 1) * limit;
@@ -71,6 +72,10 @@ export class DatabaseStorage implements IStorage {
 
     if (filters?.category) {
       conditions.push(eq(equipment.category, filters.category));
+    }
+
+    if (filters?.make) {
+      conditions.push(sql`UPPER(${equipment.make}) = ${filters.make.toUpperCase()}`);
     }
 
     if (filters?.search) {
@@ -124,6 +129,26 @@ export class DatabaseStorage implements IStorage {
     const counts: Record<string, number> = {};
     for (const row of results) {
       counts[row.category] = Number(row.count);
+    }
+    return counts;
+  }
+
+  async getEquipmentBrandCounts(category: string): Promise<Record<string, number>> {
+    const results = await db
+      .select({
+        brand: sql<string>`UPPER(make)`,
+        count: sql<number>`count(*)`,
+      })
+      .from(equipment)
+      .where(eq(equipment.category, category))
+      .groupBy(sql`UPPER(make)`)
+      .having(sql`count(*) >= 1`);
+
+    const counts: Record<string, number> = {};
+    for (const row of results) {
+      if (row.brand && row.brand.trim()) {
+        counts[row.brand] = Number(row.count);
+      }
     }
     return counts;
   }
