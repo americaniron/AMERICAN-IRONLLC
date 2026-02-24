@@ -72,41 +72,41 @@ const BRAND_COLORS: Record<string, string> = {
 };
 
 const BRAND_LOGOS: Record<string, string> = {
-  "BOBCAT": "https://logo.clearbit.com/bobcat.com",
-  "JOHN DEERE": "https://logo.clearbit.com/deere.com",
-  "KOMATSU": "https://logo.clearbit.com/komatsu.com",
-  "CASE": "https://logo.clearbit.com/casece.com",
-  "VOLVO": "https://logo.clearbit.com/volvoce.com",
-  "JCB": "https://logo.clearbit.com/jcb.com",
-  "GENIE": "https://logo.clearbit.com/genielift.com",
-  "VERMEER": "https://logo.clearbit.com/vermeer.com",
-  "INTERNATIONAL": "https://logo.clearbit.com/internationaltrucks.com",
-  "FREIGHTLINER": "https://logo.clearbit.com/freightliner.com",
-  "KENWORTH": "https://logo.clearbit.com/kenworth.com",
-  "PETERBILT": "https://logo.clearbit.com/peterbilt.com",
-  "EPIROC": "https://logo.clearbit.com/epiroc.com",
-  "BOSCH": "https://logo.clearbit.com/bosch.com",
-  "KUBOTA": "https://logo.clearbit.com/kubota.com",
-  "DOOSAN": "https://logo.clearbit.com/doosan.com",
-  "HYUNDAI": "https://logo.clearbit.com/hyundai-ce.com",
-  "KOBELCO": "https://logo.clearbit.com/kobelco-usa.com",
-  "TEREX": "https://logo.clearbit.com/terex.com",
-  "SANY": "https://logo.clearbit.com/sanyamerica.com",
-  "MANITOWOC": "https://logo.clearbit.com/manitowoc.com",
-  "STANLEY": "https://logo.clearbit.com/stanleyinfrastructure.com",
-  "MULTIQUIP": "https://logo.clearbit.com/multiquip.com",
-  "WACKER": "https://logo.clearbit.com/wackerneuson.com",
-  "DITCH WITCH": "https://logo.clearbit.com/ditchwitch.com",
-  "SULLAIR": "https://logo.clearbit.com/sullair.com",
-  "WIRTGEN": "https://logo.clearbit.com/wirtgen.com",
-  "ALLMAND": "https://logo.clearbit.com/allmand.com",
-  "MAGNI": "https://logo.clearbit.com/magnith.com",
-  "LINK BELT CRANE": "https://logo.clearbit.com/linkbelt.com",
-  "LEDWELL": "https://logo.clearbit.com/ledwell.com",
-  "FELLING": "https://logo.clearbit.com/felling.com",
-  "ROCKLAND": "https://logo.clearbit.com/rocklandmfg.com",
-  "TERAN": "https://logo.clearbit.com/teranbuckets.com",
-  "EDCO": "https://logo.clearbit.com/edcoinc.com",
+  "BOBCAT": "/images/brands/bobcat.png",
+  "JOHN DEERE": "/images/brands/john-deere.png",
+  "KOMATSU": "/images/brands/komatsu.png",
+  "CASE": "/images/brands/case.png",
+  "VOLVO": "/images/brands/volvo.png",
+  "JCB": "/images/brands/jcb.png",
+  "GENIE": "/images/brands/genie.png",
+  "VERMEER": "/images/brands/vermeer.png",
+  "INTERNATIONAL": "/images/brands/international.png",
+  "FREIGHTLINER": "/images/brands/freightliner.png",
+  "KENWORTH": "/images/brands/kenworth.png",
+  "PETERBILT": "/images/brands/peterbilt.png",
+  "EPIROC": "/images/brands/epiroc.png",
+  "BOSCH": "/images/brands/bosch.png",
+  "KUBOTA": "/images/brands/kubota.png",
+  "DOOSAN": "/images/brands/doosan.png",
+  "HYUNDAI": "/images/brands/hyundai.png",
+  "KOBELCO": "/images/brands/kobelco.png",
+  "TEREX": "/images/brands/terex.png",
+  "SANY": "/images/brands/sany.png",
+  "MANITOWOC": "/images/brands/manitowoc.png",
+  "STANLEY": "/images/brands/stanley.png",
+  "MULTIQUIP": "/images/brands/multiquip.png",
+  "WACKER": "/images/brands/wacker.png",
+  "DITCH WITCH": "/images/brands/ditch-witch.png",
+  "SULLAIR": "/images/brands/sullair.png",
+  "WIRTGEN": "/images/brands/wirtgen.png",
+  "ALLMAND": "/images/brands/allmand.png",
+  "MAGNI": "/images/brands/magni.png",
+  "LINK BELT CRANE": "/images/brands/link-belt.png",
+  "LEDWELL": "/images/brands/ledwell.png",
+  "FELLING": "/images/brands/felling.png",
+  "ROCKLAND": "/images/brands/rockland.png",
+  "TERAN": "/images/brands/teran.png",
+  "EDCO": "/images/brands/edco.png",
 };
 
 const VIDEOS = [
@@ -155,7 +155,7 @@ function RotatingVideoBackground() {
   );
 }
 
-function BrandLogo({ brand, size = 48 }: { brand: string; size?: number }) {
+function BrandLogo({ brand, size = 48, className = "" }: { brand: string; size?: number; className?: string }) {
   const [imgError, setImgError] = useState(false);
   const logoUrl = BRAND_LOGOS[brand];
   const displayName = BRAND_DISPLAY_NAMES[brand] || brand.charAt(0) + brand.slice(1).toLowerCase();
@@ -164,8 +164,8 @@ function BrandLogo({ brand, size = 48 }: { brand: string; size?: number }) {
   if (!logoUrl || imgError) {
     return (
       <div
-        className="font-black tracking-tight text-center leading-tight"
-        style={{ color: brandColor, fontSize: size * 0.45 }}
+        className={`font-black tracking-tight text-center leading-tight ${className}`}
+        style={{ color: brandColor, fontSize: size * 0.4 }}
       >
         {displayName}
       </div>
@@ -176,8 +176,8 @@ function BrandLogo({ brand, size = 48 }: { brand: string; size?: number }) {
     <img
       src={logoUrl}
       alt={`${displayName} logo`}
-      className="object-contain"
-      style={{ width: size, height: size }}
+      className={`object-contain ${className}`}
+      style={{ maxWidth: size, maxHeight: size }}
       onError={() => setImgError(true)}
     />
   );
@@ -266,8 +266,8 @@ export default function OtherEquipmentBrands() {
                       style={{ "--flash-index": i % 8 } as any}
                     >
                       <div className="aspect-[16/10] relative rounded-t-md overflow-hidden bg-white dark:bg-zinc-900">
-                        <div className="w-full h-full flex items-center justify-center p-6">
-                          <BrandLogo brand={brand} size={72} />
+                        <div className="w-full h-full flex items-center justify-center p-4">
+                          <BrandLogo brand={brand} size={130} />
                         </div>
                         <div className="absolute bottom-0 left-0 right-0 h-1.5" style={{ backgroundColor: brandColor }} />
                       </div>
@@ -356,8 +356,8 @@ function BrandListings({ brand, onBack }: { brand: string; onBack: () => void })
         <div className="absolute bottom-0 left-0 right-0 h-1.5" style={{ backgroundColor: brandColor }} />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-6">
-            <div className="w-20 h-20 rounded-xl bg-white dark:bg-zinc-800 flex items-center justify-center p-3 shadow-lg shrink-0">
-              <BrandLogo brand={brand} size={56} />
+            <div className="w-24 h-24 rounded-xl bg-white dark:bg-zinc-800 flex items-center justify-center p-3 shadow-lg shrink-0">
+              <BrandLogo brand={brand} size={72} />
             </div>
             <div>
               <h1 className="flash-reveal text-3xl sm:text-4xl lg:text-5xl font-bold text-primary-foreground mb-2 tracking-tight" data-testid="text-page-title">
