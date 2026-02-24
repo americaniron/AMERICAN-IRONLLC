@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Link, useLocation } from "wouter";
+import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, ChevronRight, Search, Wrench } from "lucide-react";
+import { ArrowRight, ChevronRight, Search, Wrench, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -71,6 +71,44 @@ const BRAND_COLORS: Record<string, string> = {
   "MANITOWOC": "#B81C2C",
 };
 
+const BRAND_LOGOS: Record<string, string> = {
+  "BOBCAT": "https://logo.clearbit.com/bobcat.com",
+  "JOHN DEERE": "https://logo.clearbit.com/deere.com",
+  "KOMATSU": "https://logo.clearbit.com/komatsu.com",
+  "CASE": "https://logo.clearbit.com/casece.com",
+  "VOLVO": "https://logo.clearbit.com/volvoce.com",
+  "JCB": "https://logo.clearbit.com/jcb.com",
+  "GENIE": "https://logo.clearbit.com/genielift.com",
+  "VERMEER": "https://logo.clearbit.com/vermeer.com",
+  "INTERNATIONAL": "https://logo.clearbit.com/internationaltrucks.com",
+  "FREIGHTLINER": "https://logo.clearbit.com/freightliner.com",
+  "KENWORTH": "https://logo.clearbit.com/kenworth.com",
+  "PETERBILT": "https://logo.clearbit.com/peterbilt.com",
+  "EPIROC": "https://logo.clearbit.com/epiroc.com",
+  "BOSCH": "https://logo.clearbit.com/bosch.com",
+  "KUBOTA": "https://logo.clearbit.com/kubota.com",
+  "DOOSAN": "https://logo.clearbit.com/doosan.com",
+  "HYUNDAI": "https://logo.clearbit.com/hyundai-ce.com",
+  "KOBELCO": "https://logo.clearbit.com/kobelco-usa.com",
+  "TEREX": "https://logo.clearbit.com/terex.com",
+  "SANY": "https://logo.clearbit.com/sanyamerica.com",
+  "MANITOWOC": "https://logo.clearbit.com/manitowoc.com",
+  "STANLEY": "https://logo.clearbit.com/stanleyinfrastructure.com",
+  "MULTIQUIP": "https://logo.clearbit.com/multiquip.com",
+  "WACKER": "https://logo.clearbit.com/wackerneuson.com",
+  "DITCH WITCH": "https://logo.clearbit.com/ditchwitch.com",
+  "SULLAIR": "https://logo.clearbit.com/sullair.com",
+  "WIRTGEN": "https://logo.clearbit.com/wirtgen.com",
+  "ALLMAND": "https://logo.clearbit.com/allmand.com",
+  "MAGNI": "https://logo.clearbit.com/magnith.com",
+  "LINK BELT CRANE": "https://logo.clearbit.com/linkbelt.com",
+  "LEDWELL": "https://logo.clearbit.com/ledwell.com",
+  "FELLING": "https://logo.clearbit.com/felling.com",
+  "ROCKLAND": "https://logo.clearbit.com/rocklandmfg.com",
+  "TERAN": "https://logo.clearbit.com/teranbuckets.com",
+  "EDCO": "https://logo.clearbit.com/edcoinc.com",
+};
+
 const VIDEOS = [
   "/images/equip-bg-1.mp4",
   "/images/equip-bg-2.mp4",
@@ -117,11 +155,36 @@ function RotatingVideoBackground() {
   );
 }
 
+function BrandLogo({ brand, size = 48 }: { brand: string; size?: number }) {
+  const [imgError, setImgError] = useState(false);
+  const logoUrl = BRAND_LOGOS[brand];
+  const displayName = BRAND_DISPLAY_NAMES[brand] || brand.charAt(0) + brand.slice(1).toLowerCase();
+  const brandColor = BRAND_COLORS[brand] || "#FFCD11";
+
+  if (!logoUrl || imgError) {
+    return (
+      <div
+        className="font-black tracking-tight text-center leading-tight"
+        style={{ color: brandColor, fontSize: size * 0.45 }}
+      >
+        {displayName}
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={logoUrl}
+      alt={`${displayName} logo`}
+      className="object-contain"
+      style={{ width: size, height: size }}
+      onError={() => setImgError(true)}
+    />
+  );
+}
+
 export default function OtherEquipmentBrands() {
-  const [location] = useLocation();
-  const searchStr = typeof window !== "undefined" ? window.location.search : "";
-  const params = new URLSearchParams(searchStr);
-  const selectedBrand = params.get("brand");
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
 
   const heroRef = useFlashReveal();
   const gridRef = useFlashReveal();
@@ -130,8 +193,12 @@ export default function OtherEquipmentBrands() {
     queryKey: ["/api/equipment/brands/counts?category=OTHER EQUIPMENT"],
   });
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [selectedBrand]);
+
   if (selectedBrand) {
-    return <BrandListings brand={selectedBrand} />;
+    return <BrandListings brand={selectedBrand} onBack={() => setSelectedBrand(null)} />;
   }
 
   const sortedBrands = brandCounts
@@ -188,28 +255,21 @@ export default function OtherEquipmentBrands() {
                 const displayName = BRAND_DISPLAY_NAMES[brand] || brand.charAt(0) + brand.slice(1).toLowerCase();
                 const brandColor = BRAND_COLORS[brand] || "#FFCD11";
                 return (
-                  <Link
+                  <div
                     key={brand}
-                    href={`/equipment/other?brand=${encodeURIComponent(brand)}`}
+                    onClick={() => setSelectedBrand(brand)}
+                    className="cursor-pointer"
+                    data-testid={`card-brand-${brand.toLowerCase().replace(/\s+/g, "-")}`}
                   >
                     <Card
-                      className="flash-reveal-scale group overflow-visible hover-elevate cursor-pointer border-card-border h-full"
+                      className="flash-reveal-scale group overflow-visible hover-elevate border-card-border h-full"
                       style={{ "--flash-index": i % 8 } as any}
-                      data-testid={`card-brand-${brand.toLowerCase().replace(/\s+/g, "-")}`}
                     >
-                      <div className="aspect-[16/10] relative rounded-t-md overflow-hidden bg-muted">
-                        <div className="w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${brandColor}15, ${brandColor}30)` }}>
-                          <div className="text-center">
-                            <div
-                              className="text-3xl font-black tracking-tight mb-1"
-                              style={{ color: brandColor }}
-                            >
-                              {displayName}
-                            </div>
-                            <div className="text-xs text-muted-foreground uppercase tracking-widest">Equipment</div>
-                          </div>
+                      <div className="aspect-[16/10] relative rounded-t-md overflow-hidden bg-white dark:bg-zinc-900">
+                        <div className="w-full h-full flex items-center justify-center p-6">
+                          <BrandLogo brand={brand} size={72} />
                         </div>
-                        <div className="absolute bottom-0 left-0 right-0 h-1" style={{ backgroundColor: brandColor }} />
+                        <div className="absolute bottom-0 left-0 right-0 h-1.5" style={{ backgroundColor: brandColor }} />
                       </div>
                       <div className="p-5 flex items-center justify-between">
                         <div>
@@ -219,7 +279,7 @@ export default function OtherEquipmentBrands() {
                         <ArrowRight className="w-5 h-5 text-accent opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
                     </Card>
-                  </Link>
+                  </div>
                 );
               })}
             </div>
@@ -239,8 +299,7 @@ export default function OtherEquipmentBrands() {
   );
 }
 
-function BrandListings({ brand }: { brand: string }) {
-  const [, setLoc] = useLocation();
+function BrandListings({ brand, onBack }: { brand: string; onBack: () => void }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
   const ITEMS_PER_PAGE = 24;
@@ -261,7 +320,12 @@ function BrandListings({ brand }: { brand: string }) {
   })();
 
   const { data, isLoading } = useQuery<{ items: Equipment[]; total: number }>({
-    queryKey: [queryUrl],
+    queryKey: ["/api/equipment", "other", brand, searchTerm, page],
+    queryFn: async () => {
+      const res = await fetch(queryUrl);
+      if (!res.ok) throw new Error("Failed to fetch");
+      return res.json();
+    },
   });
 
   const equipment = data?.items;
@@ -280,7 +344,7 @@ function BrandListings({ brand }: { brand: string }) {
             <ChevronRight className="w-3.5 h-3.5" />
             <Link href="/equipment"><span className="cursor-pointer">Equipment</span></Link>
             <ChevronRight className="w-3.5 h-3.5" />
-            <Link href="/equipment/other"><span className="cursor-pointer">Other Equipment</span></Link>
+            <span className="cursor-pointer hover:text-foreground transition-colors" onClick={onBack}>Other Equipment</span>
             <ChevronRight className="w-3.5 h-3.5" />
             <span className="text-foreground font-medium">{displayName}</span>
           </nav>
@@ -289,14 +353,21 @@ function BrandListings({ brand }: { brand: string }) {
 
       <section className="relative py-16 overflow-hidden" ref={heroRef}>
         <div className="absolute inset-0 bg-primary" />
-        <div className="absolute bottom-0 left-0 right-0 h-1" style={{ backgroundColor: brandColor }} />
+        <div className="absolute bottom-0 left-0 right-0 h-1.5" style={{ backgroundColor: brandColor }} />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
-          <h1 className="flash-reveal text-3xl sm:text-4xl lg:text-5xl font-bold text-primary-foreground mb-4 tracking-tight" data-testid="text-page-title">
-            {displayName} Equipment
-          </h1>
-          <p className="flash-reveal text-primary-foreground/70 text-lg max-w-2xl" style={{ "--flash-index": 1 } as any}>
-            Browse our {displayName} equipment inventory. {total > 0 ? `${total} items available.` : ""}
-          </p>
+          <div className="flex items-center gap-6">
+            <div className="w-20 h-20 rounded-xl bg-white dark:bg-zinc-800 flex items-center justify-center p-3 shadow-lg shrink-0">
+              <BrandLogo brand={brand} size={56} />
+            </div>
+            <div>
+              <h1 className="flash-reveal text-3xl sm:text-4xl lg:text-5xl font-bold text-primary-foreground mb-2 tracking-tight" data-testid="text-page-title">
+                {displayName} Equipment
+              </h1>
+              <p className="flash-reveal text-primary-foreground/70 text-lg" style={{ "--flash-index": 1 } as any}>
+                {total > 0 ? `${total} items available` : "Loading inventory..."}
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -315,9 +386,11 @@ function BrandListings({ brand }: { brand: string }) {
             </div>
             <Button
               variant="outline"
-              onClick={() => setLoc("/equipment/other")}
+              onClick={onBack}
+              className="gap-2"
               data-testid="button-back-brands"
             >
+              <ArrowLeft className="w-4 h-4" />
               All Brands
             </Button>
           </div>
