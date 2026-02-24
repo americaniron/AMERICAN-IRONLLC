@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "wouter";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -22,11 +22,15 @@ import {
   Phone,
   MapPin,
   Globe,
+  LogIn,
+  Save,
+  User,
 } from "lucide-react";
 import type { Equipment, PowerUnit } from "@shared/schema";
 import { useFlashReveal } from "@/hooks/useFlashReveal";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/use-auth";
 
 function generateQuoteNumber() {
   const now = new Date();
@@ -105,8 +109,11 @@ export default function QuotePreview() {
   const [emailOpen, setEmailOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [emailSent, setEmailSent] = useState(false);
+  const [quoteSaved, setQuoteSaved] = useState(false);
   const { toast } = useToast();
   const contentRef = useFlashReveal();
+  const { user, isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
 
   const isEquipment = type === "equipment";
   const apiUrl = isEquipment ? `/api/equipment/${id}` : `/api/power-units/${id}`;
@@ -120,6 +127,40 @@ export default function QuotePreview() {
       ? equipmentToQuoteItem(rawItem as Equipment)
       : powerUnitToQuoteItem(rawItem as PowerUnit)
     : null;
+
+  useEffect(() => {
+    if (isAuthenticated && user?.email && !email) {
+      setEmail(user.email);
+    }
+  }, [isAuthenticated, user, email]);
+
+  const saveQuoteMutation = useMutation({
+    mutationFn: async () => {
+      if (!quoteItem) return;
+      const itemDesc = `${quoteItem.title} (${quoteItem.identifier}) - ${quoteItem.price}`;
+      return apiRequest("POST", "/api/quotes", {
+        name: [user?.firstName, user?.lastName].filter(Boolean).join(" ") || "Customer",
+        email: user?.email || "",
+        items: itemDesc,
+        notes: `Quote #${quoteNumber} — ${quoteItem.category} | ${quoteItem.type === "equipment" ? "Equipment" : "Power Unit"} ID: ${id}`,
+      });
+    },
+    onSuccess: () => {
+      setQuoteSaved(true);
+      queryClient.invalidateQueries({ queryKey: ["/api/portal/quotes"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/portal/profile"] });
+      toast({ title: "Quote Saved", description: "This quote has been saved to your portal." });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Could not save quote. Please try again.", variant: "destructive" });
+    },
+  });
+
+  useEffect(() => {
+    if (isAuthenticated && quoteItem && !quoteSaved && !saveQuoteMutation.isPending) {
+      saveQuoteMutation.mutate();
+    }
+  }, [isAuthenticated, quoteItem]);
 
   const emailMutation = useMutation({
     mutationFn: async (recipientEmail: string) => {
@@ -241,6 +282,40 @@ export default function QuotePreview() {
             <Mail className="w-4 h-4" />
             Email Quote
           </Button>
+          {isAuthenticated ? (
+            <Button
+              size="sm"
+              variant={quoteSaved ? "outline" : "default"}
+              className={quoteSaved ? "gap-1.5 text-green-600 border-green-300" : "gap-1.5"}
+              onClick={() => !quoteSaved && saveQuoteMutation.mutate()}
+              disabled={quoteSaved || saveQuoteMutation.isPending}
+              data-testid="button-save-quote-portal"
+            >
+              {quoteSaved ? (
+                <>
+                  <CheckCircle2 className="w-4 h-4" />
+                  Saved to Portal
+                </>
+              ) : saveQuoteMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4" />
+                  Save to Portal
+                </>
+              )}
+            </Button>
+          ) : (
+            <a href="/api/login" data-testid="link-save-quote-login">
+              <Button size="sm" variant="outline" className="gap-1.5">
+                <LogIn className="w-4 h-4" />
+                Save Your Quote
+              </Button>
+            </a>
+          )}
         </div>
       </div>
 

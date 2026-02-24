@@ -48,11 +48,11 @@ Preferred communication style: Simple, everyday language.
 - **Tables**:
   - `equipment` — Heavy equipment listings (id, equipmentId, make, model, year, meter, price, location, category, imageUrl)
   - `parts` — Parts catalog (id, partNumber, description, category, subcategory, price, compatibility, engineModel, gasket, equipment, imageUrl) — 17,554 items from parsed Costex catalog across 14 categories
-  - `quote_requests` — Quote request submissions (name, email, phone, shipTo, notes, items)
+  - `quote_requests` — Quote request submissions (id, customerId, name, email, phone, shipTo, notes, items, status, createdAt) — customerId links to authenticated user for portal history
   - `contact_inquiries` — Contact form submissions (name, email, message)
   - `users` — User accounts (id, username) — exists in schema but auth not fully implemented
   - `project_estimates` — AI-generated project estimates (projectName, projectType, location, terrain, projectSize, duration, additionalDetails, estimateResult)
-  - `power_units` — Power units & generators inventory (id, stockNumber, model, category, hp, kw, rpm, year, condition, location, price, imageUrl) — 95 items across 4 categories: Generator Sets (40), Marine Engines (26), Power Units (21), Industrial Generators (8)
+  - `power_units` — Power units & generators inventory (id, stockNumber, model, category, hp, kw, rpm, year, condition, location, price, imageUrl) — 138 items across 4 categories: Generator Sets (40), Marine Engines (26), Power Units (21), Industrial Generators (8), plus 43 additional units (PU-096 to PU-138)
   - `conversations` / `messages` — Chat storage tables (from OpenAI integration)
 
 ### API Endpoints

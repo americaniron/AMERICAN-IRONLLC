@@ -1,7 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,9 +17,10 @@ import {
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { FileText, Send, CheckCircle2, X, Minus, Plus } from "lucide-react";
+import { FileText, Send, CheckCircle2, X, Minus, Plus, Save, LogIn, User } from "lucide-react";
 import { useFlashReveal } from "@/hooks/useFlashReveal";
 import { useQuoteCart } from "@/hooks/useQuoteCart";
+import { useAuth } from "@/hooks/use-auth";
 
 const quoteSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -37,6 +38,9 @@ export default function QuoteRequest() {
   const heroRef = useFlashReveal();
   const contentRef = useFlashReveal();
   const { items: cartItems, removeItem, updateQuantity, clearCart } = useQuoteCart();
+  const { user, isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
+  const [lastUserId, setLastUserId] = useState<string | null>(null);
 
   const form = useForm<QuoteFormData>({
     resolver: zodResolver(quoteSchema),
@@ -49,6 +53,20 @@ export default function QuoteRequest() {
       items: "",
     },
   });
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const userId = user.id || user.email || "";
+      if (userId !== lastUserId) {
+        const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ");
+        if (fullName) form.setValue("name", fullName);
+        if (user.email) form.setValue("email", user.email);
+        setLastUserId(userId);
+      }
+    } else if (!isAuthenticated && lastUserId) {
+      setLastUserId(null);
+    }
+  }, [isAuthenticated, user, form, lastUserId]);
 
   useEffect(() => {
     if (cartItems.length > 0) {
@@ -66,9 +84,13 @@ export default function QuoteRequest() {
       return apiRequest("POST", "/api/quotes", data);
     },
     onSuccess: () => {
-      toast({ title: "Quote Request Sent", description: "We'll respond within one business day." });
+      toast({ title: "Quote Request Sent", description: "We'll respond within one business day." + (isAuthenticated ? " Your quote has been saved to your portal." : "") });
       form.reset();
       clearCart();
+      if (isAuthenticated) {
+        queryClient.invalidateQueries({ queryKey: ["/api/portal/quotes"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/portal/profile"] });
+      }
     },
     onError: () => {
       toast({ title: "Error", description: "Failed to submit. Please try again.", variant: "destructive" });
@@ -277,6 +299,24 @@ export default function QuoteRequest() {
                         </FormItem>
                       )}
                     />
+
+                    {isAuthenticated ? (
+                      <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3 flex items-center gap-2 text-sm" data-testid="text-logged-in-notice">
+                        <User className="w-4 h-4 text-green-600 dark:text-green-400 shrink-0" />
+                        <span className="text-green-700 dark:text-green-300">
+                          Signed in as <strong>{user?.email}</strong> — this quote will be saved to your portal.
+                        </span>
+                      </div>
+                    ) : (
+                      <a href="/api/login" className="block" data-testid="link-save-quote-login">
+                        <div className="bg-muted/50 border border-border rounded-lg p-3 flex items-center gap-2 text-sm cursor-pointer hover:bg-muted transition-colors">
+                          <LogIn className="w-4 h-4 text-accent shrink-0" />
+                          <span className="text-muted-foreground">
+                            <strong className="text-foreground">Save Your Quote</strong> — Sign in to save this quote to your account for future reference.
+                          </span>
+                        </div>
+                      </a>
+                    )}
 
                     <Button
                       type="submit"

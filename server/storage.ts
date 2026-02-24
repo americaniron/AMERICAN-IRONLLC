@@ -55,6 +55,7 @@ export interface IStorage {
   getPowerUnitsCount(): Promise<number>;
 
   getQuotesByEmail(email: string): Promise<QuoteRequest[]>;
+  getQuotesByCustomerId(customerId: string): Promise<QuoteRequest[]>;
   getOrdersByCustomerId(customerId: string): Promise<CustomerOrder[]>;
   getPaymentsByCustomerId(customerId: string): Promise<CustomerPayment[]>;
   getContactInquiriesByEmail(email: string): Promise<ContactInquiry[]>;
@@ -370,6 +371,10 @@ export class DatabaseStorage implements IStorage {
 
   async getQuotesByEmail(email: string): Promise<QuoteRequest[]> {
     return db.select().from(quoteRequests).where(eq(quoteRequests.email, email)).orderBy(desc(quoteRequests.createdAt));
+  }
+
+  async getQuotesByCustomerId(customerId: string): Promise<QuoteRequest[]> {
+    return db.select().from(quoteRequests).where(eq(quoteRequests.customerId, customerId)).orderBy(desc(quoteRequests.createdAt));
   }
 
   async getOrdersByCustomerId(customerId: string): Promise<CustomerOrder[]> {

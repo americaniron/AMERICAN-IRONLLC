@@ -120,7 +120,8 @@ export async function registerRoutes(
   app.post("/api/quotes", async (req, res) => {
     try {
       const data = insertQuoteRequestSchema.parse(req.body);
-      const item = await storage.createQuoteRequest(data);
+      const customerId = (req as any).user?.claims?.sub || null;
+      const item = await storage.createQuoteRequest({ ...data, customerId });
 
       const businessHtml = `
 <!DOCTYPE html>
@@ -923,9 +924,15 @@ Provide a thorough, institutional-grade estimate with specific equipment recomme
 
   app.get("/api/portal/quotes", isAuthenticated, async (req: any, res) => {
     try {
+      const customerId = req.user?.claims?.sub;
       const email = req.user?.claims?.email;
-      if (!email) return res.status(400).json({ error: "No email associated with account" });
-      const quotes = await storage.getQuotesByEmail(email);
+      let quotes: any[] = [];
+      if (customerId) {
+        quotes = await storage.getQuotesByCustomerId(customerId);
+      }
+      if (quotes.length === 0 && email) {
+        quotes = await storage.getQuotesByEmail(email);
+      }
       res.json(quotes);
     } catch (error) {
       console.error("Portal quotes error:", error);

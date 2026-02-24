@@ -33,6 +33,7 @@ export const parts = pgTable("parts", {
 
 export const quoteRequests = pgTable("quote_requests", {
   id: serial("id").primaryKey(),
+  customerId: varchar("customer_id", { length: 255 }),
   name: varchar("name", { length: 200 }).notNull(),
   email: varchar("email", { length: 200 }).notNull(),
   phone: varchar("phone", { length: 50 }),
