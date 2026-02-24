@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Zap } from "lucide-react";
@@ -9,6 +10,52 @@ import marineEnginesImg from "@/assets/images/marine-engines.png";
 import generatorSetsImg from "@/assets/images/generator-sets.png";
 import powerUnitsImg from "@/assets/images/power-units-cat.png";
 import industrialGeneratorsImg from "@/assets/images/industrial-generators.png";
+
+const VIDEOS = [
+  "/images/power-bg-1.mp4",
+  "/images/power-bg-2.mp4",
+];
+
+function RotatingVideoBackground() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [fadingOut, setFadingOut] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const nextIndexRef = useRef(1);
+
+  const handleVideoEnd = useCallback(() => {
+    setFadingOut(true);
+    setTimeout(() => {
+      setActiveIndex(nextIndexRef.current);
+      nextIndexRef.current = (nextIndexRef.current + 1) % VIDEOS.length;
+      setFadingOut(false);
+    }, 600);
+  }, []);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.load();
+    video.play().catch(() => {});
+  }, [activeIndex]);
+
+  return (
+    <>
+      <video
+        ref={videoRef}
+        key={activeIndex}
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ opacity: fadingOut ? 0 : 0.45, transition: "opacity 0.6s ease-in-out" }}
+        muted
+        playsInline
+        onEnded={handleVideoEnd}
+        data-testid="video-power-units-bg"
+      >
+        <source src={VIDEOS[activeIndex]} type="video/mp4" />
+      </video>
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
+    </>
+  );
+}
 
 const POWER_CATEGORIES = [
   { name: "Generator Sets", label: "Generator Sets", image: generatorSetsImg, description: "20kW to 2,000kW diesel and natural gas generator sets" },
@@ -30,10 +77,7 @@ export default function PowerUnits() {
   return (
     <div className="flash-page-transition">
       <section className="relative py-24 overflow-hidden bg-black" ref={heroRef}>
-        <div className="absolute inset-0 bg-gradient-to-br from-yellow-900/40 via-black to-black/90" />
-        <div className="absolute inset-0">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/10 rounded-full blur-3xl" />
-        </div>
+        <RotatingVideoBackground />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-3 mb-4">
             <Zap className="w-8 h-8 text-accent flash-reveal" />

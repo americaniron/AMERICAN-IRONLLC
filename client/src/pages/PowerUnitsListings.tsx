@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,65 @@ import marineEnginesImg from "@/assets/images/marine-engines.png";
 import generatorSetsImg from "@/assets/images/generator-sets.png";
 import powerUnitsImg from "@/assets/images/power-units-cat.png";
 import industrialGeneratorsImg from "@/assets/images/industrial-generators.png";
+
+const CATEGORY_VIDEOS: Record<string, string[]> = {
+  "Generator Sets": ["/images/power-bg-1.mp4", "/images/power-bg-2.mp4"],
+  "Marine Engines": ["/images/power-marine-bg.mp4", "/images/power-bg-1.mp4"],
+  "Power Units": ["/images/power-units-bg.mp4", "/images/power-bg-2.mp4"],
+  "Industrial Engines": ["/images/power-industrial-bg.mp4", "/images/power-bg-1.mp4"],
+};
+
+const DEFAULT_VIDEOS = ["/images/power-bg-1.mp4", "/images/power-bg-2.mp4"];
+
+function RotatingVideoBackground({ category }: { category: string }) {
+  const videos = CATEGORY_VIDEOS[category] || DEFAULT_VIDEOS;
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [fadingOut, setFadingOut] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const nextIndexRef = useRef(1);
+
+  const handleVideoEnd = useCallback(() => {
+    setFadingOut(true);
+    setTimeout(() => {
+      setActiveIndex(prev => {
+        const next = (prev + 1) % videos.length;
+        nextIndexRef.current = (next + 1) % videos.length;
+        return next;
+      });
+      setFadingOut(false);
+    }, 600);
+  }, [videos.length]);
+
+  useEffect(() => {
+    setActiveIndex(0);
+    nextIndexRef.current = 1;
+  }, [category]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.load();
+    video.play().catch(() => {});
+  }, [activeIndex, category]);
+
+  return (
+    <>
+      <video
+        ref={videoRef}
+        key={`${category}-${activeIndex}`}
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ opacity: fadingOut ? 0 : 0.45, transition: "opacity 0.6s ease-in-out" }}
+        muted
+        playsInline
+        onEnded={handleVideoEnd}
+        data-testid="video-listings-bg"
+      >
+        <source src={videos[activeIndex]} type="video/mp4" />
+      </video>
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
+    </>
+  );
+}
 
 const CATEGORY_IMAGES: Record<string, string> = {
   "Generator Sets": generatorSetsImg,
@@ -74,8 +133,8 @@ export default function PowerUnitsListings() {
 
   return (
     <div className="flash-page-transition">
-      <section className="relative py-16 bg-black" ref={heroRef}>
-        <div className="absolute inset-0 bg-gradient-to-br from-yellow-900/30 via-black to-black/90" />
+      <section className="relative py-16 overflow-hidden bg-black" ref={heroRef}>
+        <RotatingVideoBackground category={category} />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-2 text-sm text-white/60 mb-4">
             <Link href="/power-units" className="hover:text-accent transition-colors" data-testid="link-power-units-home">Power Units & Generators</Link>
