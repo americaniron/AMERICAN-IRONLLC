@@ -1,10 +1,45 @@
 import { db } from "./db";
 import { equipment, parts, powerUnits } from "@shared/schema";
-import { sql } from "drizzle-orm";
+import { sql, eq } from "drizzle-orm";
 import * as fs from "fs";
 import * as path from "path";
 
 const BATCH_SIZE = 500;
+
+async function syncPowerUnitImages() {
+  try {
+    const dataDir = path.resolve(process.cwd(), "server", "data");
+    const filePath = path.join(dataDir, "power-units.json");
+    if (!fs.existsSync(filePath)) return;
+
+    const jsonData = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+    const dbRows = await db.select({ id: powerUnits.id, stockNumber: powerUnits.stockNumber, imageUrl: powerUnits.imageUrl }).from(powerUnits);
+
+    const jsonByStock: Record<string, string> = {};
+    for (const r of jsonData) {
+      const sn = r.stockNumber || r.stock_number;
+      const img = r.imageUrl || r.image_url;
+      if (sn && img) jsonByStock[sn] = img;
+    }
+
+    let updated = 0;
+    for (const row of dbRows) {
+      const expectedImg = jsonByStock[row.stockNumber];
+      if (expectedImg && expectedImg !== row.imageUrl) {
+        await db.update(powerUnits).set({ imageUrl: expectedImg }).where(eq(powerUnits.id, row.id));
+        updated++;
+      }
+    }
+
+    if (updated > 0) {
+      console.log(`Synced ${updated} power unit image URLs to match data file.`);
+    } else {
+      console.log("Power unit images already in sync.");
+    }
+  } catch (error) {
+    console.error("Error syncing power unit images:", error);
+  }
+}
 
 async function insertBatch(table: any, rows: any[], label: string) {
   let inserted = 0;
@@ -29,7 +64,8 @@ export async function seedDatabase() {
     const puTotal = Number(puCount.count);
 
     if (eqTotal >= 2000 && ptTotal >= 17000 && puTotal >= 100) {
-      console.log(`Database already seeded (${eqTotal} equipment, ${ptTotal} parts, ${puTotal} power units), skipping.`);
+      console.log(`Database already seeded (${eqTotal} equipment, ${ptTotal} parts, ${puTotal} power units).`);
+      await syncPowerUnitImages();
       return;
     }
 
