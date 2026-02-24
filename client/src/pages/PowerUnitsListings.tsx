@@ -113,15 +113,15 @@ export default function PowerUnitsListings() {
     setPage(1);
   }, [category, search]);
 
-  const queryParams = new URLSearchParams();
-  if (category) queryParams.set("category", category);
-  if (search) queryParams.set("search", search);
-  queryParams.set("page", String(page));
-  queryParams.set("limit", String(limit));
+  const queryString = new URLSearchParams({
+    ...(category && { category }),
+    ...(search && { search }),
+    page: String(page),
+    limit: String(limit),
+  }).toString();
 
   const { data, isLoading } = useQuery<{ items: PowerUnit[]; total: number }>({
-    queryKey: ["/api/power-units", category, search, page],
-    queryFn: () => fetch(`/api/power-units?${queryParams.toString()}`).then(r => r.json()),
+    queryKey: [`/api/power-units?${queryString}`],
   });
 
   const items = data?.items || [];
