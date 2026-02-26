@@ -434,8 +434,8 @@ function BrandListings({ brand, onBack }: { brand: string; onBack: () => void })
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-card">
-                            <Wrench className="w-12 h-12 text-muted-foreground/30" />
+                          <div className="w-full h-full flex items-center justify-center bg-white dark:bg-zinc-900 p-6">
+                            <BrandLogo brand={item.make || brand} size={100} />
                           </div>
                         )}
                         <div className="absolute top-3 left-3">
