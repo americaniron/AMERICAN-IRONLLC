@@ -81,11 +81,19 @@ Preferred communication style: Simple, everyday language.
 - **Feature**: IRON Estimator at `/services/estimator` — generates comprehensive construction project equipment estimates using real inventory pricing data
 - **Integration files**: `server/replit_integrations/` (chat, audio, image, batch modules)
 
+### Static Assets
+- **Images**: All site images (equipment, parts, power units) are served via Express from `static-assets/images/` — NOT from `client/public/` — to keep them out of Vite's file watcher scope and prevent OOM crashes
+- **Express static route**: `app.use("/images", express.static(path.resolve(process.cwd(), "static-assets/images")))` serves `/images/*` requests
+- **Parts images**: 975 part item images at `static-assets/images/parts/items/` served as `/images/parts/items/*.jpg`
+- **IMPORTANT**: Do NOT add large image directories back into `client/public/` — this causes the dev server to scan 170MB+ of files on startup
+
 ### Build System
-- **Development**: `npm run dev` — runs tsx with Vite dev server middleware for HMR
+- **Workflow Command**: `npm run start` — serves the pre-built production bundle from `dist/index.cjs`. The workflow runs in production mode for stability (Vite dev server causes OOM crashes in this environment with large data files)
+- **After Code Changes**: Run `npm run build` via bash, then restart the workflow to apply changes
 - **Production Build**: `npm run build` — runs `script/build.ts` which builds client with Vite and server with esbuild
 - **Production Start**: `npm run start` — serves built `dist/index.cjs`
 - **Database Push**: `npm run db:push` — pushes Drizzle schema to PostgreSQL
+- **NOTE**: `npm run dev` (Vite dev server) causes OOM crashes because it file-watches the workspace and compiles TypeScript at runtime. Always use the production build workflow.
 
 ### Key Design Decisions
 1. **Monorepo structure** — Client, server, and shared code in one repo with path aliases (`@/`, `@shared/`)

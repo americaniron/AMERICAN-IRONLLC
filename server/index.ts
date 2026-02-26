@@ -5,12 +5,19 @@ import { createServer } from "http";
 import path from "path";
 import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
 
+process.on("uncaughtException", (err) => {
+  console.error("[CRASH] Uncaught Exception:", err);
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("[CRASH] Unhandled Rejection at:", promise, "reason:", reason);
+});
+
+
 const app = express();
 const httpServer = createServer(app);
 
-const staticImagesDir = typeof __dirname !== "undefined"
-  ? path.resolve(__dirname, "../static-assets/images")
-  : path.resolve(import.meta.dirname, "../static-assets/images");
+const staticImagesDir = path.resolve(process.cwd(), "static-assets/images");
 app.use("/images", express.static(staticImagesDir, { maxAge: "7d" }));
 
 declare module "http" {
