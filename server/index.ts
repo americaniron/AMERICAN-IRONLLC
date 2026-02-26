@@ -2,10 +2,13 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
+import path from "path";
 import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
 
 const app = express();
 const httpServer = createServer(app);
+
+app.use("/images/parts/items", express.static(path.resolve(import.meta.dirname, "../static-assets/images/parts/items"), { maxAge: "7d" }));
 
 declare module "http" {
   interface IncomingMessage {
