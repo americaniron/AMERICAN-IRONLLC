@@ -99,10 +99,15 @@ export default function Home() {
   return (
     <div className="flash-page-transition">
       <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden bg-black" style={{ WebkitTransform: "translateZ(0)" }}>
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url(/images/hero-equipment.png)" }}
-        />
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover opacity-60"
+        >
+          <source src="/images/intro-flash.mp4" type="video/mp4" />
+        </video>
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
