@@ -8,7 +8,10 @@ import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
 const app = express();
 const httpServer = createServer(app);
 
-app.use("/images/parts/items", express.static(path.resolve(import.meta.dirname, "../static-assets/images/parts/items"), { maxAge: "7d" }));
+const staticAssetsDir = typeof __dirname !== "undefined"
+  ? path.resolve(__dirname, "../static-assets/images/parts/items")
+  : path.resolve(import.meta.dirname, "../static-assets/images/parts/items");
+app.use("/images/parts/items", express.static(staticAssetsDir, { maxAge: "7d" }));
 
 declare module "http" {
   interface IncomingMessage {
