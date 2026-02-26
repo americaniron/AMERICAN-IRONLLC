@@ -8,10 +8,10 @@ import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
 const app = express();
 const httpServer = createServer(app);
 
-const staticAssetsDir = typeof __dirname !== "undefined"
-  ? path.resolve(__dirname, "../static-assets/images/parts/items")
-  : path.resolve(import.meta.dirname, "../static-assets/images/parts/items");
-app.use("/images/parts/items", express.static(staticAssetsDir, { maxAge: "7d" }));
+const staticImagesDir = typeof __dirname !== "undefined"
+  ? path.resolve(__dirname, "../static-assets/images")
+  : path.resolve(import.meta.dirname, "../static-assets/images");
+app.use("/images", express.static(staticImagesDir, { maxAge: "7d" }));
 
 declare module "http" {
   interface IncomingMessage {
