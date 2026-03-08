@@ -7,7 +7,6 @@ import {
   Zap,
   HardHat,
   Wrench,
-  Sparkles,
   ExternalLink,
   ChevronRight,
 } from "lucide-react";
@@ -30,6 +29,7 @@ interface PromoItem {
   buttonLabel: string;
   stat: string;
   statLabel: string;
+  bgImage: string;
 }
 
 const PROMO_DATA: Record<PromoVariant, PromoItem> = {
@@ -43,6 +43,7 @@ const PROMO_DATA: Record<PromoVariant, PromoItem> = {
     buttonLabel: "Launch Estimator",
     stat: "14",
     statLabel: "Report Sections",
+    bgImage: "/images/promo-estimator.png",
   },
   parts: {
     icon: Package,
@@ -54,6 +55,7 @@ const PROMO_DATA: Record<PromoVariant, PromoItem> = {
     buttonLabel: "Browse Parts",
     stat: "17.5K+",
     statLabel: "Parts Available",
+    bgImage: "/images/promo-parts.png",
   },
   equipment: {
     icon: HardHat,
@@ -65,6 +67,7 @@ const PROMO_DATA: Record<PromoVariant, PromoItem> = {
     buttonLabel: "View Equipment",
     stat: "2,100+",
     statLabel: "Units In Stock",
+    bgImage: "/images/promo-equipment.png",
   },
   "power-units": {
     icon: Zap,
@@ -76,6 +79,7 @@ const PROMO_DATA: Record<PromoVariant, PromoItem> = {
     buttonLabel: "View Power Units",
     stat: "138",
     statLabel: "Power Units",
+    bgImage: "/images/promo-power-units.png",
   },
   "mechanic-hub": {
     icon: Wrench,
@@ -88,6 +92,7 @@ const PROMO_DATA: Record<PromoVariant, PromoItem> = {
     buttonLabel: "Launch Mechanic Hub",
     stat: "FREE",
     statLabel: "Access Now",
+    bgImage: "/images/promo-mechanic.png",
   },
 };
 
@@ -190,53 +195,56 @@ export function PromoBar({ variants, className = "" }: PromoBarProps) {
 
             const inner = (
               <div
-                className="group relative rounded-xl overflow-hidden cursor-pointer h-full flex flex-col transition-all duration-500 ease-out hover:-translate-y-2 hover:shadow-[0_20px_60px_-15px_hsl(var(--accent)/0.3)]"
-                style={{
-                  background: "linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card)/0.8) 100%)",
-                }}
+                className="group relative rounded-xl overflow-hidden cursor-pointer h-full flex flex-col transition-all duration-500 ease-out hover:-translate-y-2 hover:shadow-[0_20px_60px_-15px_hsl(var(--accent)/0.4)]"
                 data-testid={`promo-banner-${variant}`}
               >
-                <div className="absolute inset-0 rounded-xl border border-accent/20 group-hover:border-accent/50 transition-colors duration-500" />
+                <div
+                  className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-110"
+                  style={{ backgroundImage: `url(${promo.bgImage})` }}
+                />
 
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-accent to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/40" />
+                <div className="absolute inset-0 bg-gradient-to-br from-black/30 via-transparent to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full bg-accent/5 group-hover:bg-accent/10 transition-all duration-700 group-hover:scale-150" />
+                <div className="absolute inset-0 rounded-xl border-2 border-accent/20 group-hover:border-accent/60 transition-colors duration-500" style={{ boxShadow: "inset 0 0 30px rgba(0,0,0,0.5)" }} />
 
-                <div className="relative p-6 flex flex-col h-full">
-                  <div className="flex items-start justify-between mb-4">
+                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-accent to-transparent opacity-70 group-hover:opacity-100 transition-opacity duration-500" />
+
+                <div className="relative p-6 flex flex-col h-full min-h-[280px]">
+                  <div className="flex items-start justify-between mb-5">
                     <div className="relative">
-                      <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 border border-accent/30 flex items-center justify-center group-hover:scale-110 group-hover:shadow-[0_0_20px_hsl(var(--accent)/0.3)] transition-all duration-500">
-                        <Icon className="w-7 h-7 text-accent" />
+                      <div className="w-14 h-14 rounded-xl bg-black/50 backdrop-blur-md border border-accent/40 flex items-center justify-center group-hover:scale-110 group-hover:shadow-[0_0_25px_hsl(var(--accent)/0.4)] transition-all duration-500">
+                        <Icon className="w-7 h-7 text-accent drop-shadow-[0_0_8px_hsl(var(--accent)/0.5)]" />
                       </div>
                       <div className="absolute -top-1 -right-1">
                         <PulsingDot />
                       </div>
                     </div>
 
-                    <div className="text-right">
-                      <div className="text-2xl font-black text-accent leading-none tracking-tight">
+                    <div className="text-right bg-black/40 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-white/10">
+                      <div className="text-2xl font-black text-accent leading-none tracking-tight drop-shadow-[0_0_10px_hsl(var(--accent)/0.4)]">
                         {promo.stat}
                       </div>
-                      <div className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider mt-0.5">
+                      <div className="text-[10px] text-gray-300 font-semibold uppercase tracking-wider mt-0.5">
                         {promo.statLabel}
                       </div>
                     </div>
                   </div>
 
                   <div className="mb-1">
-                    <span className="text-[10px] font-black tracking-[0.15em] text-accent/70 uppercase">
+                    <span className="text-[10px] font-black tracking-[0.15em] text-accent/80 uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
                       {promo.tagline}
                     </span>
                   </div>
-                  <h3 className="font-black text-lg text-foreground mb-2 group-hover:text-accent transition-colors duration-300">
+                  <h3 className="font-black text-xl text-white mb-2 group-hover:text-accent transition-colors duration-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                     {promo.title}
                   </h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed mb-5 flex-1">
+                  <p className="text-sm text-gray-300 leading-relaxed mb-5 flex-1 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
                     {promo.description}
                   </p>
 
-                  <div className="flex items-center justify-between">
-                    <span className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent/10 border border-accent/20 text-sm font-bold text-accent group-hover:bg-accent group-hover:text-black transition-all duration-300">
+                  <div className="flex items-center justify-between mt-auto">
+                    <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-accent/20 backdrop-blur-sm border border-accent/30 text-sm font-black text-accent group-hover:bg-accent group-hover:text-black group-hover:border-accent transition-all duration-300 shadow-lg">
                       {promo.buttonLabel}
                       {promo.external ? (
                         <ExternalLink className="w-4 h-4" />
@@ -244,7 +252,7 @@ export function PromoBar({ variants, className = "" }: PromoBarProps) {
                         <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
                       )}
                     </span>
-                    <ChevronRight className="w-5 h-5 text-muted-foreground/30 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
+                    <ChevronRight className="w-5 h-5 text-white/30 group-hover:text-accent group-hover:translate-x-1 transition-all duration-300" />
                   </div>
                 </div>
               </div>
