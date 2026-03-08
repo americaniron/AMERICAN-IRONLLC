@@ -415,7 +415,7 @@ You must generate a detailed, institutional-quality estimate. IMPORTANT FORMATTI
 - Include brand recommendations based on terrain, project type, and industry best practices
 - Structure your response with clear ## section headers
 
-Your estimate MUST include these sections with tables:
+Your estimate MUST include ALL of the following sections with tables:
 
 ## 1. Primary Equipment Requirements
 Present as a table with columns: Equipment Type | Recommended Brand & Model | Quantity | Est. Unit Cost | Est. Total
@@ -438,10 +438,38 @@ Reference our 12,200+ parts catalog.
 ## 6. Personnel Requirements
 Table format: Role | Quantity | Duration | Notes
 
-## 7. Project Cost Summary
-Present a final summary table:
+## 7. Environmental & Compliance Analysis
+Table format: Requirement | Description | Est. Cost | Regulatory Authority
+Include environmental permits, erosion/sediment control, stormwater management, dust suppression, noise ordinance compliance, wetland mitigation, endangered species surveys, air quality monitoring, waste disposal/recycling requirements, and any EPA/state/local environmental regulations relevant to the project location and type.
+
+## 8. Safety Equipment & PPE Requirements
+Table format: Item | Specification | Qty | Est. Cost
+Include personal protective equipment (hard hats, high-vis vests, steel-toe boots, safety glasses, hearing protection, fall protection harnesses), site safety signage, first aid stations, fire extinguishers, safety barriers/fencing, communication equipment, emergency response kits, and OSHA compliance items.
+
+## 9. Fuel & Energy Consumption Projections
+Table format: Equipment/Source | Fuel Type | Daily Consumption | Monthly Cost | Project Total
+Include diesel, gasoline, electricity, and any alternative fuel estimates. Factor in current regional fuel prices, idle time estimates, and seasonal consumption variations. Provide a total fuel budget with contingency.
+
+## 10. Weather & Seasonal Risk Assessment
+Table format: Risk Factor | Impact Level | Mitigation Strategy | Est. Additional Cost
+Analyze weather patterns for the project location, seasonal risks (hurricanes, freezing, monsoons, extreme heat), weather-related downtime projections, seasonal productivity adjustments, winter operations requirements, heat stress management, and recommended weather contingency budget (typically 5-15% of project cost).
+
+## 11. Equipment Rental vs. Purchase ROI Analysis
+Table format: Equipment | Purchase Cost | Monthly Rental | Break-Even (Months) | Recommendation
+For each major piece of equipment, analyze whether renting or purchasing provides better ROI based on the project duration. Include factors like depreciation, maintenance savings, tax benefits of ownership, rental flexibility, and residual value. Provide a clear Buy/Rent recommendation for each item.
+
+## 12. Technology & Automation Recommendations
+Table format: Technology | Application | Est. Cost | Projected Savings/Benefits
+Recommend GPS machine control systems, telematics fleet management, drone surveying/mapping, BIM integration, automated grade control, laser-guided systems, fleet tracking software, digital project management tools, IoT sensors for equipment monitoring, and any AI-powered optimization tools relevant to the project type.
+
+## 13. Project Phasing & Equipment Mobilization Timeline
+Table format: Phase | Duration | Key Equipment Needed | Mobilization Notes
+Break the project into logical phases (site preparation, foundation/earthwork, primary construction, finishing, demobilization). For each phase, list the specific equipment required, when it needs to arrive on-site, staging areas, and equipment rotation schedule. Include lead times for equipment procurement/rental.
+
+## 14. Project Cost Summary
+Present a final comprehensive summary table:
 | Cost Category | Low Estimate | Mid Estimate | High Estimate |
-Include subtotals and grand total.
+Include subtotals for: Equipment, Transportation, Maintenance & Parts, Personnel, Environmental & Compliance, Safety & PPE, Fuel & Energy, Weather Contingency, Technology & Automation, and grand total.
 
 Use real pricing ranges based on inventory data. Be specific with brand/model recommendations — choose brands known for reliability in the given terrain and project type. Consider Caterpillar, Komatsu, John Deere, Volvo, Case, Bobcat, Kubota, Liebherr, Hitachi, Doosan, and other major manufacturers.
 
@@ -474,7 +502,7 @@ Provide a thorough, institutional-grade estimate with specific brand and model r
           },
         ],
         stream: true,
-        max_completion_tokens: 8192,
+        max_completion_tokens: 16384,
       });
 
       let fullResponse = "";

@@ -18,7 +18,7 @@ Preferred communication style: Simple, everyday language.
 - **Build Tool**: Vite with React plugin
 - **Directory**: All frontend code lives in `client/src/`
   - Pages in `client/src/pages/`
-  - Reusable components in `client/src/components/`
+  - Reusable components in `client/src/components/` (includes PromoBar for cross-promotional banners, Navbar with 3D hover effects)
   - shadcn/ui primitives in `client/src/components/ui/`
   - Hooks in `client/src/hooks/`
   - Utilities in `client/src/lib/`
@@ -66,7 +66,7 @@ Preferred communication style: Simple, everyday language.
 - `GET /api/power-units` — List power units with optional `category` and `search` filters, pagination
 - `GET /api/power-units/categories/counts` — Get power unit counts by category
 - `GET /api/power-units/:id` — Get single power unit by database ID
-- `POST /api/estimate` — IRON Estimator: AI-powered equipment estimator (streaming SSE response, uses OpenAI gpt-5.2 with real inventory data)
+- `POST /api/estimate` — IRON Estimator: AI-powered equipment estimator (streaming SSE response, uses OpenAI gpt-5.2 with real inventory data, max 16384 tokens). Generates 14-section reports including environmental compliance, safety/PPE, fuel projections, weather risk, ROI analysis, technology recommendations, and project phasing timeline
 - `POST /api/quotes/send-email` — Send quote email with PDF attachment (uses Resend API + PDFKit); accepts { email, itemType, itemId, quoteNumber, quoteDate }
 - `POST /api/shipping/ups-rates` — Live UPS rate shopping (OAuth 2.0 + Rating API); accepts origin/destination addresses + package dimensions, returns available services with pricing
 
@@ -78,7 +78,8 @@ Preferred communication style: Simple, everyday language.
 ### AI Integration
 - **Provider**: Replit AI Integrations (OpenAI-compatible, no API key needed)
 - **Model**: gpt-5.2 for project estimation
-- **Feature**: IRON Estimator at `/services/estimator` — generates comprehensive construction project equipment estimates using real inventory pricing data
+- **Feature**: IRON Estimator at `/services/estimator` — generates comprehensive 14-section construction project equipment estimates with 22 project types, 14 terrain types, styled output rendering with animated tables, progress phases, section icons, and cost summary cards
+- **Estimator Output**: Enhanced markdown rendering with alternating row tables, fade-in animations, generation progress indicator (5 phases), section-specific icons, and visual cost summary cards
 - **Integration files**: `server/replit_integrations/` (chat, audio, image, batch modules)
 
 ### Static Assets

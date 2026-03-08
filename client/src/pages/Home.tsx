@@ -25,6 +25,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { useFlashReveal } from "@/hooks/useFlashReveal";
+import { PromoBar } from "@/components/PromoBar";
 
 const categories = [
   "Wheel Loaders", "Excavators", "Bulldozers", "Telehandlers",
@@ -533,6 +534,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <PromoBar variants={["estimator", "parts", "power-units"]} />
 
       <section className="py-20 bg-card relative overflow-hidden" ref={ctaRef}>
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-accent/30 to-transparent" />

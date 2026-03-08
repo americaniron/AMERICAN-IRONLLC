@@ -32,9 +32,22 @@ import {
   Mail,
   Phone,
   Building2,
+  Truck,
+  Wrench,
+  Users,
+  DollarSign,
+  Fuel,
+  Leaf,
+  CloudRain,
+  Wifi,
+  Calendar,
+  AlertTriangle,
+  CheckCircle2,
+  type LucideIcon,
 } from "lucide-react";
 import { useFlashReveal } from "@/hooks/useFlashReveal";
 import { useToast } from "@/hooks/use-toast";
+import { PromoBar } from "@/components/PromoBar";
 
 const ESTIMATOR_VIDEOS = [
   "/images/estimator-bg-1.mp4",
@@ -57,6 +70,12 @@ const PROJECT_TYPES = [
   "Solar Farm / Wind Farm",
   "Landfill / Environmental",
   "Industrial Facility",
+  "Tunnel Construction",
+  "Waterway / Canal",
+  "Stadium / Arena",
+  "Data Center",
+  "EV Charging Infrastructure",
+  "Warehouse / Distribution Center",
   "Other",
 ];
 
@@ -70,6 +89,10 @@ const TERRAIN_TYPES = [
   "Forest / Wooded",
   "Urban / Developed",
   "Coastal / Marine",
+  "Permafrost / Frozen",
+  "Volcanic",
+  "Flood Plain",
+  "Reclaimed Land",
   "Mixed Terrain",
 ];
 
@@ -181,6 +204,65 @@ function FieldCompletionRing({ filled, total }: { filled: number; total: number 
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
         <span className="text-xs font-bold text-accent">{filled}/{total}</span>
+      </div>
+    </div>
+  );
+}
+
+const GENERATION_PHASES = [
+  { label: "Analyzing project parameters", icon: Target, duration: 3000 },
+  { label: "Cross-referencing equipment inventory", icon: Database, duration: 4000 },
+  { label: "Computing cost projections", icon: Calculator, duration: 4000 },
+  { label: "Evaluating logistics & transportation", icon: Truck, duration: 3000 },
+  { label: "Generating detailed report", icon: FileText, duration: 3000 },
+];
+
+function GenerationProgress() {
+  const [phase, setPhase] = useState(0);
+
+  useEffect(() => {
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    let elapsed = 0;
+    GENERATION_PHASES.forEach((p, idx) => {
+      if (idx === 0) return;
+      elapsed += GENERATION_PHASES[idx - 1].duration;
+      timers.push(setTimeout(() => setPhase(idx), elapsed));
+    });
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
+  const currentPhase = GENERATION_PHASES[phase];
+  const PhaseIcon = currentPhase.icon;
+
+  return (
+    <div className="flex flex-col items-center gap-6 py-16" data-testid="generation-progress">
+      <div className="relative w-20 h-20">
+        <svg className="w-20 h-20 iron-ring" viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="35" fill="none" stroke="hsl(var(--accent) / 0.15)" strokeWidth="2" />
+          <circle cx="40" cy="40" r="35" fill="none" stroke="hsl(var(--accent))" strokeWidth="2.5" strokeDasharray="25 15" />
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <PhaseIcon className="w-7 h-7 text-accent animate-pulse" />
+        </div>
+      </div>
+      <div className="text-center space-y-2">
+        <p className="font-black text-foreground text-base">{currentPhase.label}</p>
+        <p className="text-sm text-muted-foreground">This may take a moment...</p>
+      </div>
+      <div className="flex items-center gap-2 w-64">
+        {GENERATION_PHASES.map((phaseItem, idx) => {
+          const PhaseItemIcon = phaseItem.icon;
+          return (
+          <div key={idx} className="flex-1 flex flex-col items-center gap-1.5">
+            <div className={`w-full h-1.5 rounded-full transition-all duration-700 ${
+              idx <= phase ? "bg-accent" : "bg-muted"
+            }`} />
+            <PhaseItemIcon className={`w-3 h-3 transition-colors duration-500 ${
+              idx <= phase ? "text-accent" : "text-muted-foreground/40"
+            }`} />
+          </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -314,70 +396,274 @@ export default function ProjectEstimator() {
     setShowResult(false);
   };
 
+  const getSectionIcon = (title: string): LucideIcon => {
+    const lower = title.toLowerCase();
+    if (lower.includes("equipment") && (lower.includes("primary") || lower.includes("fleet"))) return HardHat;
+    if (lower.includes("support") || lower.includes("auxiliary")) return Wrench;
+    if (lower.includes("transport") || lower.includes("logistics") || lower.includes("mobilization")) return Truck;
+    if (lower.includes("maintenance") || lower.includes("parts") || lower.includes("replacement")) return Wrench;
+    if (lower.includes("personnel") || lower.includes("labor") || lower.includes("crew") || lower.includes("staff")) return Users;
+    if (lower.includes("cost") || lower.includes("budget") || lower.includes("pricing") || lower.includes("financial") || lower.includes("summary")) return DollarSign;
+    if (lower.includes("fuel") || lower.includes("energy")) return Fuel;
+    if (lower.includes("environment") || lower.includes("compliance") || lower.includes("permit")) return Leaf;
+    if (lower.includes("safety") || lower.includes("ppe")) return Shield;
+    if (lower.includes("weather") || lower.includes("seasonal") || lower.includes("climate")) return CloudRain;
+    if (lower.includes("technology") || lower.includes("automation") || lower.includes("gps") || lower.includes("telematics")) return Wifi;
+    if (lower.includes("timeline") || lower.includes("phase") || lower.includes("schedule")) return Calendar;
+    if (lower.includes("risk") || lower.includes("contingenc")) return AlertTriangle;
+    if (lower.includes("roi") || lower.includes("rental") || lower.includes("purchase")) return TrendingUp;
+    if (lower.includes("recommendation") || lower.includes("conclusion")) return CheckCircle2;
+    if (lower.includes("overview") || lower.includes("project")) return Target;
+    return BarChart3;
+  };
+
+  const isCostSummarySection = (title: string): boolean => {
+    const lower = title.toLowerCase();
+    return (lower.includes("cost") || lower.includes("budget") || lower.includes("pricing")) && (lower.includes("summary") || lower.includes("total") || lower.includes("breakdown") || lower.includes("overview"));
+  };
+
+  const renderCostSummaryCards = (lines: string[], startIdx: number): { elements: JSX.Element[]; endIdx: number } => {
+    const cards: { label: string; value: string }[] = [];
+    let idx = startIdx;
+    while (idx < lines.length) {
+      const line = lines[idx];
+      if (line.startsWith("# ") || line.startsWith("## ")) break;
+      if (line.startsWith("|") && !line.includes("---")) {
+        const cells = line.split("|").filter(Boolean).map((c) => c.trim());
+        if (cells.length >= 2 && /\$/.test(cells[cells.length - 1])) {
+          cards.push({ label: cells[0], value: cells[cells.length - 1] });
+        }
+      }
+      if (line.startsWith("- ") || line.startsWith("* ")) {
+        const match = line.match(/^[-*]\s+\*?\*?(.+?)\*?\*?\s*[:–-]\s*(.+)/);
+        if (match && /\$/.test(match[2])) {
+          cards.push({ label: match[1].replace(/\*/g, ""), value: match[2].replace(/\*/g, "") });
+        }
+      }
+      idx++;
+    }
+
+    if (cards.length === 0) return { elements: [], endIdx: startIdx };
+
+    const totalCard = cards.find(c => c.label.toLowerCase().includes("total") || c.label.toLowerCase().includes("grand"));
+    const otherCards = cards.filter(c => c !== totalCard);
+
+    const elements: JSX.Element[] = [];
+    elements.push(
+      <div key={`cost-cards-${startIdx}`} className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 my-4">
+          {otherCards.map((card, ci) => (
+            <div
+              key={ci}
+              className="rounded-lg border border-border/50 bg-muted/30 p-4 flex flex-col gap-1"
+              data-testid={`card-cost-item-${ci}`}
+            >
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{card.label}</span>
+              <span className="text-lg font-black text-foreground">{card.value}</span>
+            </div>
+          ))}
+        </div>
+        {totalCard && (
+          <div className="rounded-lg border-2 border-accent/40 bg-accent/5 p-5 flex items-center justify-between gap-4 my-3" data-testid="card-cost-total">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-accent/10 border border-accent/30 flex items-center justify-center">
+                <DollarSign className="w-5 h-5 text-accent" />
+              </div>
+              <span className="text-base font-black uppercase">{totalCard.label}</span>
+            </div>
+            <span className="text-2xl font-black text-accent">{totalCard.value}</span>
+          </div>
+        )}
+      </div>
+    );
+
+    return { elements, endIdx: idx };
+  };
+
   const renderMarkdown = (text: string) => {
     const lines = text.split("\n");
     const elements: JSX.Element[] = [];
+    let sectionIndex = 0;
+    let tableRows: { cells: string[]; isHeader: boolean }[] = [];
+    let tableStartKey = 0;
 
-    lines.forEach((line, i) => {
+    const flushTable = () => {
+      if (tableRows.length === 0) return;
+      const rows = [...tableRows];
+      const key = tableStartKey;
+      const colCount = rows[0]?.cells.length || 1;
+      elements.push(
+        <div key={`table-${key}`} className="my-4 rounded-lg border border-border/50 overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-500" data-testid={`table-section-${key}`}>
+          {rows.map((row, ri) => (
+            <div
+              key={ri}
+              className={`grid gap-0 ${
+                row.isHeader
+                  ? "bg-accent/15 font-semibold text-foreground"
+                  : ri % 2 === 0
+                  ? "bg-muted/20"
+                  : "bg-transparent"
+              } ${!row.isHeader && ri < rows.length - 1 ? "border-b border-border/20" : ""}`}
+              style={{ gridTemplateColumns: `repeat(${colCount}, 1fr)` }}
+            >
+              {row.cells.map((cell, ci) => (
+                <div
+                  key={ci}
+                  className={`px-3 py-2 text-sm ${row.isHeader ? "py-2.5" : ""} ${ci > 0 ? "border-l border-border/20" : ""}`}
+                  dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(cell) }}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+      );
+      tableRows = [];
+    };
+
+    let i = 0;
+    while (i < lines.length) {
+      const line = lines[i];
+
       if (line.startsWith("# ")) {
+        flushTable();
+        sectionIndex++;
+        const title = line.slice(2);
+        const Icon = getSectionIcon(title);
         elements.push(
-          <h1 key={i} className="text-2xl font-bold text-accent mt-6 mb-3">
-            {line.slice(2)}
-          </h1>
+          <div key={i} className="animate-in fade-in slide-in-from-bottom-3 duration-500" style={{ animationDelay: `${sectionIndex * 50}ms` }}>
+            <div className="flex items-center gap-3 mt-8 mb-4">
+              <div className="w-10 h-10 rounded-lg bg-accent/10 border border-accent/30 flex items-center justify-center shrink-0">
+                <Icon className="w-5 h-5 text-accent" />
+              </div>
+              <h1 className="text-2xl font-black text-foreground tracking-tight">{title}</h1>
+            </div>
+            <div className="h-0.5 bg-gradient-to-r from-accent/60 via-accent/20 to-transparent rounded-full mb-3" />
+          </div>
         );
-      } else if (line.startsWith("## ")) {
+        i++;
+        continue;
+      }
+
+      if (line.startsWith("## ")) {
+        flushTable();
+        sectionIndex++;
+        const title = line.slice(3);
+        const Icon = getSectionIcon(title);
+
+        if (isCostSummarySection(title)) {
+          elements.push(
+            <div key={i} className="animate-in fade-in slide-in-from-bottom-3 duration-500" style={{ animationDelay: `${sectionIndex * 50}ms` }}>
+              <div className="flex items-center gap-3 mt-6 mb-3">
+                <div className="w-9 h-9 rounded-lg bg-accent/10 border border-accent/30 flex items-center justify-center shrink-0">
+                  <Icon className="w-4.5 h-4.5 text-accent" />
+                </div>
+                <h2 className="text-xl font-black text-foreground">{title}</h2>
+              </div>
+              <div className="h-px bg-gradient-to-r from-accent/40 via-accent/15 to-transparent mb-2" />
+            </div>
+          );
+          i++;
+          const { elements: costElements, endIdx } = renderCostSummaryCards(lines, i);
+          if (costElements.length > 0) {
+            elements.push(...costElements);
+            i = endIdx;
+          }
+          continue;
+        }
+
         elements.push(
-          <h2 key={i} className="text-xl font-bold mt-5 mb-2 text-foreground border-b border-accent/30 pb-1">
-            {line.slice(3)}
-          </h2>
+          <div key={i} className="animate-in fade-in slide-in-from-bottom-3 duration-500" style={{ animationDelay: `${sectionIndex * 50}ms` }}>
+            <div className="flex items-center gap-3 mt-6 mb-3">
+              <div className="w-9 h-9 rounded-lg bg-accent/10 border border-accent/30 flex items-center justify-center shrink-0">
+                <Icon className="w-4.5 h-4.5 text-accent" />
+              </div>
+              <h2 className="text-xl font-black text-foreground">{title}</h2>
+            </div>
+            <div className="h-px bg-gradient-to-r from-accent/40 via-accent/15 to-transparent mb-2" />
+          </div>
         );
-      } else if (line.startsWith("### ")) {
+        i++;
+        continue;
+      }
+
+      if (line.startsWith("### ")) {
+        flushTable();
         elements.push(
-          <h3 key={i} className="text-lg font-semibold mt-4 mb-1 text-accent">
+          <h3 key={i} className="text-lg font-semibold mt-4 mb-1 text-accent animate-in fade-in duration-300">
             {line.slice(4)}
           </h3>
         );
-      } else if (line.startsWith("---")) {
-        elements.push(<hr key={i} className="border-border my-4" />);
-      } else if (line.startsWith("- ") || line.startsWith("* ")) {
+        i++;
+        continue;
+      }
+
+      if (line.startsWith("---")) {
+        flushTable();
+        elements.push(
+          <div key={i} className="my-6 flex items-center gap-3">
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
+            <Sparkles className="w-3.5 h-3.5 text-accent/40" />
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
+          </div>
+        );
+        i++;
+        continue;
+      }
+
+      if (line.startsWith("- ") || line.startsWith("* ")) {
+        flushTable();
         const content = line.slice(2);
         elements.push(
-          <div key={i} className="flex gap-2 ml-4 my-0.5">
+          <div key={i} className="flex gap-2 ml-4 my-0.5 animate-in fade-in duration-300">
             <span className="text-accent mt-1.5 shrink-0">•</span>
             <span className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(content) }} />
           </div>
         );
-      } else if (/^\d+\.\s/.test(line)) {
+        i++;
+        continue;
+      }
+
+      if (/^\d+\.\s/.test(line)) {
+        flushTable();
         const match = line.match(/^(\d+)\.\s(.*)$/);
         if (match) {
           elements.push(
-            <div key={i} className="flex gap-2 ml-4 my-0.5">
+            <div key={i} className="flex gap-2 ml-4 my-0.5 animate-in fade-in duration-300">
               <span className="text-accent font-semibold shrink-0">{match[1]}.</span>
               <span className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(match[2]) }} />
             </div>
           );
         }
-      } else if (line.startsWith("|")) {
-        if (!line.includes("---")) {
-          const cells = line.split("|").filter(Boolean).map((c) => c.trim());
-          const isHeader = i + 1 < lines.length && lines[i + 1]?.includes("---");
-          elements.push(
-            <div key={i} className={`grid gap-2 py-1 px-2 ${isHeader ? "font-semibold bg-accent/10 rounded" : "border-b border-border/30"}`} style={{ gridTemplateColumns: `repeat(${cells.length}, 1fr)` }}>
-              {cells.map((cell, j) => (
-                <span key={j} className="text-sm" dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(cell) }} />
-              ))}
-            </div>
-          );
+        i++;
+        continue;
+      }
+
+      if (line.startsWith("|")) {
+        if (line.includes("---")) {
+          i++;
+          continue;
         }
-      } else if (line.trim() === "") {
+        if (tableRows.length === 0) tableStartKey = i;
+        const cells = line.split("|").filter(Boolean).map((c) => c.trim());
+        const isHeader = i + 1 < lines.length && lines[i + 1]?.includes("---");
+        tableRows.push({ cells, isHeader });
+        i++;
+        continue;
+      }
+
+      flushTable();
+
+      if (line.trim() === "") {
         elements.push(<div key={i} className="h-2" />);
       } else {
         elements.push(
-          <p key={i} className="text-muted-foreground leading-relaxed" dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(line) }} />
+          <p key={i} className="text-muted-foreground leading-relaxed animate-in fade-in duration-300" dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(line) }} />
         );
       }
-    });
+      i++;
+    }
 
+    flushTable();
     return elements;
   };
 
@@ -851,6 +1137,13 @@ export default function ProjectEstimator() {
                     "Transportation & logistics costs",
                     "Maintenance & replacement parts budget",
                     "Personnel requirements",
+                    "Environmental & compliance analysis",
+                    "Safety equipment & PPE requirements",
+                    "Fuel & energy consumption projections",
+                    "Weather & seasonal risk assessment",
+                    "Rental vs. purchase ROI analysis",
+                    "Technology & automation recommendations",
+                    "Project phasing & mobilization timeline",
                     "Complete cost summary (low/mid/high)",
                   ].map((item) => (
                     <li key={item} className="flex items-start gap-2">
@@ -918,19 +1211,7 @@ export default function ProjectEstimator() {
 
               <div className="prose prose-sm max-w-none">
                 {isGenerating && !estimateResult && (
-                  <div className="flex flex-col items-center gap-4 py-16 text-muted-foreground">
-                    <div className="relative w-16 h-16">
-                      <svg className="w-16 h-16 iron-ring" viewBox="0 0 64 64">
-                        <circle cx="32" cy="32" r="28" fill="none" stroke="hsl(var(--accent) / 0.2)" strokeWidth="2" />
-                        <circle cx="32" cy="32" r="28" fill="none" stroke="hsl(var(--accent))" strokeWidth="2" strokeDasharray="20 12" />
-                      </svg>
-                      <Cpu className="absolute inset-0 m-auto w-6 h-6 text-accent" />
-                    </div>
-                    <div className="text-center">
-                      <p className="font-semibold text-foreground">Analyzing Project Requirements</p>
-                      <p className="text-sm">Cross-referencing inventory data and generating estimate...</p>
-                    </div>
-                  </div>
+                  <GenerationProgress />
                 )}
 
                 {estimateResult && (
@@ -968,6 +1249,10 @@ export default function ProjectEstimator() {
               )}
             </Card>
           </div>
+
+          {!isGenerating && estimateResult && (
+            <PromoBar variants={["equipment", "parts", "mechanic-hub"]} className="mt-8" />
+          )}
         </section>
       )}
     </div>

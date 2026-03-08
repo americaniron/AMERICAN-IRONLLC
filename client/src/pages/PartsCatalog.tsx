@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ArrowRight, Search, Package, Wrench } from "lucide-react";
 import { useFlashReveal } from "@/hooks/useFlashReveal";
+import { PromoBar } from "@/components/PromoBar";
 
 const VIDEOS = [
   "/images/parts-bg-1.mp4",
@@ -250,6 +251,8 @@ export default function PartsCatalog() {
           </div>
         </div>
       </section>
+
+      <PromoBar variants={["power-units", "equipment", "estimator"]} />
     </div>
   );
 }

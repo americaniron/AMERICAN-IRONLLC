@@ -5,6 +5,7 @@ import { ArrowRight, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useFlashReveal } from "@/hooks/useFlashReveal";
+import { PromoBar } from "@/components/PromoBar";
 
 import marineEnginesImg from "@/assets/images/marine-engines.png";
 import generatorSetsImg from "@/assets/images/generator-sets.png";
@@ -138,6 +139,8 @@ export default function PowerUnits() {
           </div>
         </div>
       </section>
+
+      <PromoBar variants={["equipment", "parts", "estimator"]} />
     </div>
   );
 }

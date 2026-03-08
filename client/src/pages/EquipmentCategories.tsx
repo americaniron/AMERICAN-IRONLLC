@@ -5,6 +5,7 @@ import { ArrowRight, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useFlashReveal } from "@/hooks/useFlashReveal";
+import { PromoBar } from "@/components/PromoBar";
 
 const VIDEOS = [
   "/images/equip-bg-1.mp4",
@@ -162,6 +163,8 @@ export default function EquipmentCategories() {
           </div>
         </div>
       </section>
+
+      <PromoBar variants={["estimator", "parts", "power-units"]} />
     </div>
   );
 }

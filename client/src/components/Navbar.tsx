@@ -99,11 +99,19 @@ export default function Navbar() {
               <div className="relative" ref={servicesRef}>
                 <button
                   onClick={() => setServicesOpen(!servicesOpen)}
-                  className={`px-3 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-1 ${
+                  className={`px-3 py-2 text-sm font-medium rounded-md transition-all duration-300 ease-out flex items-center gap-1 hover:scale-105 hover:-translate-y-0.5 hover:text-accent ${
                     location.startsWith("/services") && location !== "/services/estimator"
                       ? "text-accent"
                       : "text-foreground/70"
                   }`}
+                  onMouseEnter={(e) => {
+                    if (!(location.startsWith("/services") && location !== "/services/estimator")) {
+                      e.currentTarget.style.textShadow = "0 0 8px hsl(var(--accent) / 0.5), 0 0 16px hsl(var(--accent) / 0.25)";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.textShadow = "none";
+                  }}
                   data-testid="button-services-menu"
                 >
                   Services
@@ -307,11 +315,33 @@ function NavLink({ href, active, children }: { href: string; active: boolean; ch
   return (
     <Link href={href}>
       <span
-        className={`px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 cursor-pointer hover:text-accent ${
-          active ? "text-accent" : "text-foreground/70"
+        className={`group relative px-3 py-2 text-sm font-medium rounded-md cursor-pointer inline-block transition-all duration-300 ease-out hover:scale-105 hover:-translate-y-0.5 ${
+          active
+            ? "text-accent"
+            : "text-foreground/70 hover:text-accent"
         }`}
+        style={{
+          perspective: "600px",
+          transformStyle: "preserve-3d",
+        }}
+        onMouseEnter={(e) => {
+          if (!active) {
+            e.currentTarget.style.textShadow = "0 0 8px hsl(var(--accent) / 0.5), 0 0 16px hsl(var(--accent) / 0.25)";
+          }
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.textShadow = "none";
+        }}
       >
         {children}
+        <span
+          className={`absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 rounded-full bg-accent transition-all duration-300 ease-out ${
+            active ? "w-3/4 opacity-100" : "w-0 opacity-0 group-hover:w-3/4 group-hover:opacity-100"
+          }`}
+          style={{
+            boxShadow: active ? "0 0 6px hsl(var(--accent) / 0.4)" : "none",
+          }}
+        />
       </span>
     </Link>
   );
