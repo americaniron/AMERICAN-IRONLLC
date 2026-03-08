@@ -18,6 +18,11 @@ import {
   Cog,
   CircleDot,
   BarChart3,
+  Sparkles,
+  BookOpen,
+  Video,
+  MessageCircle,
+  ExternalLink,
 } from "lucide-react";
 import { useFlashReveal } from "@/hooks/useFlashReveal";
 
@@ -94,6 +99,7 @@ export default function Home() {
   const servicesRef = useFlashReveal();
   const browseRef = useFlashReveal();
   const valueRef = useFlashReveal();
+  const mechanicRef = useFlashReveal();
   const ctaRef = useFlashReveal();
 
   return (
@@ -393,6 +399,89 @@ export default function Home() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20 relative overflow-hidden" ref={mechanicRef}>
+        <div className="absolute inset-0 bg-gradient-to-br from-black via-zinc-900 to-black" />
+        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "url(/images/hero-equipment.png)", backgroundSize: "cover", backgroundPosition: "center", filter: "blur(2px) grayscale(0.5)" }} />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-transparent to-black/70" />
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-accent to-transparent" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="flash-reveal inline-flex items-center gap-2 mb-5">
+                <span className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-accent" />
+                </span>
+                <span className="text-accent text-sm font-bold tracking-widest uppercase">Just Launched</span>
+              </div>
+
+              <h2 className="flash-reveal text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-5 tracking-tight leading-tight" style={{ "--flash-index": 1 } as any}>
+                Introducing the{" "}
+                <span className="text-accent-glow">Mechanic Hub</span>
+              </h2>
+
+              <p className="flash-reveal text-lg text-white/70 mb-8 leading-relaxed max-w-xl" style={{ "--flash-index": 2 } as any}>
+                Your all-in-one platform for heavy equipment maintenance, repair guides, troubleshooting tools, and expert mechanic resources. Built for operators, technicians, and fleet managers who demand the best from their machines.
+              </p>
+
+              <div className="flash-reveal grid grid-cols-2 gap-4 mb-8" style={{ "--flash-index": 3 } as any}>
+                {[
+                  { icon: BookOpen, label: "Repair Manuals & Guides" },
+                  { icon: Video, label: "Training Videos" },
+                  { icon: MessageCircle, label: "Expert Community" },
+                  { icon: Wrench, label: "Diagnostic Tools" },
+                ].map((feat) => (
+                  <div key={feat.label} className="flex items-center gap-3 text-white/80">
+                    <div className="w-9 h-9 rounded-md bg-accent/20 border border-accent/30 flex items-center justify-center shrink-0">
+                      <feat.icon className="w-4 h-4 text-accent" />
+                    </div>
+                    <span className="text-sm font-medium">{feat.label}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flash-reveal" style={{ "--flash-index": 4 } as any}>
+                <a
+                  href="https://heavy-equipment-mechanic.replit.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-testid="button-mechanic-hub-cta"
+                >
+                  <Button size="lg" className="bg-accent text-accent-foreground gap-2 text-base px-8 flash-glow-pulse">
+                    <Sparkles className="w-5 h-5" />
+                    Explore Mechanic Hub
+                    <ExternalLink className="w-4 h-4" />
+                  </Button>
+                </a>
+              </div>
+            </div>
+
+            <div className="flash-reveal-right relative hidden lg:block">
+              <div className="relative rounded-xl overflow-hidden border-2 border-accent/30 shadow-2xl shadow-accent/10">
+                <div className="aspect-[16/10] bg-zinc-900 flex items-center justify-center">
+                  <div className="text-center p-8">
+                    <div className="w-20 h-20 rounded-full bg-accent/20 border-2 border-accent/40 flex items-center justify-center mx-auto mb-4">
+                      <Wrench className="w-10 h-10 text-accent" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2">Heavy Equipment Mechanic</h3>
+                    <p className="text-white/50 text-sm">Maintenance & Repair Platform</p>
+                    <div className="mt-4 flex items-center justify-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                      <span className="text-green-400 text-xs font-medium">Live Now</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="absolute -top-3 -right-3 bg-accent text-accent-foreground px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg flex items-center gap-1.5">
+                <Sparkles className="w-3 h-3" />
+                Free Access
+              </div>
+            </div>
           </div>
         </div>
       </section>

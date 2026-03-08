@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, Phone, Mail, ChevronDown, User, LogIn } from "lucide-react";
+import { Menu, X, Phone, Mail, ChevronDown, User, LogIn, Sparkles } from "lucide-react";
 import { SiFacebook, SiX, SiInstagram, SiLinkedin, SiYoutube, SiWhatsapp } from "react-icons/si";
 import logoImg from "@assets/american_iron_new_logo_1771911523492.png";
 import { Button } from "@/components/ui/button";
@@ -126,6 +126,20 @@ export default function Navbar() {
               </div>
 
               <NavLink href="/services/estimator" active={location === "/services/estimator"}>IRON Estimator</NavLink>
+              <a
+                href="https://heavy-equipment-mechanic.replit.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative px-3 py-2 text-sm font-bold rounded-md transition-all duration-200 cursor-pointer text-accent hover:text-accent flex items-center gap-1.5 group"
+                data-testid="link-mechanic-hub"
+              >
+                <Sparkles className="w-3.5 h-3.5 animate-pulse" />
+                Mechanic Hub
+                <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-accent" />
+                </span>
+              </a>
               <NavLink href="/contact" active={location === "/contact"}>Contact</NavLink>
             </nav>
 
@@ -217,6 +231,18 @@ export default function Navbar() {
                 </MobileLink>
               ))}
               <MobileLink href="/services/estimator" onClick={() => setMobileOpen(false)}>IRON Estimator</MobileLink>
+              <a
+                href="https://heavy-equipment-mechanic.replit.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-bold rounded-md text-accent transition-colors hover:bg-accent/10"
+                onClick={() => setMobileOpen(false)}
+                data-testid="mobile-link-mechanic-hub"
+              >
+                <Sparkles className="w-4 h-4 animate-pulse" />
+                Mechanic Hub
+                <span className="ml-auto text-[10px] font-semibold bg-accent text-accent-foreground px-1.5 py-0.5 rounded-full uppercase tracking-wider">New</span>
+              </a>
               <MobileLink href="/quote" onClick={() => setMobileOpen(false)}>Request Quote</MobileLink>
               <a
                 href="https://wa.me/18132006088"
