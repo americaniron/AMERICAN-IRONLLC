@@ -87,8 +87,7 @@ const PROMO_DATA: Record<PromoVariant, PromoItem> = {
     tagline: "PARTNER PLATFORM",
     description:
       "Repair manuals, training videos, diagnostic tools, and an expert community for heavy equipment technicians worldwide.",
-    href: "https://heavy-equipment-mechanic.replit.app",
-    external: true,
+    href: "/mechanic-hub",
     buttonLabel: "Launch Mechanic Hub",
     stat: "FREE",
     statLabel: "Access Now",

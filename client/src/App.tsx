@@ -25,6 +25,7 @@ import PowerUnitsListings from "@/pages/PowerUnitsListings";
 import QuotePreview from "@/pages/QuotePreview";
 import CustomerPortal from "@/pages/CustomerPortal";
 import OtherEquipmentBrands from "@/pages/OtherEquipmentBrands";
+import MechanicHub from "@/pages/MechanicHub";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -43,6 +44,7 @@ function Router() {
       <Route path="/services/transportation" component={ServiceTransportation} />
       <Route path="/services/shipping" component={ServiceShipping} />
       <Route path="/services/estimator" component={ProjectEstimator} />
+      <Route path="/mechanic-hub" component={MechanicHub} />
       <Route path="/power-units" component={PowerUnits} />
       <Route path="/power-units/listings" component={PowerUnitsListings} />
       <Route path="/quote/item/:type/:id" component={QuotePreview} />

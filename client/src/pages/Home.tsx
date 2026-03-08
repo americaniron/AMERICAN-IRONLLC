@@ -450,38 +450,33 @@ export default function Home() {
               </div>
 
               <div className="flash-reveal" style={{ "--flash-index": 4 } as any}>
-                <a
-                  href="https://heavy-equipment-mechanic.replit.app"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block transition-all duration-300 hover:-translate-y-1 active:translate-y-0"
-                  data-testid="button-mechanic-hub-cta"
-                >
-                  <Button
-                    size="lg"
-                    className="gap-2 text-base px-10 py-6 text-lg font-bold border-0"
-                    style={{
-                      background: "linear-gradient(135deg, hsl(49 100% 58%) 0%, hsl(49 100% 50%) 50%, hsl(40 100% 42%) 100%)",
-                      color: "hsl(0 0% 8%)",
-                      boxShadow: "0 4px 6px rgba(255,205,17,0.35), 0 8px 24px rgba(255,205,17,0.25), 0 16px 48px rgba(255,205,17,0.15), 0 2px 0 rgba(255,255,255,0.35) inset, 0 -2px 0 rgba(0,0,0,0.15) inset",
-                      textShadow: "0 1px 0 rgba(255,255,255,0.4)",
-                    }}
+                <Link href="/mechanic-hub">
+                  <span
+                    className="inline-block transition-all duration-300 hover:-translate-y-1 active:translate-y-0 cursor-pointer"
+                    data-testid="button-mechanic-hub-cta"
                   >
-                    <Sparkles className="w-5 h-5" />
-                    Explore Mechanic Hub
-                    <ExternalLink className="w-4 h-4" />
-                  </Button>
-                </a>
+                    <Button
+                      size="lg"
+                      className="gap-2 text-base px-10 py-6 text-lg font-bold border-0"
+                      style={{
+                        background: "linear-gradient(135deg, hsl(49 100% 58%) 0%, hsl(49 100% 50%) 50%, hsl(40 100% 42%) 100%)",
+                        color: "hsl(0 0% 8%)",
+                        boxShadow: "0 4px 6px rgba(255,205,17,0.35), 0 8px 24px rgba(255,205,17,0.25), 0 16px 48px rgba(255,205,17,0.15), 0 2px 0 rgba(255,255,255,0.35) inset, 0 -2px 0 rgba(0,0,0,0.15) inset",
+                        textShadow: "0 1px 0 rgba(255,255,255,0.4)",
+                      }}
+                    >
+                      <Sparkles className="w-5 h-5" />
+                      Explore Mechanic Hub
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </span>
+                </Link>
               </div>
             </div>
 
             <div className="flash-reveal-right relative hidden lg:block">
-              <a
-                href="https://heavy-equipment-mechanic.replit.app"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block transition-all duration-500 hover:-translate-y-2 hover:rotate-[0.5deg] cursor-pointer group"
-              >
+              <Link href="/mechanic-hub">
+                <span className="block transition-all duration-500 hover:-translate-y-2 hover:rotate-[0.5deg] cursor-pointer group">
                 <div
                   className="relative rounded-2xl overflow-hidden border-2 border-accent/40"
                   style={{
@@ -517,7 +512,7 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
-              </a>
+              </span></Link>
               <div
                 className="absolute -top-3 -right-3 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 z-10"
                 style={{
