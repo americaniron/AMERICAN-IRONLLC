@@ -130,14 +130,22 @@ export default function Navbar() {
                 href="https://heavy-equipment-mechanic.replit.app"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="relative px-3 py-2 text-sm font-bold rounded-md transition-all duration-200 cursor-pointer text-accent hover:text-accent flex items-center gap-1.5 group"
+                className="relative px-3.5 py-1.5 text-sm font-bold rounded-lg cursor-pointer flex items-center gap-1.5 group transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0"
+                style={{
+                  background: "linear-gradient(135deg, hsl(49 100% 54%) 0%, hsl(40 100% 45%) 100%)",
+                  color: "hsl(0 0% 10%)",
+                  boxShadow: "0 2px 4px rgba(255,205,17,0.3), 0 4px 12px rgba(255,205,17,0.2), 0 1px 0 rgba(255,255,255,0.3) inset, 0 -1px 0 rgba(0,0,0,0.15) inset",
+                  textShadow: "0 1px 0 rgba(255,255,255,0.3)",
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 4px 8px rgba(255,205,17,0.4), 0 8px 24px rgba(255,205,17,0.3), 0 0 20px rgba(255,205,17,0.15), 0 1px 0 rgba(255,255,255,0.3) inset, 0 -1px 0 rgba(0,0,0,0.15) inset"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 2px 4px rgba(255,205,17,0.3), 0 4px 12px rgba(255,205,17,0.2), 0 1px 0 rgba(255,255,255,0.3) inset, 0 -1px 0 rgba(0,0,0,0.15) inset"; }}
                 data-testid="link-mechanic-hub"
               >
-                <Sparkles className="w-3.5 h-3.5 animate-pulse" />
+                <Sparkles className="w-3.5 h-3.5" />
                 Mechanic Hub
-                <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-accent" />
+                <span className="absolute -top-1.5 -right-1.5 flex h-3.5 w-3.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-red-500 text-white text-[7px] font-bold items-center justify-center">!</span>
                 </span>
               </a>
               <NavLink href="/contact" active={location === "/contact"}>Contact</NavLink>
@@ -235,13 +243,19 @@ export default function Navbar() {
                 href="https://heavy-equipment-mechanic.replit.app"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-bold rounded-md text-accent transition-colors hover:bg-accent/10"
+                className="flex items-center gap-2.5 mx-3 my-1.5 px-4 py-3 text-sm font-bold rounded-lg transition-all duration-300 active:scale-[0.98]"
+                style={{
+                  background: "linear-gradient(135deg, hsl(49 100% 54%) 0%, hsl(40 100% 45%) 100%)",
+                  color: "hsl(0 0% 10%)",
+                  boxShadow: "0 3px 8px rgba(255,205,17,0.3), 0 6px 20px rgba(255,205,17,0.15), 0 1px 0 rgba(255,255,255,0.3) inset, 0 -2px 0 rgba(0,0,0,0.1) inset",
+                  textShadow: "0 1px 0 rgba(255,255,255,0.3)",
+                }}
                 onClick={() => setMobileOpen(false)}
                 data-testid="mobile-link-mechanic-hub"
               >
-                <Sparkles className="w-4 h-4 animate-pulse" />
+                <Sparkles className="w-4 h-4" />
                 Mechanic Hub
-                <span className="ml-auto text-[10px] font-semibold bg-accent text-accent-foreground px-1.5 py-0.5 rounded-full uppercase tracking-wider">New</span>
+                <span className="ml-auto text-[10px] font-bold bg-red-500 text-white px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm">New</span>
               </a>
               <MobileLink href="/quote" onClick={() => setMobileOpen(false)}>Request Quote</MobileLink>
               <a

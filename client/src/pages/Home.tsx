@@ -437,10 +437,13 @@ export default function Home() {
                   { icon: Wrench, label: "Diagnostic Tools" },
                 ].map((feat) => (
                   <div key={feat.label} className="flex items-center gap-3 text-white/80">
-                    <div className="w-9 h-9 rounded-md bg-accent/20 border border-accent/30 flex items-center justify-center shrink-0">
-                      <feat.icon className="w-4 h-4 text-accent" />
+                    <div
+                      className="w-10 h-10 rounded-lg bg-accent/15 border border-accent/30 flex items-center justify-center shrink-0"
+                      style={{ boxShadow: "0 3px 8px rgba(255,205,17,0.15), 0 1px 0 rgba(255,255,255,0.1) inset" }}
+                    >
+                      <feat.icon className="w-4.5 h-4.5 text-accent" style={{ filter: "drop-shadow(0 1px 3px rgba(255,205,17,0.4))" }} />
                     </div>
-                    <span className="text-sm font-medium">{feat.label}</span>
+                    <span className="text-sm font-semibold">{feat.label}</span>
                   </div>
                 ))}
               </div>
@@ -450,9 +453,19 @@ export default function Home() {
                   href="https://heavy-equipment-mechanic.replit.app"
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="inline-block transition-all duration-300 hover:-translate-y-1 active:translate-y-0"
                   data-testid="button-mechanic-hub-cta"
                 >
-                  <Button size="lg" className="bg-accent text-accent-foreground gap-2 text-base px-8 flash-glow-pulse">
+                  <Button
+                    size="lg"
+                    className="gap-2 text-base px-10 py-6 text-lg font-bold border-0"
+                    style={{
+                      background: "linear-gradient(135deg, hsl(49 100% 58%) 0%, hsl(49 100% 50%) 50%, hsl(40 100% 42%) 100%)",
+                      color: "hsl(0 0% 8%)",
+                      boxShadow: "0 4px 6px rgba(255,205,17,0.35), 0 8px 24px rgba(255,205,17,0.25), 0 16px 48px rgba(255,205,17,0.15), 0 2px 0 rgba(255,255,255,0.35) inset, 0 -2px 0 rgba(0,0,0,0.15) inset",
+                      textShadow: "0 1px 0 rgba(255,255,255,0.4)",
+                    }}
+                  >
                     <Sparkles className="w-5 h-5" />
                     Explore Mechanic Hub
                     <ExternalLink className="w-4 h-4" />
@@ -462,23 +475,58 @@ export default function Home() {
             </div>
 
             <div className="flash-reveal-right relative hidden lg:block">
-              <div className="relative rounded-xl overflow-hidden border-2 border-accent/30 shadow-2xl shadow-accent/10">
-                <div className="aspect-[16/10] bg-zinc-900 flex items-center justify-center">
-                  <div className="text-center p-8">
-                    <div className="w-20 h-20 rounded-full bg-accent/20 border-2 border-accent/40 flex items-center justify-center mx-auto mb-4">
-                      <Wrench className="w-10 h-10 text-accent" />
-                    </div>
-                    <h3 className="text-xl font-bold text-white mb-2">Heavy Equipment Mechanic</h3>
-                    <p className="text-white/50 text-sm">Maintenance & Repair Platform</p>
-                    <div className="mt-4 flex items-center justify-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                      <span className="text-green-400 text-xs font-medium">Live Now</span>
+              <a
+                href="https://heavy-equipment-mechanic.replit.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block transition-all duration-500 hover:-translate-y-2 hover:rotate-[0.5deg] cursor-pointer group"
+              >
+                <div
+                  className="relative rounded-2xl overflow-hidden border-2 border-accent/40"
+                  style={{
+                    boxShadow: "0 8px 16px rgba(255,205,17,0.2), 0 16px 48px rgba(255,205,17,0.15), 0 24px 64px rgba(0,0,0,0.4), 0 2px 0 rgba(255,255,255,0.1) inset",
+                    transform: "perspective(800px) rotateY(-2deg) rotateX(1deg)",
+                  }}
+                >
+                  <div className="aspect-[16/10] bg-gradient-to-br from-zinc-800 via-zinc-900 to-black flex items-center justify-center relative overflow-hidden">
+                    <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,205,17,0.1) 10px, rgba(255,205,17,0.1) 11px)" }} />
+                    <div className="text-center p-8 relative z-10">
+                      <div
+                        className="w-24 h-24 rounded-2xl bg-accent/15 border-2 border-accent/40 flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform duration-500"
+                        style={{ boxShadow: "0 8px 24px rgba(255,205,17,0.2), 0 0 40px rgba(255,205,17,0.1)" }}
+                      >
+                        <Wrench className="w-12 h-12 text-accent" style={{ filter: "drop-shadow(0 2px 8px rgba(255,205,17,0.5))" }} />
+                      </div>
+                      <h3 className="text-2xl font-bold text-white mb-2" style={{ textShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>Heavy Equipment Mechanic</h3>
+                      <p className="text-white/50 text-sm mb-4">Maintenance & Repair Platform</p>
+                      <div className="flex items-center justify-center gap-2 mb-4">
+                        <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
+                        <span className="text-green-400 text-xs font-semibold tracking-wide">Live Now</span>
+                      </div>
+                      <div
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0"
+                        style={{
+                          background: "linear-gradient(135deg, hsl(49 100% 54%) 0%, hsl(40 100% 45%) 100%)",
+                          color: "hsl(0 0% 10%)",
+                          boxShadow: "0 2px 8px rgba(255,205,17,0.4)",
+                        }}
+                      >
+                        Launch App <ExternalLink className="w-3 h-3" />
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div className="absolute -top-3 -right-3 bg-accent text-accent-foreground px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg flex items-center gap-1.5">
-                <Sparkles className="w-3 h-3" />
+              </a>
+              <div
+                className="absolute -top-3 -right-3 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 z-10"
+                style={{
+                  background: "linear-gradient(135deg, hsl(49 100% 58%) 0%, hsl(40 100% 42%) 100%)",
+                  color: "hsl(0 0% 8%)",
+                  boxShadow: "0 4px 12px rgba(255,205,17,0.4), 0 2px 4px rgba(0,0,0,0.2), 0 1px 0 rgba(255,255,255,0.3) inset",
+                  textShadow: "0 1px 0 rgba(255,255,255,0.3)",
+                }}
+              >
+                <Sparkles className="w-3.5 h-3.5" />
                 Free Access
               </div>
             </div>
