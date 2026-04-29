@@ -1,0 +1,15 @@
+node_modules
+npm-debug.log
+.git
+.gitignore
+.env
+.env.*
+.dev.vars*
+.DS_Store
+.wrangler
+attached_assets
+*.tar.gz
+dist
+.vscode
+.idea
+README.md

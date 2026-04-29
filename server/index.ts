@@ -3,7 +3,7 @@ import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
 import path from "path";
-import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
+import { setupAuth, registerAuthRoutes } from "./auth";
 
 process.on("uncaughtException", (err) => {
   console.error("[CRASH] Uncaught Exception:", err);
@@ -19,6 +19,7 @@ const httpServer = createServer(app);
 
 const staticImagesDir = path.resolve(process.cwd(), "static-assets/images");
 app.use("/images", express.static(staticImagesDir, { maxAge: "7d" }));
+app.get("/healthz", (_req, res) => res.status(200).json({ ok: true }));
 
 declare module "http" {
   interface IncomingMessage {
@@ -117,7 +118,6 @@ app.use((req, res, next) => {
     {
       port,
       host: "0.0.0.0",
-      reusePort: true,
     },
     () => {
       log(`serving on port ${port}`);

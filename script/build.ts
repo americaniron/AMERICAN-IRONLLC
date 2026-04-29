@@ -23,7 +23,7 @@ const allowlist = [
   "openai",
   "passport",
   "passport-local",
-  "pg",
+  "@neondatabase/serverless",
   "stripe",
   "uuid",
   "ws",
