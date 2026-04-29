@@ -77,9 +77,9 @@ app.use((req, res, next) => {
 
 (async () => {
   const { seedDatabase } = await import("./seed");
-  // Seed database in all environments to ensure production parity
-  console.log("Checking database seed status...");
-  await seedDatabase();
+  // Seed database in background to avoid blocking Cloud Run startup
+  console.log("Checking database seed status in background...");
+  seedDatabase().catch(err => console.error("Background seeding failed:", err));
 
   await setupAuth(app);
   registerAuthRoutes(app);
