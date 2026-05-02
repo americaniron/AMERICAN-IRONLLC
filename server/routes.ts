@@ -480,7 +480,7 @@ End with a note that actual pricing may vary and encourage the visitor to reques
       res.setHeader("Connection", "keep-alive");
 
       const stream = await openai.chat.completions.create({
-        model: "gpt-5.2",
+        model: "gpt-4o",
         messages: [
           { role: "system", content: systemPrompt },
           {

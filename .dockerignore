@@ -7,7 +7,7 @@ npm-debug.log
 .dev.vars*
 .DS_Store
 .wrangler
-attached_assets
+# attached_assets removed to allow Vite build to access them
 *.tar.gz
 dist
 .vscode
